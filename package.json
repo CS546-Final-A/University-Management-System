@@ -2,10 +2,10 @@
   "name": "university-management-system",
   "version": "1.0.0",
   "description": "The final project for CS 546",
-  "main": "src/index.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
