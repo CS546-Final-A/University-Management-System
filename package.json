@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/CS546-Final-A/University-Management-System/issues"
   },
-  "homepage": "https://github.com/CS546-Final-A/University-Management-System#readme"
+  "homepage": "https://github.com/CS546-Final-A/University-Management-System#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
