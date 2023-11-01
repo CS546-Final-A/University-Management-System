@@ -1,8 +1,11 @@
 import express from "express";
+import session from "express-session";
 import lusca from "lusca";
 import ejs from "ejs";
 
 const app = express();
+
+app.use(session({ secret: "I need to be moved to .env", resave: false, saveUninitialized: false }));
 
 app.use(
 	lusca({
