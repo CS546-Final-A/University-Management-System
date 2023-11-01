@@ -27,3 +27,7 @@ app.set("view engine", ejs);
 app.listen(8080, () => {
 	console.log("Running web server on port 8080");
 });
+
+app.get("/", (req, res) => {
+	res.render("index.ejs", { name: "Developer" });
+});
