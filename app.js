@@ -1,7 +1,7 @@
 import express from "express";
 import session from "express-session";
 import lusca from "lusca";
-import ejs from "ejs";
+import { engine } from "express-handlebars";
 
 const app = express();
 
@@ -22,12 +22,14 @@ app.use(
 	})
 );
 
-app.set("view engine", ejs);
+app.engine("handlebars", engine());
+app.set("view engine", "handlebars");
+app.set("views", "./views");
 
 app.listen(8080, () => {
 	console.log("Running web server on port 8080");
 });
 
 app.get("/", (req, res) => {
-	res.render("index.ejs", { name: "Developer" });
+	res.render("index", { name: "Developer" });
 });
