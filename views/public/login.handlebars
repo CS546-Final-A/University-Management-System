@@ -1,5 +1,8 @@
-You are logging in
-
 <form>
-    <input type="hidden" value="{{_csrf}}">
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username"> </input><br>
+    <label for="passwrod">Password:</label><br>
+    <input type="password" id="password" name="password"></input></form><br>
+    <input type="hidden" id="csrf" value="{{_csrf}}">
+    <input type="submit" id="submit" value="Login"></input>
 </form>
