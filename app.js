@@ -7,6 +7,8 @@ import loginroutes from "./routes/login.js";
 
 const app = express();
 
+app.use(express.json());
+
 app.use(
   session({
     secret: "I need to be moved to .env",
@@ -41,5 +43,7 @@ app.listen(8080, () => {
 app.get("/", (req, res) => {
   res.render("public/index", { name: "Developer" });
 });
+
+app.use("/scripts", express.static("./static/scripts"));
 
 app.use("/login", loginroutes);
