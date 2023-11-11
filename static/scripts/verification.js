@@ -1,14 +1,23 @@
 const verify = {
-  username: (username) => {
-    // Will change username to email later. Verification rules will be updated accordingly
-    if (typeof username != "string") {
-      throw "Username is not a string";
+  email: (email) => {
+    // Email checking function as I had it written for labs, can be made better
+    function surroundingcheck(str, part) {
+      str = str.split(part);
+      for (let section of str) {
+        if (section.length === 0) {
+          throw "Invalid email";
+        }
+      }
     }
-    username = username.trim();
-    if (username.length < 1) {
-      throw "Username is empty";
+
+    if (!/^([a-z]|\d|\.|\_|\-)+@([a-z]|\d|\-)+\.([a-z]|\d|\-)+$/.test(email)) {
+      throw "Invalid email";
     }
-    return username.toLowerCase();
+    const left = email.split("@")[0];
+
+    surroundingcheck(left, ".");
+    surroundingcheck(left, "_");
+    surroundingcheck(left, "-");
   },
   password: (password) => {
     // Password rules will be discussed together and updated accordingly

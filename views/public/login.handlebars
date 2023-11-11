@@ -1,8 +1,8 @@
 <form>
-    <label for="username">Username:</label><br>
-    <input type="text" id="username" name="username"> </input><br>
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required> </input><br>
     <label for="passwrod">Password:</label><br>
-    <input type="password" id="password" name="password"></input></form><br>
+    <input type="password" id="password" name="password" required></input></form><br>
     <input type="hidden" id="csrf" value="{{_csrf}}">
     <input type="submit" id="submit" value="Login"></input>
 </form>

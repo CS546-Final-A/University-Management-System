@@ -8,10 +8,10 @@ async function login() {
   const csrf = document.getElementById("csrf").value;
 
   try {
-    const username = verify.username(document.getElementById("username").value);
+    const email = verify.email(document.getElementById("email").value);
     const password = verify.password(document.getElementById("password").value);
     const result = await request("POST", "/login", csrf, {
-      username: username,
+      email: email,
       password: password,
     });
     console.log(result);
