@@ -1,16 +1,8 @@
-import {dbConnection} from './mongoConnection.js';
+import { dbConnection } from "./mongoConnection.js";
 
-const getCollectionFn = (collection) => {
-  let _col = undefined;
+const getCollectionFn = async (collection) => {
+  const db = await dbConnection();
+  _col = await db.collection(collection);
 
-  return async () => {
-    if (!_col) {
-      const db = await dbConnection();
-      _col = await db.collection(collection);
-    }
-
-    return _col;
-  };
+  return _col;
 };
-
-/* Now, you can list your collections here: */
