@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import session from "express-session";
 import lusca from "lusca";
@@ -7,11 +8,12 @@ import loginroutes from "./routes/login.js";
 
 const app = express();
 
+
 app.use(express.json());
 
 app.use(
   session({
-    secret: "I need to be moved to .env",
+    secret: process.env.CookieSecret,
     resave: false,
     saveUninitialized: false,
   })
