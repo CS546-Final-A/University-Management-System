@@ -22,6 +22,8 @@ const verify = {
     surroundingcheck(left, ".");
     surroundingcheck(left, "_");
     surroundingcheck(left, "-");
+
+    return email;
   },
   password: (password) => {
     // Password rules will be discussed together and updated accordingly
