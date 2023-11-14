@@ -1,10 +1,10 @@
+import "dotenv/config";
 import express from "express";
 import session from "express-session";
 import lusca from "lusca";
 import { engine } from "express-handlebars";
 
 const app = express();
-
 app.use(
   session({
     secret: "I need to be moved to .env",
