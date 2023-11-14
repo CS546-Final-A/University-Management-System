@@ -10,6 +10,11 @@ const verify = {
       }
     }
 
+    if (typeof email != "string") {
+      throw "Email is not a string";
+    }
+    email = email.trim().toLowerCase();
+
     if (!/^([a-z]|\d|\.|\_|\-)+@([a-z]|\d|\-)+\.([a-z]|\d|\-)+$/.test(email)) {
       throw "Invalid email";
     }
