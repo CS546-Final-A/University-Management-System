@@ -7,9 +7,19 @@ async function login() {
 
   const csrf = document.getElementById("csrf").value;
 
+  let email;
+  let password;
+
   try {
-    const email = verify.email(document.getElementById("email").value);
-    const password = verify.password(document.getElementById("password").value);
+    email = verify.email(document.getElementById("email").value);
+    password = verify.password(document.getElementById("password").value);
+  } catch (e) {
+    alert(e);
+    sending = false;
+    return;
+  }
+
+  try {
     const result = await request("POST", "/login", csrf, {
       email: email,
       password: password,
