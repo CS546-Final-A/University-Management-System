@@ -7,7 +7,7 @@ import { engine } from "express-handlebars";
 const app = express();
 app.use(
   session({
-    secret: "I need to be moved to .env",
+    secret: process.env.CookieSecret,
     resave: false,
     saveUninitialized: false,
   })

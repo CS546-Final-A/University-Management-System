@@ -12,4 +12,5 @@ npm start
 
 ```
 mongoServerUrl="URL pointing to your mongodb instance"
+CookieSecret="A random string that helps keep session cookies secure"
 ```
