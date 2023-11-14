@@ -4,7 +4,13 @@ import session from "express-session";
 import lusca from "lusca";
 import { engine } from "express-handlebars";
 
+import loginroutes from "./routes/login.js";
+
 const app = express();
+
+
+app.use(express.json());
+
 app.use(
   session({
     secret: process.env.CookieSecret,
@@ -37,5 +43,9 @@ app.listen(8080, () => {
 });
 
 app.get("/", (req, res) => {
-  res.render("index", { name: "Developer" });
+  res.render("public/index", { name: "Developer" });
 });
+
+app.use("/scripts", express.static("./static/scripts"));
+
+app.use("/login", loginroutes);
