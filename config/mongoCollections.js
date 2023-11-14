@@ -7,7 +7,5 @@ const getCollectionFn = async (collection) => {
   return _col;
 };
 
-
 /* Now, you can list your collections here: */
 export const users = getCollectionFn("users");
-
