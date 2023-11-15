@@ -32,4 +32,16 @@ async function login() {
     sending = false;
   }
 }
+
+function enterLogin(event) {
+  if (
+    event.key === "Enter" &&
+    document.getElementById("email").value.length > 0 &&
+    document.getElementById("password").value.length > 0
+  ) {
+    login();
+  }
+}
 document.getElementById("submit").addEventListener("click", login);
+document.getElementById("email").addEventListener("keyup", enterLogin);
+document.getElementById("password").addEventListener("keyup", enterLogin);
