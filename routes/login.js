@@ -6,7 +6,7 @@ import verify from "../data_validation.js";
 const router = Router();
 
 router.get("/", (req, res) => {
-  res.render("public/login");
+  res.render("public/login", { style: "login" });
 });
 
 router.post("/", async (req, res) => {
@@ -18,7 +18,7 @@ router.post("/", async (req, res) => {
 
     if (result.successful) {
       req.session.userid = result.id;
-      req.session.type = result.usertype;
+      req.session.type = result.type;
     }
 
     res.json({ loggedin: result.successful });
