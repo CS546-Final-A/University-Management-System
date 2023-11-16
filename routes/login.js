@@ -18,7 +18,7 @@ router.post("/", async (req, res) => {
 
     if (result.successful) {
       req.session.userid = result.id;
-      req.session.type = result.usertype;
+      req.session.type = result.type;
     }
 
     res.json({ loggedin: result.successful });
