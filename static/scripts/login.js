@@ -25,7 +25,7 @@ async function login() {
       password: password,
     });
     if (result.loggedin) {
-      // Redirect to dashboard
+      window.location.pathname = "/dashboard";
     } else {
       throw "Incorrect email or password";
     }

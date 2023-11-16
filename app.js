@@ -4,7 +4,7 @@ import session from "express-session";
 import lusca from "lusca";
 import { engine } from "express-handlebars";
 
-import loginroutes from "./routes/login.js";
+import route from "./routes/index.js";
 
 const app = express();
 
@@ -41,11 +41,12 @@ app.listen(8080, () => {
   console.log("Running web server on port 8080");
 });
 
+route(app);
+
 app.get("/", (req, res) => {
-  res.render("public/index", { name: "Developer" });
+  if (req.session.userid) {
+    res.redirect("/dashboard");
+  } else {
+    res.redirect("/login");
+  }
 });
-
-app.use("/scripts", express.static("./static/scripts"));
-app.use("/styles", express.static("./static/styles"));
-
-app.use("/login", loginroutes);
