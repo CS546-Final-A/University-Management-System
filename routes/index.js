@@ -1,6 +1,7 @@
 import express from "express";
 
 import login from "./login.js";
+import logout from "./logout.js";
 import dashboard from "./dashboard.js";
 
 function route(app) {
@@ -8,6 +9,7 @@ function route(app) {
   app.use("/styles", express.static("./static/styles"));
 
   app.use("/login", login);
+  app.use("/logout", logout);
   app.use("/dashboard", dashboard);
 }
 
