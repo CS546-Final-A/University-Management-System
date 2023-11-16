@@ -26,7 +26,10 @@ async function request(method, target, csrf, data) {
       },
       body: JSON.stringify(data),
     });
-    const result = await response.text();
+    let result = await response.text();
+    if (result.length > 0) {
+      result = JSON.parse(result);
+    }
     return result;
   } catch (e) {
     throw e;
