@@ -14,7 +14,7 @@ async function login() {
     email = verify.email(document.getElementById("email").value);
     password = verify.password(document.getElementById("password").value);
   } catch (e) {
-    alert(e);
+    setError(e);
     sending = false;
     return;
   }
@@ -24,10 +24,13 @@ async function login() {
       email: email,
       password: password,
     });
-    console.log(result);
+    if (result.loggedin) {
+      // Redirect to dashboard
+    } else {
+      throw "Incorrect email or password";
+    }
   } catch (e) {
-    alert("Login error");
-    console.log(e);
+    setError(e);
   } finally {
     sending = false;
   }
@@ -42,6 +45,16 @@ function enterLogin(event) {
     login();
   }
 }
+
+function setError(error) {
+  // Reset the fadout animation and overwrite text
+  const errdiv = document.getElementById("error");
+  errdiv.innerText = error;
+  errdiv.style.animationName = "";
+  errdiv.offsetHeight;
+  errdiv.style.animationName = "fadeout";
+}
+
 document.getElementById("submit").addEventListener("click", login);
 document.getElementById("email").addEventListener("keyup", enterLogin);
 document.getElementById("password").addEventListener("keyup", enterLogin);

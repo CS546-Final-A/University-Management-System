@@ -46,5 +46,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/scripts", express.static("./static/scripts"));
+app.use("/styles", express.static("./static/styles"));
 
 app.use("/login", loginroutes);
