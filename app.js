@@ -42,11 +42,3 @@ app.listen(8080, () => {
 });
 
 route(app);
-
-app.get("/", (req, res) => {
-  if (req.session.userid) {
-    res.redirect("/dashboard");
-  } else {
-    res.redirect("/login");
-  }
-});
