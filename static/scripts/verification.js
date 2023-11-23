@@ -40,4 +40,42 @@ const verify = {
     }
     return password;
   },
+  name: (name) => {
+    if (typeof name !== "string") {
+      throw "Name is not a string";
+    }
+    name = name.trim().toLowerCase();
+    if (name.length < 3 || name.length > 20) {
+      throw "Name must be between 3 and 20 charachters long";
+    }
+    namearr = name.split("");
+    for (let char of namearr) {
+      if (!/([a-z]|-|\ |\')/.test(char)) {
+        throw "Invalid charachter in name";
+      }
+    }
+    return name[0].toUpperCase() + name.slice(1);
+  },
+  ssn: (ssn) => {
+    if (typeof ssn !== "string") {
+      throw "Social Security Number is not a string";
+    }
+    ssn = ssn.trim();
+    if (!/^\d{3}-\d{2}-\d{4}$/.test(ssn)) {
+      throw "Invalid Social Security Number";
+    }
+    return ssn;
+  },
+  accountype: (type) => {
+    if (typeof type !== "string") {
+      throw "Invalid account type";
+    }
+    type = type.trim();
+
+    const types = ["Admin", "Professor", "Student"];
+    if (!types.includes(type)) {
+      throw "Invalid account type";
+    }
+    return type;
+  },
 };

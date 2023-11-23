@@ -26,6 +26,29 @@ function lengthlimit() {
   }
 }
 
+function submitform() {
+  let sending = false;
+  return async function () {
+    if (sending) {
+      return;
+    }
+    sending = true;
+    const firstname = verify.name(document.getElementById("firstname").value);
+    const lastname = verify.name(document.getElementById("lastname").value);
+    const email = verify.email(document.getElementById("email").value);
+    const ssn = verify.ssn(document.getElementById("identification").value);
+    const type = verify.accountype(document.getElementById("type").value);
+
+    const data = {
+      firstname: firstname,
+      lastname: lastname,
+      email: email,
+      identification: { type: "ssn", number: ssn },
+      accountype: type,
+    };
+  };
+}
+
 document
   .getElementById("identification")
   .addEventListener("focusout", formatssn);
