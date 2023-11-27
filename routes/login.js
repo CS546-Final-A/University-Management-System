@@ -33,7 +33,7 @@ router.post("/", async (req, res) => {
       res.json({ error: e });
     } else {
       res.status(500);
-      res.json("Login error");
+      res.json({ error: "Login error" });
     }
   }
 });

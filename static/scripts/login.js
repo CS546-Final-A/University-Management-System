@@ -30,7 +30,11 @@ async function login() {
       throw "Incorrect email or password";
     }
   } catch (e) {
-    setError(e);
+    if (e.error) {
+      setError(e.error);
+    } else {
+      setError(e);
+    }
   } finally {
     sending = false;
   }

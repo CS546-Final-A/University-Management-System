@@ -26,12 +26,21 @@ async function request(method, target, csrf, data) {
       },
       body: JSON.stringify(data),
     });
-    let result = await response.text();
-    if (result.length > 0) {
-      result = JSON.parse(result);
+
+    if (await response.ok) {
+      let result = await response.text();
+      if (result.length > 0) {
+        result = JSON.parse(result);
+      }
+      return result;
+    } else {
+      throw await response.text();
     }
-    return result;
   } catch (e) {
-    throw e;
+    try {
+      e = JSON.parse(e);
+    } finally {
+      throw e;
+    }
   }
 }
