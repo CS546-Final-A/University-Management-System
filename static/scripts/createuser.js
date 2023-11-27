@@ -49,7 +49,7 @@ function adduser() {
         accountype: type,
       };
 
-      const result = await request("PUT", "/create/user", csrf, data);
+      const result = await request("PUT", "/users/create", csrf, data);
       sending = false;
     } catch (e) {
       sending = false;
