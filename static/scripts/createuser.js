@@ -26,26 +26,35 @@ function lengthlimit() {
   }
 }
 
-function submitform() {
+function adduser() {
   let sending = false;
+  const csrf = document.getElementById("csrf").value;
   return async function () {
     if (sending) {
       return;
     }
     sending = true;
-    const firstname = verify.name(document.getElementById("firstname").value);
-    const lastname = verify.name(document.getElementById("lastname").value);
-    const email = verify.email(document.getElementById("email").value);
-    const ssn = verify.ssn(document.getElementById("identification").value);
-    const type = verify.accountype(document.getElementById("type").value);
+    try {
+      const firstname = verify.name(document.getElementById("firstname").value);
+      const lastname = verify.name(document.getElementById("lastname").value);
+      const email = verify.email(document.getElementById("email").value);
+      const ssn = verify.ssn(document.getElementById("identification").value);
+      const type = verify.accountype(document.getElementById("type").value);
 
-    const data = {
-      firstname: firstname,
-      lastname: lastname,
-      email: email,
-      identification: { type: "ssn", number: ssn },
-      accountype: type,
-    };
+      const data = {
+        firstname: firstname,
+        lastname: lastname,
+        email: email,
+        identification: { type: "ssn", number: ssn },
+        accountype: type,
+      };
+
+      const result = await request("PUT", "/create/user", csrf, data);
+      sending = false;
+    } catch (e) {
+      sending = false;
+      console.log(e);
+    }
   };
 }
 
@@ -55,3 +64,5 @@ document
 document
   .getElementById("identification")
   .addEventListener("input", lengthlimit);
+
+document.getElementById("submit").addEventListener("click", adduser());
