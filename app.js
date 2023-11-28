@@ -4,7 +4,10 @@ import session from "express-session";
 import lusca from "lusca";
 import { engine } from "express-handlebars";
 
+import SMTPConnect from "./config/smptConnection.js";
 import route from "./routes/index.js";
+
+const smptconnection = SMTPConnect();
 
 const app = express();
 
@@ -39,6 +42,15 @@ app.set("views", "./views");
 
 app.listen(8080, () => {
   console.log("Running web server on port 8080");
+});
+
+smptconnection.verify(function (error, success) {
+  if (error) {
+    console.log(error);
+    throw "Failed to connect to SMTP";
+  } else {
+    console.log("Connected to SMTP Server");
+  }
 });
 
 route(app);
