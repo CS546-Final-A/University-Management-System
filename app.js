@@ -5,9 +5,11 @@ import lusca from "lusca";
 import { engine } from "express-handlebars";
 
 import SMTPConnect from "./config/smptConnection.js";
+import { dbConnection } from "./config/mongoConnection.js";
 import route from "./routes/index.js";
 
 const smptconnection = SMTPConnect();
+const databaseconnection = dbConnection();
 
 const app = express();
 
@@ -40,6 +42,8 @@ app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", "./views");
 
+route(app);
+
 app.listen(8080, () => {
   console.log("Running web server on port 8080");
 });
@@ -53,4 +57,8 @@ smptconnection.verify(function (error, success) {
   }
 });
 
-route(app);
+if (await databaseconnection) {
+  console.log("Connected to Database Server");
+} else {
+  throw "Failed to connect to database";
+}
