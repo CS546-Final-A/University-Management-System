@@ -29,11 +29,17 @@ async function sendRegistrationEmail(email, userid) {
     `,
   };
 
-  const messagesent = await emailer.sendMail(message);
-  console.log(messagesent);
-
+  let messagesent;
+  try {
+    messagesent = await emailer.sendMail(message);
+  } catch (e) {
+    // Throw only the response message
+    const error = { status: 500, message: e.response };
+    throw error;
+  }
   if (messagesent.rejected.length) {
-    throw "Failed to send email";
+    const error = { status: 400, message: "Email rejected" };
+    throw error;
   }
   return messagesent;
 }

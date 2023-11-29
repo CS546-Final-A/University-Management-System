@@ -9,7 +9,7 @@ router.get("/create", (req, res) => {
   res.render("admin/createuser");
 });
 
-router.put("/create", (req, res) => {
+router.put("/create", async (req, res) => {
   try {
     const firstname = verify.name(req.body.firstname);
     const lastname = verify.name(req.body.lastname);
@@ -18,14 +18,21 @@ router.put("/create", (req, res) => {
     if (identification.type === "ssn") {
       identification.number = verify.ssn(identification.number);
     } else {
-      throw "Invalid identification type";
+      const error = { code: 400, message: "Invalid identification type" };
+      throw error;
     }
     const accountype = verify.accountype(req.body.accountype);
 
-    createUser(firstname, lastname, email, identification, accountype);
+    await createUser(firstname, lastname, email, identification, accountype);
   } catch (e) {
-    res.status(400);
-    res.send(e);
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      console.log(e);
+      res.status(500);
+      return res.json({ error: "Internal server error" });
+    }
   }
 });
 

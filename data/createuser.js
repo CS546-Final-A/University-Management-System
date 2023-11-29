@@ -33,7 +33,8 @@ async function createUser(firstname, lastname, email, identification, type) {
   if (identification.type === "ssn") {
     identification.number = verify.ssn(identification.number);
   } else {
-    throw "Invalid identification type";
+    const error = { code: 400, message: "Invalid identification type" };
+    throw error;
   }
   type = verify.accountype(type);
   const usercol = await users();
@@ -59,11 +60,13 @@ async function createUser(firstname, lastname, email, identification, type) {
     }
   );
   if (existinguser) {
+    const error = { code: 400 };
     if (existinguser.email === email) {
-      throw "A user with this email address already exists";
+      error.message = "A user with this email address already exists";
     } else {
-      throw "A user with this id number already exists";
+      error.message = "A user with this id number already exists";
     }
+    throw error;
   }
 
   const userdata = {
@@ -78,7 +81,8 @@ async function createUser(firstname, lastname, email, identification, type) {
   const insertion = await usercol.insertOne(userdata);
   if (!insertion.acknowledged || !insertion.insertedId) {
     // Move to catch
-    throw "Insertion error";
+    const error = { code: 500, message: "Database insertion error" };
+    throw error;
   }
 
   const userid = insertion.insertedId;

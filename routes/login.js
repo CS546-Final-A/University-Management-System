@@ -23,15 +23,11 @@ router.post("/", async (req, res) => {
 
     res.json({ loggedin: result.successful });
   } catch (e) {
-    if (
-      e === "Invalid email" ||
-      e === "Password is not a string" ||
-      e === "Password is empty" ||
-      e === "Password is too long"
-    ) {
-      res.status(400);
-      res.json({ error: e });
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
     } else {
+      console.log(e);
       res.status(500);
       res.json({ error: "Login error" });
     }
