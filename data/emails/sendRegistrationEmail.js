@@ -23,7 +23,7 @@ async function sendRegistrationEmail(email, userid) {
         <body>
             <p>Congragulations, you have been selected to join the ${UNIVERSITYNAME} family. Please use the link below to create your ${UNIVERSITYNAME} account.</p><br>
             <a href="${process.env.SiteDomain}/register/${userid}">Register Now</a><br>
-            <a href="${process.env.SiteDomain}/register/${userid}">href="${process.env.SiteDomain}/register/${userid}</a>
+            <a href="${process.env.SiteDomain}/register/${userid}">href="${process.env.SiteDomain}/register/${userid}"></a>
         </body>
     </html>
     `,
