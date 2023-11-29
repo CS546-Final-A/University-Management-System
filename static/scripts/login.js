@@ -1,5 +1,6 @@
 let sending = false;
-async function login() {
+async function login(event) {
+  event.preventDefault();
   if (sending) {
     return;
   }
@@ -59,6 +60,4 @@ function setError(error) {
   errdiv.style.animationName = "fadeout";
 }
 
-document.getElementById("submit").addEventListener("click", login);
-document.getElementById("email").addEventListener("keyup", enterLogin);
-document.getElementById("password").addEventListener("keyup", enterLogin);
+document.getElementById("loginform").addEventListener("submit", login);
