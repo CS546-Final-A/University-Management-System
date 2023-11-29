@@ -48,7 +48,7 @@ const verify = {
     if (name.length < 3 || name.length > 20) {
       throw "Name must be between 3 and 20 charachters long";
     }
-    namearr = name.split("");
+    const namearr = name.split("");
     for (let char of namearr) {
       if (!/([a-z]|-|\ |\')/.test(char)) {
         throw "Invalid charachter in name";

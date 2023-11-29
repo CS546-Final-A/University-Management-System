@@ -33,7 +33,7 @@ async function createUser(firstname, lastname, email, identification, type) {
   } else {
     throw "Invalid identification type";
   }
-  type = verify.type(type);
+  type = verify.accountype(type);
   const usercol = await users();
 
   // Disallows multiple users with one email or identification number.
