@@ -29,7 +29,8 @@ function lengthlimit() {
 function adduser() {
   let sending = false;
   const csrf = document.getElementById("csrf").value;
-  return async function () {
+  return async function (event) {
+    event.preventDefault();
     if (sending) {
       return;
     }
@@ -50,6 +51,7 @@ function adduser() {
       };
 
       const result = await request("PUT", "/users/create", csrf, data);
+      console.log(result);
       sending = false;
     } catch (e) {
       sending = false;
@@ -65,4 +67,4 @@ document
   .getElementById("identification")
   .addEventListener("input", lengthlimit);
 
-document.getElementById("submit").addEventListener("click", adduser());
+document.getElementById("newuserform").addEventListener("submit", adduser());

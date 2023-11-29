@@ -1,5 +1,7 @@
 import { users } from "../config/mongoCollections.js";
+
 import verify from "../data_validation.js";
+import sendRegistrationEmail from "./emails/sendRegistrationEmail.js";
 
 /*async function createUser(type, email, password) {
   // Quick mockup function for testing user login procedure. Incomplete and insecure. Do not use in current state
@@ -80,6 +82,7 @@ async function createUser(firstname, lastname, email, identification, type) {
   }
 
   const userid = insertion.insertedId;
+  sendRegistrationEmail(email, userid);
 }
 
 export default createUser;

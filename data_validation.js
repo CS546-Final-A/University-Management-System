@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 const verify = {
   email: (email) => {
     // Email checking function as I had it written for labs, can be made better
@@ -76,6 +78,12 @@ const verify = {
       throw "Invalid account type";
     }
     return type;
+  },
+  dbid: (id) => {
+    if (!(id instanceof ObjectId)) {
+      throw "Not an ObjectId";
+    }
+    return id;
   },
 };
 
