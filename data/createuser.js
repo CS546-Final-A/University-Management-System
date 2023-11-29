@@ -75,7 +75,7 @@ async function createUser(firstname, lastname, email, identification, type) {
     staus: "Initalized",
   };
 
-  const insertion = await usercol.insertOne({ userdata });
+  const insertion = await usercol.insertOne(userdata);
   if (!insertion.acknowledged || !insertion.insertedId) {
     // Move to catch
     throw "Insertion error";
