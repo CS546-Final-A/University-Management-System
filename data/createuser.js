@@ -82,7 +82,13 @@ async function createUser(firstname, lastname, email, identification, type) {
   }
 
   const userid = insertion.insertedId;
-  sendRegistrationEmail(email, userid);
+  try {
+    await sendRegistrationEmail(email, userid);
+  } catch (e) {
+    // cleanup on failed email and rethrow the error
+    await usercol.deleteOne({ _id: userid });
+    throw e;
+  }
 }
 
 export default createUser;
