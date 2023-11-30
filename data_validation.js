@@ -82,6 +82,9 @@ const verify = {
     if (typeof id.number !== "string") {
       throwerror("ID number is not a string");
     }
+    if (Object.keys(id).length !== 2) {
+      throwerror("ID includes extraneous fields");
+    }
     id.type = id.type.trim();
     const types = ["ssn"];
     if (!types.includes(id.type)) {
