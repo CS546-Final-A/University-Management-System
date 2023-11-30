@@ -17,7 +17,31 @@ router.put("/create", async (req, res) => {
     const identification = verify.governmentID(req.body.identification);
     const accountype = verify.accountype(req.body.accountype);
 
-    await createUser(firstname, lastname, email, identification, accountype);
+    const status = await createUser(
+      firstname,
+      lastname,
+      email,
+      identification,
+      accountype
+    );
+    if (status.successful) {
+      res.json(status);
+    } else {
+      const error = {
+        status: 500,
+        message: `An unexpcted error has occurred the request is as follows 
+        firstname: ${req.body.firstname}
+        lastname: ${req.body.lastname}
+        email: ${req.body.email}
+        id: {
+          type: ${req.body.identification.type}
+          number: ${req.body.identification.number}
+        }
+        accounttype: ${req.body.accountype}
+        `,
+      };
+      throw error;
+    }
   } catch (e) {
     if (e.status !== 500 && e.status) {
       res.status(e.status);

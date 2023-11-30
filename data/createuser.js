@@ -87,6 +87,7 @@ async function createUser(firstname, lastname, email, identification, type) {
   const userid = insertion.insertedId;
   try {
     await sendRegistrationEmail(email, userid);
+    return { successful: true };
   } catch (e) {
     // cleanup on failed email and rethrow the error
     await usercol.deleteOne({ _id: userid });
