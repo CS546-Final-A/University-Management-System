@@ -14,13 +14,7 @@ router.put("/create", async (req, res) => {
     const firstname = verify.name(req.body.firstname);
     const lastname = verify.name(req.body.lastname);
     const email = verify.email(req.body.email);
-    const identification = req.body.identification;
-    if (identification.type === "ssn") {
-      identification.number = verify.ssn(identification.number);
-    } else {
-      const error = { code: 400, message: "Invalid identification type" };
-      throw error;
-    }
+    const identification = verify.governmentID(req.body.identification);
     const accountype = verify.accountype(req.body.accountype);
 
     await createUser(firstname, lastname, email, identification, accountype);

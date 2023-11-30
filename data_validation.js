@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 
-function thowerror(message) {
+function throwerror(message) {
   const error = { status: 400, message: message };
   throw error;
 }
@@ -12,17 +12,17 @@ const verify = {
       str = str.split(part);
       for (let section of str) {
         if (section.length === 0) {
-          thowerror("Invalid email");
+          throwerror("Invalid email");
         }
       }
     }
     if (typeof email != "string") {
-      thowerror("Email is not a string");
+      throwerror("Email is not a string");
     }
     email = email.trim().toLowerCase();
 
     if (!/^([a-z]|\d|\.|\_|\-)+@([a-z]|\d|\-)+\.([a-z]|\d|\-)+$/.test(email)) {
-      thowerror("Invalid email");
+      throwerror("Invalid email");
     }
     const left = email.split("@")[0];
 
@@ -35,58 +35,77 @@ const verify = {
   password: (password) => {
     // Password rules will be discussed together and updated accordingly
     if (typeof password != "string") {
-      thowerror("Password is not a string");
+      throwerror("Password is not a string");
     }
     password = password.trim();
     if (password.length < 1) {
-      thowerror("Password is empty");
+      throwerror("Password is empty");
     }
     if (password.length > 128) {
-      thowerror("Password is too long");
+      throwerror("Password is too long");
     }
     return password;
   },
   name: (name) => {
     if (typeof name !== "string") {
-      thowerror("Name is not a string");
+      throwerror("Name is not a string");
     }
     name = name.trim().toLowerCase();
     if (name.length < 3 || name.length > 20) {
-      thowerror("Name must be between 3 and 20 charachters long");
+      throwerror("Name must be between 3 and 20 charachters long");
     }
     const namearr = name.split("");
     for (let char of namearr) {
       if (!/([a-z]|-|\ |\')/.test(char)) {
-        thowerror("Invalid charachter in name");
+        throwerror("Invalid charachter in name");
       }
     }
     return name[0].toUpperCase() + name.slice(1);
   },
   ssn: (ssn) => {
     if (typeof ssn !== "string") {
-      thowerror("Social Security Number is not a string");
+      throwerror("Social Security Number is not a string");
     }
     ssn = ssn.trim();
     if (!/^\d{3}-\d{2}-\d{4}$/.test(ssn)) {
-      thowerror("Invalid Social Security Number");
+      throwerror("Invalid Social Security Number");
     }
     return ssn;
   },
+  governmentID: (id) => {
+    if (typeof id !== "object") {
+      throwerror("ID is not an object");
+    }
+    if (typeof id.type !== "string") {
+      throwerror("ID type is not a string");
+    }
+    if (typeof id.number !== "string") {
+      throwerror("ID number is not a string");
+    }
+    id.type = id.type.trim();
+    const types = ["ssn"];
+    if (!types.includes(id.type)) {
+      throwerror("Invalid ID type");
+    } else {
+      id.number = verify[id.type](id.number);
+    }
+    return id;
+  },
   accountype: (type) => {
     if (typeof type !== "string") {
-      thowerror("Invalid account type");
+      throwerror("Invalid account type");
     }
     type = type.trim();
 
     const types = ["Admin", "Professor", "Student"];
     if (!types.includes(type)) {
-      thowerror("Invalid account type");
+      throwerror("Invalid account type");
     }
     return type;
   },
   dbid: (id) => {
     if (!(id instanceof ObjectId)) {
-      thowerror("Not an ObjectId");
+      throwerror("Not an ObjectId");
     }
     return id;
   },

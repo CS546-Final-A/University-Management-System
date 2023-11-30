@@ -30,11 +30,10 @@ async function createUser(firstname, lastname, email, identification, type) {
   firstname = verify.name(firstname);
   lastname = verify.name(lastname);
   email = verify.email(email);
-  if (identification.type === "ssn") {
-    identification.number = verify.ssn(identification.number);
-  } else {
-    const error = { code: 400, message: "Invalid identification type" };
-    throw error;
+  identification = verify.governmentID(identification);
+  const publicID = { type: identification.type };
+  if (publicID.type === "ssn") {
+    publicID.number = identification.number.split("-")[2];
   }
   type = verify.accountype(type);
   const usercol = await users();
@@ -73,7 +72,7 @@ async function createUser(firstname, lastname, email, identification, type) {
     firstname: firstname,
     lastname: lastname,
     email: email,
-    identification: identification,
+    identification: publicID,
     type: type,
     staus: "Initalized",
   };
