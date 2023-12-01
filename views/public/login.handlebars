@@ -1,10 +1,10 @@
-<form>
+<form id="loginform">
     <label for="email">Email:</label><br>
     <input type="email" id="email" name="email" required> </input><br>
-    <label for="passwrod">Password:</label><br>
-    <input type="password" id="password" name="password" required></input></form><br>
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" required></input><br>
     <input type="hidden" id="csrf" value="{{_csrf}}">
-    <input type="submit" id="submit" value="Login"></input>
+    <br><input type="submit" id="submit" value="Login"></input>
 </form>
 <div id="error"></div>
 <script src="Scripts/verification.js"></script>

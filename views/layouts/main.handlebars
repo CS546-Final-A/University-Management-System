@@ -4,8 +4,10 @@
 <head>
     <meta charset="utf-8">
     <title>University Management Systems</title>
-    {{#if style}}
-    <link rel="stylesheet" href="/styles/{{style}}.css">
+    {{#if style.length}}
+    {{#each style}}
+    <link rel="stylesheet" href="/styles/{{this}}.css">
+    {{/each}}
     {{/if}}
 </head>
 
