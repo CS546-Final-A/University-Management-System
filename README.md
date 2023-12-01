@@ -17,6 +17,6 @@ SMTPServerURL="The url pointing to your SMTP server"
 SMTPPort=465
 SMTPUsername="Username"
 SMTPPassword="Password"
-MailServerDomain="mtarasov.com"
+MailServerDomain="The domain from which your emails will be sent"
 SiteDomain="The url from which the site can be accessed"
 ```
