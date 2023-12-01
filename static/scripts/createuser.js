@@ -30,6 +30,7 @@ function adduser() {
   let sending = false;
   const csrf = document.getElementById("csrf").value;
   return async function (event) {
+    formatssn();
     event.preventDefault();
     if (sending) {
       return;
@@ -51,13 +52,31 @@ function adduser() {
       };
 
       const result = await request("PUT", "/users/create", csrf, data);
-      console.log(result);
-      sending = false;
+      if (result.successful) {
+        document.getElementById(
+          "status"
+        ).innerText = `${firstname} ${lastname} successfully added.`;
+      }
     } catch (e) {
+      document.getElementById("status").innerText = "";
+      if (e.error) {
+        setError(e.error);
+      } else {
+        setError(e);
+      }
+    } finally {
       sending = false;
-      console.log(e);
     }
   };
+}
+
+function setError(error) {
+  // Reset the fadout animation and overwrite text
+  const errdiv = document.getElementById("error");
+  errdiv.innerText = error;
+  errdiv.style.animationName = "";
+  errdiv.offsetHeight;
+  errdiv.style.animationName = "fadeout";
 }
 
 document

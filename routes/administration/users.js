@@ -6,7 +6,7 @@ import createUser from "../../data/createuser.js";
 const router = Router();
 
 router.get("/create", (req, res) => {
-  res.render("admin/createuser");
+  res.render("admin/createuser", { style: ["error"] });
 });
 
 router.put("/create", async (req, res) => {

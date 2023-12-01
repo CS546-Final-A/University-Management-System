@@ -59,7 +59,7 @@ async function createUser(firstname, lastname, email, identification, type) {
     }
   );
   if (existinguser) {
-    const error = { code: 400 };
+    const error = { status: 400 };
     if (existinguser.email === email) {
       error.message = "A user with this email address already exists";
     } else {
@@ -80,7 +80,7 @@ async function createUser(firstname, lastname, email, identification, type) {
   const insertion = await usercol.insertOne(userdata);
   if (!insertion.acknowledged || !insertion.insertedId) {
     // Move to catch
-    const error = { code: 500, message: "Database insertion error" };
+    const error = { status: 500, message: "Database insertion error" };
     throw error;
   }
 
