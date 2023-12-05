@@ -44,10 +44,6 @@ app.set("views", "./views");
 
 route(app);
 
-app.listen(8080, () => {
-  console.log("Running web server on port 8080");
-});
-
 smptconnection.verify(function (error, success) {
   if (error) {
     console.log(error);
@@ -62,3 +58,7 @@ if (await databaseconnection) {
 } else {
   throw "Failed to connect to database";
 }
+
+app.listen(8080, () => {
+  console.log("Running web server on port 8080");
+});
