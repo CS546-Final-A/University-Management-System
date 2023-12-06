@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import verify from "../data_validation.js";
+import identificationVerificationHTML from "../data/identificationVerifierHTML.js";
 import { users } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 
@@ -17,16 +18,21 @@ router.get("/:userid", async (req, res) => {
       throw { status: 400, message: "Invalid registration link" };
     }
 
-    const identification = await usercol.findOne(
+    const result = await usercol.findOne(
       { _id: new ObjectId(id), status: "Initalized" },
       { projection: { _id: 0, identification: 1 } }
     );
 
-    if (!identification) {
+    if (!result) {
       throw { status: 404, message: "Invalid registration link" };
     }
 
-    res.render("public/registration", { identification: identification.type });
+    res.render("public/registration", {
+      identification: result.identification.type,
+      identificationverification: identificationVerificationHTML(
+        result.identification.type
+      ),
+    });
   } catch (e) {
     if (e.status) {
       res.status(e.status);
