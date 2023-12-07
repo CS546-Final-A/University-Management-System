@@ -7,6 +7,9 @@ import getIdentificationByUserID from "../data/getIdentificationByUserID.js";
 const router = Router();
 
 router.get("/:userid", async (req, res) => {
+  if (req.session.idverified && req.session.userid) {
+    return res.redirect("/register/setpassword");
+  }
   try {
     const id = req.params.userid;
 
@@ -32,6 +35,9 @@ router.get("/:userid", async (req, res) => {
 });
 
 router.post("/:userid", async (req, res) => {
+  if (req.session.idverified && req.session.userid) {
+    return res.redirect("/register/setpassword");
+  }
   let identification;
   try {
     const id = req.params.userid;
@@ -50,8 +56,9 @@ router.post("/:userid", async (req, res) => {
   const idnum = req.body.idconf;
   const idtype = req.body.idtype;
   if (identification.type === idtype && identification.number === idnum) {
-    // activateuseraccount(id)
-    res.render("resetpassword");
+    req.session.idverified = true;
+    req.session.userid = req.params.userid;
+    return res.redirect("/register/setpassword");
   } else {
     res.render("public/registration", {
       identification: identification.type,
