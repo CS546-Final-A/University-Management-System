@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import verify from "../data_validation.js";
 import identificationVerificationHTML from "../data/identificationVerifierHTML.js";
-import getIdentificationByUserID from "../data/getIdentificationByUserID.js";
+import getIdentificationByUserID from "../data/getUnregisteredUserIdentification.js";
 
 function routeError(res, e) {
   if (e.status) {
