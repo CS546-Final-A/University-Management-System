@@ -3,7 +3,7 @@
         <img src="./icons/key.svg" alt="loginIcon">Login
     </div>
     <div class="card-body">
-        <form>
+        <form id="loginform">
             <div class="form-floating mb-3">
                 <input class="form-control" type="email" id="email" name="email" placeholder="name@example.com"
                     required> </input>
@@ -15,16 +15,14 @@
                     required></input>
                 <label for="password">Password:</label>
             </div>
-
-        </form>
-        <div class="row">
-            <div class="offset-4 col-4 mt-3">
-                <input type="hidden" id="csrf" value="{{_csrf}}">
-                <button class="btnSubmit col-12 py-2" type="submit" id="submit">Login</button>
+            
+            <div class="row">
+                <div class="offset-4 col-4 mt-3">
+                    <input type="hidden" id="csrf" value="{{_csrf}}">
+                    <button class="btnSubmit col-12 py-2" type="submit" id="submit">Login</button>
+                </div>
             </div>
-
-        </div>
-
+        </form>
 
     </div>
 </div>
