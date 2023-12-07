@@ -47,12 +47,16 @@ function enterLogin(event) {
 }
 
 function setError(error) {
-  // Reset the fadout animation and overwrite text
-  const errdiv = document.getElementById("error");
-  errdiv.innerText = error;
-  errdiv.style.animationName = "";
-  errdiv.offsetHeight;
-  errdiv.style.animationName = "fadeout";
+  var toastRed1 = $("html").css("--toastRed1");
+  var toastRed2 = $("html").css("--toastRed2");
+  $(".toast-header").css("background-color", toastRed1);
+  $(".toast-header").css("color", "#000000");
+  $(".toast-header .me-auto").html("&nbsp;&nbsp;Login Failed");
+
+  // $(".toast-body").css("background-color", toastRed2);
+  $(".toast-body").css("color", "#000000");
+  $(".toast-body").html(error);
+  $("#liveToast").toast("show");
 }
 
 document.getElementById("submit").addEventListener("click", login);
