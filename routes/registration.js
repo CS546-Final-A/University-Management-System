@@ -24,7 +24,7 @@ function routeError(res, e) {
 const router = Router();
 
 router.get("/:userid", async (req, res) => {
-  if (req.session.idverified && req.session.userid) {
+  if (req.session.registrationuserid) {
     return res.redirect("/register/setpassword");
   }
   try {
@@ -44,7 +44,7 @@ router.get("/:userid", async (req, res) => {
 });
 
 router.post("/:userid", async (req, res) => {
-  if (req.session.idverified && req.session.userid) {
+  if (req.session.registrationuserid) {
     return res.redirect("/register/setpassword");
   }
   let identification;
@@ -57,8 +57,7 @@ router.post("/:userid", async (req, res) => {
   const idnum = req.body.idconf;
   const idtype = req.body.idtype;
   if (identification.type === idtype && identification.number === idnum) {
-    req.session.idverified = true;
-    req.session.userid = req.params.userid;
+    req.session.registrationuserid = req.params.userid;
     return res.redirect("/register/setpassword");
   } else {
     res.render("public/registration", {
