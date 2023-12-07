@@ -4,6 +4,23 @@ import verify from "../data_validation.js";
 import identificationVerificationHTML from "../data/identificationVerifierHTML.js";
 import getIdentificationByUserID from "../data/getIdentificationByUserID.js";
 
+function routeError(res, e) {
+  if (e.status) {
+    res.status(e.status);
+    if (e.status >= 500) {
+      console.log("Error:");
+      console.log(e.message);
+      e.message = "Internal server error";
+    }
+    return res.render("public/error", { error: e.message });
+  } else {
+    console.log("Error:");
+    console.log(e);
+    res.status(500);
+    return res.render("public/error", { error: "Internal server error" });
+  }
+}
+
 const router = Router();
 
 router.get("/:userid", async (req, res) => {
@@ -22,15 +39,7 @@ router.get("/:userid", async (req, res) => {
       ),
     });
   } catch (e) {
-    if (e.status) {
-      res.status(e.status);
-      res.render("public/error", { error: e.message });
-    } else {
-      console.log("Error:");
-      console.log(e);
-      res.status(500);
-      res.render("public/error", { error: "Internal server error" });
-    }
+    routeError(res, e);
   }
 });
 
@@ -43,15 +52,7 @@ router.post("/:userid", async (req, res) => {
     const id = req.params.userid;
     identification = await getIdentificationByUserID(id);
   } catch (e) {
-    if (e.status) {
-      res.status(e.status);
-      res.render("public/error", { error: e.message });
-    } else {
-      console.log("Error:");
-      console.log(e);
-      res.status(500);
-      res.render("public/error", { error: "Internal server error" });
-    }
+    routeError(res, e);
   }
   const idnum = req.body.idconf;
   const idtype = req.body.idtype;
