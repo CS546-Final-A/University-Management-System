@@ -14,6 +14,7 @@ const databaseconnection = dbConnection();
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
@@ -22,6 +23,14 @@ app.use(
     saveUninitialized: false,
   })
 );
+
+app.use("/", (req, res, next) => {
+  if (req.body._csrf) {
+    req.headers["x-csrf-token"] = req.body._csrf;
+    delete req.body._csrf;
+  }
+  next();
+});
 
 app.use(
   lusca({

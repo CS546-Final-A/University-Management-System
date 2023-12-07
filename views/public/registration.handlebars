@@ -1,6 +1,10 @@
-<form id="registration">
+<form id="registration" method="POST">
     {{{identificationverification}}}
     <input type="hidden" name="idtype" value="{{identification}}">
-    <input type="hidden" id="csrf" value="{{_csrf}}">
+    <input type="hidden" id="_csrf" name="_csrf" value="{{_csrf}}">
     <br><input type="submit" id="submit" value="Login"></input>
 </form>
+{{#if error}}
+<div id="error">{{error}}</div>
+{{/if}}
+<script src="Scripts/registration.js"></script>
