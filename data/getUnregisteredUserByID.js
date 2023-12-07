@@ -1,7 +1,7 @@
 import { users } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 
-async function getIdentificationByUserID(id) {
+async function getUserByID(id) {
   try {
     new ObjectId(id);
   } catch {
@@ -21,4 +21,4 @@ async function getIdentificationByUserID(id) {
   return result.identification;
 }
 
-export default getIdentificationByUserID;
+export default getUserByID;
