@@ -3,6 +3,8 @@ import express from "express";
 import session from "express-session";
 import lusca from "lusca";
 import { engine } from "express-handlebars";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 import SMTPConnect from "./config/smptConnection.js";
 import { dbConnection } from "./config/mongoConnection.js";
@@ -12,6 +14,12 @@ const smptconnection = SMTPConnect();
 const databaseconnection = dbConnection();
 
 const app = express();
+
+// Serve static files from the 'icons' directory
+const __filename = fileURLToPath(import.meta.url);
+export const __dirname = dirname(__filename);
+const iconsDir = express.static(__dirname + "/static/icons");
+app.use("/icons", iconsDir);
 
 app.use(express.json());
 
@@ -27,8 +35,8 @@ app.use(
   lusca({
     csrf: true,
     /*csp: {
-			 ... 
-		},*/
+       ... 
+    },*/
     xframe: "SAMEORIGIN",
     p3p: "ABCDEF",
     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
