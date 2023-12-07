@@ -2,35 +2,20 @@ import { Router } from "express";
 
 import verify from "../data_validation.js";
 import identificationVerificationHTML from "../data/identificationVerifierHTML.js";
-import { users } from "../config/mongoCollections.js";
-import { ObjectId } from "mongodb";
+import getIdentificationByUserID from "../data/getIdentificationByUserID.js";
 
 const router = Router();
 
 router.get("/:userid", async (req, res) => {
   try {
     const id = req.params.userid;
-    const usercol = await users();
 
-    try {
-      new ObjectId(id);
-    } catch {
-      throw { status: 400, message: "Invalid registration link" };
-    }
-
-    const result = await usercol.findOne(
-      { _id: new ObjectId(id), status: "Initalized" },
-      { projection: { _id: 0, identification: 1 } }
-    );
-
-    if (!result) {
-      throw { status: 404, message: "Invalid registration link" };
-    }
+    const identification = await getIdentificationByUserID(id);
 
     res.render("public/registration", {
-      identification: result.identification.type,
+      identification: identification.type,
       identificationverification: identificationVerificationHTML(
-        result.identification.type
+        identification.type
       ),
     });
   } catch (e) {
@@ -43,6 +28,38 @@ router.get("/:userid", async (req, res) => {
       res.status(500);
       res.render("public/error", { error: "Internal server error" });
     }
+  }
+});
+
+router.post("/:userid", async (req, res) => {
+  let identification;
+  try {
+    const id = req.params.userid;
+    identification = await getIdentificationByUserID(id);
+  } catch (e) {
+    if (e.status) {
+      res.status(e.status);
+      res.render("public/error", { error: e.message });
+    } else {
+      console.log("Error:");
+      console.log(e);
+      res.status(500);
+      res.render("public/error", { error: "Internal server error" });
+    }
+  }
+  const idnum = req.body.idconf;
+  const idtype = req.body.idtype;
+  if (identification.type === idtype && identification.number === idnum) {
+    // activateuseraccount(id)
+    res.render("resetpassword");
+  } else {
+    res.render("public/registration", {
+      identification: identification.type,
+      identificationverification: identificationVerificationHTML(
+        identification.type
+      ),
+      error: "Invalid identification",
+    });
   }
 });
 
