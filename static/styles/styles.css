@@ -219,32 +219,9 @@ h1 span {
   max-height: 999px;
   transform: translate3d(0, 0px, 0);
 }
-.dropdown-menu {
-  padding: 10px !important;
-  margin: 0;
-  font-size: 13px;
-  letter-spacing: 1px;
-  color: var(--activeTextColor);
-  background-color: var(--activeBgColor);
-  border: none;
-  border-radius: 3px;
-  box-shadow: 0 5px 10px 0 rgba(138, 155, 165, 0.15);
-  transition: all 200ms linear;
-}
+
 .dropdown-toggle::after {
   display: none;
-}
-
-.dropdown-item {
-  padding: 3px 15px;
-  color: var(--activeTextColor);
-  border-radius: 2px;
-  transition: all 200ms linear;
-}
-.dropdown-item:hover,
-.dropdown-item:focus {
-  color: var(--activeTextColor);
-  background-color: rgba(129, 103, 169, 0.6);
 }
 
 body.dark .start-header {
