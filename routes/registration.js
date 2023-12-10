@@ -23,6 +23,16 @@ function routeError(res, e) {
 
 const router = Router();
 
+router.get("/setpassword", (req, res) => {
+  if (!req.session.registrationuserid) {
+    const error = {
+      status: 401,
+      message: "You attempted to access a page without proper authentication",
+    };
+    return routeError(res, error);
+  }
+});
+
 router.get("/:userid", async (req, res) => {
   if (req.session.registrationuserid) {
     return res.redirect("/register/setpassword");
@@ -32,14 +42,14 @@ router.get("/:userid", async (req, res) => {
 
     const identification = await getIdentificationByUserID(id);
 
-    res.render("public/registration", {
+    return res.render("public/registration", {
       identification: identification.type,
       identificationverification: identificationVerificationHTML(
         identification.type
       ),
     });
   } catch (e) {
-    routeError(res, e);
+    return routeError(res, e);
   }
 });
 
@@ -52,7 +62,7 @@ router.post("/:userid", async (req, res) => {
     const id = req.params.userid;
     identification = await getIdentificationByUserID(id);
   } catch (e) {
-    routeError(res, e);
+    return routeError(res, e);
   }
   const idnum = req.body.idconf;
   const idtype = req.body.idtype;
