@@ -74,7 +74,7 @@ async function createUser(firstname, lastname, email, identification, type) {
     email: email,
     identification: publicID,
     type: type,
-    staus: "Initalized",
+    status: "Initalized",
   };
 
   const insertion = await usercol.insertOne(userdata);

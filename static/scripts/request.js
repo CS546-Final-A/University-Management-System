@@ -27,7 +27,7 @@ async function request(method, target, csrf, data) {
       body: JSON.stringify(data),
     });
 
-    if (await response.ok) {
+    if (response.ok) {
       let result = await response.text();
       if (result.length > 0) {
         result = JSON.parse(result);

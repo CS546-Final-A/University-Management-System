@@ -22,6 +22,7 @@ const iconsDir = express.static(__dirname + "/static/icons");
 app.use("/icons", iconsDir);
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
@@ -30,6 +31,14 @@ app.use(
     saveUninitialized: false,
   })
 );
+
+app.use("/", (req, res, next) => {
+  if (req.body._csrf) {
+    req.headers["x-csrf-token"] = req.body._csrf;
+    delete req.body._csrf;
+  }
+  next();
+});
 
 app.use(
   lusca({
@@ -52,10 +61,6 @@ app.set("views", "./views");
 
 route(app);
 
-app.listen(8080, () => {
-  console.log("Running web server on port 8080");
-});
-
 smptconnection.verify(function (error, success) {
   if (error) {
     console.log(error);
@@ -70,3 +75,7 @@ if (await databaseconnection) {
 } else {
   throw "Failed to connect to database";
 }
+
+app.listen(8080, () => {
+  console.log("Running web server on port 8080");
+});
