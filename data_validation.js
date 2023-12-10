@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 
-function throwerror(message) {
+export function throwerror(message) {
   const error = { status: 400, message: message };
   throw error;
 }
@@ -111,6 +111,12 @@ const verify = {
       throwerror("Not an ObjectId");
     }
     return id;
+  },
+  string: (string, stringName) => {
+    if (typeof string !== "string")
+    throwerror(`${stringName} is not a string`);
+    if (!string.trim()) throwerror(`${stringName} is not a string`);
+    return string.trim();
   },
 };
 
