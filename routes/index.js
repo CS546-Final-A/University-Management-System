@@ -8,6 +8,7 @@ import register from "./registration.js";
 import logout from "./logout.js";
 import dashboard from "./dashboard.js";
 import user_management from "./administration/users.js";
+import courses from "./courses/courses.js";
 
 function route(app) {
   app.use("/scripts", express.static("./static/scripts"));
@@ -22,6 +23,7 @@ function route(app) {
 
   app.use("/users", adminsOnly);
   app.use("/users", user_management);
+  app.use('/courses', courses);
 }
 
 export default route;
