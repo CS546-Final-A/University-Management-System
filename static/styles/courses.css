@@ -1,0 +1,80 @@
+h1 {
+  margin-bottom: 2rem;
+}
+a {
+  color: #8167a9;
+}
+.course-listing {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: top;
+  justify-content: start;
+  width: 100%;
+  padding: 1rem;
+  padding-top: 2rem;
+  background-color: #dfdfdf;
+}
+
+.course-listing h2 {
+  border: none;
+}
+.courses {
+  width: 100%;
+  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-listing .courses .course {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  padding: 1rem;
+}
+
+.course-listing .courses .course h2 {
+  margin-top: 1rem;
+}
+.course-listing .courses .course h2 a {
+  text-decoration: none;
+  color: unset;
+}
+/* Style for the filter container */
+.filter {
+  width: 300px; /* Adjust the width as needed */
+  margin: 20px;
+}
+
+/* Style for labels */
+.filter label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Style for text input */
+.filter input[type="text"],
+.filter select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+/* Style for the Apply button */
+.filter button {
+  background-color: #8167a9;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.filter button:hover {
+  background-color: #8167a9;
+}
