@@ -9,7 +9,7 @@ async function login(email, password) {
   const usercol = await users();
 
   const user = await usercol.findOne(
-    { email: email },
+    { email: email, status: "Active" },
     { projection: { password: 1, type: 1 } }
   );
 
