@@ -4,6 +4,7 @@ import verify from "../data_validation.js";
 import identificationVerificationHTML from "../data/identificationVerifierHTML.js";
 import getUserByID from "../data/users/getUserInfoByID.js";
 import getUnregisteredIdentificationByUserID from "../data/getUnregisteredUserIdentification.js";
+import setPassword from "../data/users/setPasswordByID.js";
 
 function routeError(res, e) {
   if (e.status) {
@@ -53,7 +54,7 @@ router.get("/setpassword", async (req, res) => {
   }
 });
 
-router.patch("/setpassword", (req, res) => {
+router.patch("/setpassword", async (req, res) => {
   try {
     if (!req.session.registrationuserid) {
       const error = {
@@ -63,9 +64,29 @@ router.patch("/setpassword", (req, res) => {
       throw error;
     }
 
-    return res.render("public/setpassword");
+    const password = verify.password(req.body.password);
+    const passwordconf = verify.password(req.body.passwordconf);
+
+    if (password !== passwordconf) {
+      throw { status: 400, message: "Passwords do not match" };
+    }
+
+    const result = await setPassword(req.session.registrationuserid, password);
+
+    return res.json({ successful: result.acknowledged });
   } catch (e) {
-    return routeError(res, e);
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      if (e.message) {
+        console.log("Error: " + e.message);
+      } else {
+        console.log("Error: " + e);
+      }
+      res.status(500);
+      res.json({ error: "Internal Server Error" });
+    }
   }
 });
 
