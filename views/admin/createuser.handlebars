@@ -1,0 +1,56 @@
+<div class="card col-12 col-md-4 offset-md-4 glassEffect">
+    <div class="card-header glassEffect">
+        <img src="../icons/createUser.svg" alt="loginIcon"> Create User
+    </div>
+    <div class="card-body">
+        <form id="newuserform">
+            <div class="form-floating mb-3">
+                <input class="form-control" type="text" id="firstname" name="firstname" placeholder="name@example.com"
+                    required />
+                <label for="firstname">First Name:</label>
+            </div>
+
+
+            <div class="form-floating mb-3">
+                <input class="form-control" type="text" id="lastname" name="lastname" placeholder="name@example.com"
+                    required />
+                <label for="lastname">Last Name:</label>
+            </div>
+
+
+            <div class="form-floating mb-3">
+                <input class="form-control" type="email" id="email" name="email" placeholder="name@example.com"
+                    required>
+                <label for="email">Email:</label>
+            </div>
+
+
+            <div class="form-floating mb-3">
+                <input class="form-control" type="text" id="identification" name="ssn" maxlength="11"
+                    placeholder="000-00-0000" required>
+                <label for="ssn">Social Security Number:</label>
+
+            </div>
+
+
+            <div class="form-floating mb-3">
+
+                <select name="type" id="type" class="selectpicker form-control" data-live-search="true">
+                    <option value="Admin">Administrator</option>
+                    <option value="Professor">Professor</option>
+                    <option value="Student">Student</option>
+                </select>
+                <label for="type">Type</label>
+            </div>
+
+
+            <input type="hidden" id="csrf" value="{{_csrf}}">
+            <button class="btnSubmit col-12 py-2" type="submit" id="submit" value="Create User">Create User</button>
+        </form>
+    </div>
+</div>
+<div id="error"></div>
+<div id="status"></div>
+<script src="/Scripts/verification.js"></script>
+<script src="/Scripts/request.js"></script>
+<script src="/Scripts/createuser.js"></script>

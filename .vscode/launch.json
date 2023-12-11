@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Node",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}\\app.js"
+    },
+    {
+      "name": "Launch Edge",
+      "request": "launch",
+      "type": "msedge",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Launch Chrome",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
+    },
+    //Requires VSCODE Extension: firefox-devtools.vscode-firefox-debug
+    {
+      "name": "Launch Firefox",
+      "request": "launch",
+      "type": "firefox",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "node_edge",
+      "configurations": ["Launch Node", "Launch Edge"]
+    },
+    {
+      "name": "node_chrome",
+      "configurations": ["Launch Node", "Launch Chrome"]
+    },
+    {
+      "name": "node_firefox",
+      "configurations": ["Launch Node", "Launch Firefox"]
+    }
+  ]
+}
