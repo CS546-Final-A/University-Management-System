@@ -1,8 +1,17 @@
 import { ObjectId } from "mongodb";
+import xss from "xss";
 
 function throwerror(message) {
   const error = { status: 400, message: message };
   throw error;
+}
+
+export function santizeInputs(req) {
+  // Sanitizes all inputs in a request object
+  for (let key in req.body.data) {
+    req.body.data[key] = xss(req.body.data[key]);
+  }
+  return req;
 }
 
 const verify = {
