@@ -1,14 +1,4 @@
 //Menu On Hover
-$("body").on("mouseenter mouseleave", ".nav-item", function (e) {
-  if ($(window).width() > 750) {
-    var _d = $(e.target).closest(".nav-item");
-    if (_d.hasClass("show")) {
-      _d.removeClass("show");
-    } else {
-      _d.addClass("show");
-    }
-  }
-});
 
 //Switch light/dark
 
