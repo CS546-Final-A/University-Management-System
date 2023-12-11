@@ -1,0 +1,28 @@
+<h1>Modules</h1>
+
+<div class="courses">
+        TEST: {{sectionID}}
+        {{#each modules}}
+        <div class="course">
+
+
+            <div class="details">
+           
+                <p>ID: {{this.moduleId}}</p>
+                <p>Name: {{this.moduleName}}</p>
+                <p>Desc: {{this.moduleDescription}}</p>
+                <p>Date: {{this.moduleDate}}</p>
+                {{!-- <p>Status: {{this.Status}}</p> --}}
+            </div>
+
+
+
+         
+            <div class="actions">
+                <a href="/workspace/{{this.sectionID}}/modules/attendance">Attendance</a>
+            </div>
+        </div>
+
+
+        {{/each}}
+    </div>
