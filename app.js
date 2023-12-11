@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import session from "express-session";
 import lusca from "lusca";
-import { engine } from "express-handlebars";
+import exphbs from "express-handlebars";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -55,7 +55,12 @@ app.use(
   })
 );
 
-app.engine("handlebars", engine());
+const handlebars = exphbs.create({
+  defaultLayout: "main",
+  partialsDir: ["views/partials/"],
+});
+
+app.engine("handlebars", handlebars.engine);
 app.set("view engine", "handlebars");
 app.set("views", "./views");
 

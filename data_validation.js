@@ -20,7 +20,6 @@ export function santizeInputs(req) {
 
 const verify = {
   email: (email) => {
-    // Email checking function as I had it written for labs, can be made better
     function surroundingcheck(str, part) {
       str = str.split(part);
       for (let section of str) {
@@ -46,16 +45,18 @@ const verify = {
     return email;
   },
   password: (password) => {
-    // Password rules will be discussed together and updated accordingly
+    // Password rules favoring length over complexity based on NIST recommendations
+    // As described by Auth0 below
+    // https://auth0.com/blog/dont-pass-on-the-new-nist-password-guidelines/
     if (typeof password != "string") {
       throwerror("Password is not a string");
     }
     password = password.trim();
-    if (password.length < 1) {
-      throwerror("Password is empty");
+    if (password.length < 8) {
+      throwerror("Password must be between 8 and 128 characters long");
     }
     if (password.length > 128) {
-      throwerror("Password is too long");
+      throwerror("Password must be between 8 and 128 characters long");
     }
     return password;
   },
