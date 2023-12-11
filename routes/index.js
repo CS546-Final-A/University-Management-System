@@ -22,13 +22,13 @@ function route(app) {
   app.use("/register", register);
 
   app.use("/", ratelimit.general); // Limit users to 1000 requests per 15 minutes
-  app.use("/", signin); // Only allow signed in users to access routes below this one
+  // app.use("/", signin); // Only allow signed in users to access routes below this one
   app.use("/logout", logout);
   app.use("/dashboard", dashboard);
 
   app.use("/users", adminsOnly);
   app.use("/users", user_management);
-  app.use('/courses', courses);
+  app.use("/courses", courses);
 }
 
 export default route;

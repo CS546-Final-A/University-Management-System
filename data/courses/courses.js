@@ -81,9 +81,58 @@ export const deleteDepartment = async (departmentId) => {
 export const getAllCourses = async () => {
   let courseList = [];
   const courseCollection = await courses();
-  courseList = await courseCollection.find({}).toArray();
+  courseList = await courseCollection
+    .aggregate([
+      {
+        $lookup: {
+          from: "sections",
+          localField: "_id",
+          foreignField: "courseId",
+          as: "sections",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "sections.sectionInstructor",
+          foreignField: "_id",
+          as: "instructor",
+        },
+      },
+      {
+        $lookup: {
+          from: "departments",
+          localField: "courseDepartmentId",
+          foreignField: "_id",
+          as: "department",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          // Include all other fields from the "courses" collection
+          courseName: 1,
+          courseNumber: 1,
+          courseDepartmentId: 1,
+          courseCredits: 1,
+          departmentName: "$department.departmentName",
+          courseDescription: 1,
+          // Include all fields from the "sections" collection
+          sectionId: "$sections._id",
+          sectionType: "$sections.sectionType",
+          sectionNumber: "$sections.sectionName",
+          sectionCapacity: "$sections.sectionCapacity",
+          sectionDay: "$sections.sectionDay",
+          sectionType: "$sections.sectionType",
+          instructors: "$instructor",
+        },
+      },
+    ])
+    .toArray();
+  console.log(courseList);
   return courseList;
 };
+
 export const registerCourse = async (
   courseNumber,
   courseName,
