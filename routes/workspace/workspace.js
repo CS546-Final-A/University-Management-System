@@ -45,4 +45,11 @@ router.route("/:sectionId/modules/attendance").get(async (req, res) => {
   res.render("workspace/attendance");
 });
 
+router.route("/:sectionId/assignments").get(async (req, res) => {
+  const section = await getSectionById(req.params.sectionId);
+  res.render("workspace/assignments", {
+    assignments: section.Assignments,
+    sectionID: `${section._id}`,
+  });
+});
 export default router;
