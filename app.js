@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import session from "express-session";
 import lusca from "lusca";
-import exphbs from "express-handlebars";
+import { engine } from "express-handlebars";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
