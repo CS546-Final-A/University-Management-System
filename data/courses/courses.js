@@ -1,22 +1,27 @@
-import { departments } from "../../config/mongoCollections";
-import verify, { throwerror } from "../../data_validation.js";
+import { departments, courses } from "../../config/mongoCollections.js";
+import verify, {
+  throwErrorWithStatus,
+  throwerror,
+} from "../../data_validation.js";
+import { validateCourse } from "./courseHelper.js";
+import { ObjectId } from "mongodb";
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Departments
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const getAllDepartments = async () => {
+  let departmentList = [];
   const departmentCollection = await departments();
-  const departmentList = await departmentCollection.find({}).toArray();
-  if (!departmentList) throwerror("Departments not found");
+  departmentList = await departmentCollection.find({}).toArray();
   return departmentList;
 };
 
 export const getDepartmentById = async (departmentId) => {
-  verify.dbid(departmentId);
+  verify.validateMongoId(departmentId, "departmentId");
   const departmentCollection = await departments();
   const department = await departmentCollection.findOne({
-    _id: new ObjectId(departmentId),
+    _id: departmentId,
   });
   if (!department) {
     throwerror("Department does not exists");
@@ -40,14 +45,14 @@ export const registerDepartment = async (departmentName) => {
 };
 
 export const updateDepartment = async (departmentId, departmentName) => {
-  verify.dbid(departmentId);
+  departmentId = verify.validateMongoId(departmentId, "departmentId");
   const departmentCollection = await departments();
   let department = await departmentCollection.findOne({
-    _id: new ObjectId(departmentId),
+    _id: departmentId,
   });
   department.departmentName = departmentName;
   const updateInfo = await departmentCollection.updateOne(
-    { _id: new ObjectId(department._id) },
+    { _id: department._id },
     { $set: department },
     { returnDocument: "after" }
   );
@@ -57,10 +62,10 @@ export const updateDepartment = async (departmentId, departmentName) => {
 };
 
 export const deleteDepartment = async (departmentId) => {
-  verify.dbid(departmentId);
+  departmentId = verify.validateMongoId(departmentId, "departmentId");
   const departmentCollection = await departments();
   const deletionInfo = await departmentCollection.findOneAndDelete({
-    _id: new ObjectId(departmentId),
+    _id: departmentId,
   });
 
   if (!deletionInfo) {
@@ -69,9 +74,105 @@ export const deleteDepartment = async (departmentId) => {
   return { departmentName: deletionInfo.departmentName, deleted: true };
 };
 
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Courses
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+export const getAllCourses = async () => {
+  let courseList = [];
+  const courseCollection = await courses();
+  courseList = await courseCollection.find({}).toArray();
+  return courseList;
+};
 export const registerCourse = async (
+  courseNumber,
   courseName,
-  courseDepartment,
+  courseDepartmentId,
   courseCredits,
   courseDescription
-) => {};
+) => {
+  let newCourse = validateCourse(
+    courseNumber,
+    courseName,
+    courseDepartmentId,
+    courseCredits,
+    courseDescription
+  );
+
+  const courseCollection = await courses();
+  const departmentCollection = await departments();
+  const existingCourse = await courseCollection.findOne({
+    courseNumber: courseNumber,
+    courseName: courseName,
+  });
+  if (existingCourse) {
+    throwErrorWithStatus(400, "Course already exists");
+  }
+  const department = await departmentCollection.findOne({
+    _id: newCourse.courseDepartmentId,
+  });
+  if (!department) {
+    throwErrorWithStatus(400, "Department not found");
+  }
+  const insertInfo = await courseCollection.insertOne(newCourse);
+  return insertInfo;
+};
+export const getCourseById = async (courseId) => {
+  courseId = verify.validateMongoId(courseId, "courseId");
+  const courseCollection = await courses();
+  const existingCourse = await courseCollection.findOne({
+    _id: courseId,
+  });
+
+  if (!existingCourse) {
+    throwErrorWithStatus(400, `Course with ${courseId} not found`);
+  }
+  return existingCourse;
+};
+export const updateCourse = async (
+  courseId,
+  courseNumber,
+  courseName,
+  courseDepartmentId,
+  courseCredits,
+  courseDescription
+) => {
+  courseId = verify.validateMongoId(courseId, "courseId");
+  let existingCourse = validateCourse(
+    courseNumber,
+    courseName,
+    courseDepartmentId,
+    courseCredits,
+    courseDescription
+  );
+  const courseCollection = await courses();
+  const updateInfo = await courseCollection.updateOne(
+    { _id: courseId },
+    {
+      $set: existingCourse,
+    },
+    { returnDocument: "after" }
+  );
+
+  if (!updateInfo) {
+    throwErrorWithStatus(400, `Course was not updated successfully!`);
+  }
+  return updateInfo;
+};
+export const deleteCourse = async (courseId) => {
+  courseId = verify.validateMongoId(courseId, "courseId");
+  const courseCollection = await courses();
+  const deleteInfo = await courseCollection.findOneAndDelete({
+    _id: courseId,
+  });
+  if (!deleteInfo) {
+    throwErrorWithStatus(400, `Course was not deleted successfully!`);
+  }
+  return deleteInfo;
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Sections
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+export const getSectionByCourseId = async (courseId) => {};
