@@ -6,7 +6,13 @@ import createUser from "../../data/createuser.js";
 const router = Router();
 
 router.get("/create", (req, res) => {
-  res.render("admin/createuser", { style: ["error"] });
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+  };
+
+  res.render("admin/createuser", renderObjs);
 });
 
 router.put("/create", async (req, res) => {

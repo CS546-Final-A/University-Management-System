@@ -55,7 +55,25 @@ app.use(
   })
 );
 
-app.engine("handlebars", engine());
+// Define the eq helper
+const eqHelper = function (a, b) {
+  if (a === b) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+// Register the eq helper with Handlebars
+app.engine(
+  "handlebars",
+  engine({
+    helpers: {
+      eq: eqHelper,
+    },
+  })
+);
+
 app.set("view engine", "handlebars");
 app.set("views", "./views");
 

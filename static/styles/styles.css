@@ -56,6 +56,10 @@ body {
   transition: all 0.2s linear;
 }
 
+#navigationList {
+  height: 70px;
+}
+
 .footer-wrap {
   position: fixed;
   width: 100%;
@@ -190,22 +194,18 @@ h1 span {
   box-shadow: 0 4px 4px rgba(26, 53, 71, 0.25), 0 0 0 1px rgba(26, 53, 71, 0.07);
 }
 .nav-item .dropdown-menu {
-  transform: translate3d(0, 10px, 0);
-  visibility: hidden;
   opacity: 0;
-  max-height: 0;
   display: block;
-  padding: 0;
-  margin: 0;
+  position: absolute;
+  inset: 0px 0px auto auto;
+  margin: 0px;
+  transform: translate3d(0px, 62px, 0px);
   transition: all 200ms linear;
 }
-.nav-item.show .dropdown-menu {
+.nav-item .dropdown-menu.show {
   opacity: 1;
-  visibility: visible;
-  max-height: 999px;
-  transform: translate3d(0, 0px, 0);
+  transform: translate3d(0px, 62px, 0px);
 }
-
 .dropdown-toggle::after {
   display: none;
 }

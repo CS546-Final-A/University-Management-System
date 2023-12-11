@@ -1,1 +1,14 @@
-<h1>Hello {{name}}</h1>
+{{#if (eq type 'Student')}}
+<div class="card col-12 glassEffect">
+    <div class="card-header glassEffect">
+        <img src="./icons/dashboardCourse.svg" alt="loginIcon"> Workspace
+    </div>
+    <div class="card-body">
+
+    </div>
+</div>
+{{/if}}
+
+{{#if (eq type 'Professor')}}
+TEST Professor
+{{/if}}

@@ -17,16 +17,17 @@
     <div class="navigation-wrap bg-light start-header">
         <div class="row">
             <header class="col-12">
-
-                <ul class="nav d-flex mx-5">
+                <ul id="navigationList" class="nav d-flex mx-5">
                     <li class="nav-item">
                         <a class="nav-link" href="/">
                             <span class="fs-5 position-relative" id="homeText">Home</span>
                         </a>
                     </li>
-                    <li class="ms-auto">
+                    {{#if name}}
+                    <li class="nav-item ms-auto dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false"><img src="/icons/user-circle.svg" alt="user-circle-icon" /></a>
+                            data-bs-auto-close="outside" aria-expanded="false"><img src="/icons/user-circle.svg"
+                                alt="user-circle-icon" /></a>
                         <ul class="dropdown-menu p-0" id="navProfileDropdown">
                             <li>
                                 <div class="container p-0">
@@ -48,6 +49,7 @@
                             </li>
                         </ul>
                     </li>
+                    {{/if}}
                 </ul>
             </header>
         </div>
@@ -79,11 +81,7 @@
     <script src="/scripts/bootstrap.bundle.min.js"></script>
     <script src="/scripts/bootstrap-select.min.js"></script>
     <script src="/scripts/styles.js"></script>
-    <script>
-        $("#navProfileDropdown").on("click", function (event) {
-            event.stopPropagation();
-        })
-    </script>
+
 </body>
 
 </html>
