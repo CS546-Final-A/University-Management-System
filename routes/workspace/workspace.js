@@ -42,7 +42,6 @@ router.route("/:sectionId/modules").get(async (req, res) => {
 });
 
 router.route("/:sectionId/modules/attendance").get(async (req, res) => {
-  console.log("Attendance");
   res.render("workspace/attendance");
 });
 
