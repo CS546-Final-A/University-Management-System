@@ -1,7 +1,7 @@
-import { users } from "../config/mongoCollections.js";
+import { users } from "../../config/mongoCollections.js";
 
-import verify from "../data_validation.js";
-import sendRegistrationEmail from "./emails/sendRegistrationEmail.js";
+import verify from "../../data_validation.js";
+import sendRegistrationEmail from "../emails/sendRegistrationEmail.js";
 
 async function createUser(firstname, lastname, email, identification, type) {
   firstname = verify.name(firstname);

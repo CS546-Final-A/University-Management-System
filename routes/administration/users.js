@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import verify from "../../data_validation.js";
-import createUser from "../../data/createuser.js";
+import createUser from "../../data/administration/createuser.js";
 
 const router = Router();
 

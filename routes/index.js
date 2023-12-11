@@ -4,9 +4,9 @@ import signin from "./middleware/signedin.js";
 import adminsOnly from "./middleware/admin.js";
 import ratelimit from "./middleware/limits.js";
 
-import login from "./login.js";
-import register from "./registration.js";
-import logout from "./logout.js";
+import login from "./users/login.js";
+import register from "./users/registration.js";
+import logout from "./users/logout.js";
 import dashboard from "./dashboard.js";
 import user_management from "./administration/users.js";
 import courses from "./courses/courses.js";
@@ -28,7 +28,7 @@ function route(app) {
 
   app.use("/users", adminsOnly);
   app.use("/users", user_management);
-  app.use('/courses', courses);
+  app.use("/courses", courses);
 }
 
 export default route;

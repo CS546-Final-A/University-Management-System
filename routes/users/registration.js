@@ -1,9 +1,9 @@
 import { Router } from "express";
 
-import verify from "../data_validation.js";
-import getUserByID from "../data/users/getUserInfoByID.js";
-import getUnregisteredIdentificationByUserID from "../data/getUnregisteredUserIdentification.js";
-import setPassword from "../data/users/setPasswordByID.js";
+import verify from "../../data_validation.js";
+import getUserByID from "../../data/users/getUserInfoByID.js";
+import getUnregisteredIdentificationByUserID from "../../data/users/getUnregisteredUserIdentification.js";
+import setPassword from "../../data/users/setPasswordByID.js";
 
 function routeError(res, e) {
   if (e.status) {

@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import login from "../data/login.js";
-import verify from "../data_validation.js";
+import login from "../../data/users/login.js";
+import verify from "../../data_validation.js";
 
 const router = Router();
 
