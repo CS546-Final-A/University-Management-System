@@ -13,8 +13,8 @@ export function throwErrorWithStatus(status, message) {
 
 export function santizeInputs(req) {
   // Sanitizes all inputs in a request object
-  for (let key in req.body.data) {
-    req.body.data[key] = xss(req.body.data[key]);
+  for (let key in req.body) {
+    req.body[key] = xss(req.body[key]);
   }
   return req;
 }

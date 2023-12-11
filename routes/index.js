@@ -29,8 +29,10 @@ function route(app) {
 
   app.use("/users", adminsOnly);
   app.use("/users", user_management);
+
   app.use('/courses', courses);
   app.use('/workspace', workspace);
+
 }
 
 export default route;

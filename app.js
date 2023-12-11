@@ -44,7 +44,7 @@ app.use(
   lusca({
     csrf: true,
     /*csp: {
-       ... 
+       ...
     },*/
     xframe: "SAMEORIGIN",
     p3p: "ABCDEF",
