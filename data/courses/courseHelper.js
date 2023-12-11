@@ -35,3 +35,55 @@ export const validateCourse = (
     courseDescription,
   };
 };
+
+export const validateSection = (
+  sectionName,
+  sectionType,
+  sectionStartTime,
+  sectionEndTime,
+  sectionDay,
+  sectionCapacity,
+  sectionYear,
+  sectionSemester,
+  sectionLocation,
+  sectionDescription
+) => {
+  if (
+    !sectionName |
+    !sectionType |
+    !sectionStartTime |
+    !sectionEndTime |
+    !sectionDay |
+    !sectionCapacity |
+    !sectionYear |
+    !sectionSemester |
+    !sectionLocation |
+    !sectionDescription
+  ) {
+    throwErrorWithStatus(400, "Missing parameters");
+  }
+
+  sectionName = verify.isAlphaString(sectionName, "sectionName");
+  sectionType = verify.sectionType(sectionType);
+  sectionStartTime = verify.time(sectionStartTime, "sectionStartTime");
+  sectionEndTime = verify.time(sectionEndTime, "sectionEndTime");
+  sectionDay = verify.day(sectionDay, "sectionDay");
+  sectionCapacity = verify.numberInteger(sectionCapacity, "sectionCapacity");
+  sectionYear = verify.year(sectionYear);
+  sectionSemester = verify.semester(sectionSemester, "sectionSemester");
+  sectionLocation = verify.string(sectionLocation, "sectionLocation");
+  sectionDescription = verify.string(sectionDescription, "sectionDescription");
+
+  return {
+    sectionName,
+    sectionType,
+    sectionStartTime,
+    sectionEndTime,
+    sectionDay,
+    sectionCapacity,
+    sectionYear,
+    sectionSemester,
+    sectionLocation,
+    sectionDescription,
+  };
+};
