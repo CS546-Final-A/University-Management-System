@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import moment from "moment";
 import xss from "xss";
 
 export function throwerror(message) {
@@ -20,7 +21,6 @@ export function santizeInputs(req) {
 
 const verify = {
   email: (email) => {
-    // Email checking function as I had it written for labs, can be made better
     function surroundingcheck(str, part) {
       str = str.split(part);
       for (let section of str) {
@@ -46,16 +46,18 @@ const verify = {
     return email;
   },
   password: (password) => {
-    // Password rules will be discussed together and updated accordingly
+    // Password rules favoring length over complexity based on NIST recommendations
+    // As described by Auth0 below
+    // https://auth0.com/blog/dont-pass-on-the-new-nist-password-guidelines/
     if (typeof password != "string") {
       throwerror("Password is not a string");
     }
     password = password.trim();
-    if (password.length < 1) {
-      throwerror("Password is empty");
+    if (password.length < 8) {
+      throwerror("Password must be between 8 and 128 characters long");
     }
     if (password.length > 128) {
-      throwerror("Password is too long");
+      throwerror("Password must be between 8 and 128 characters long");
     }
     return password;
   },
@@ -118,6 +120,79 @@ const verify = {
       throwerror("Invalid account type");
     }
     return type;
+  },
+  sectionType: (type) => {
+    if (typeof type !== "string") {
+      throwerror("Invalid section type");
+    }
+    type = type.trim();
+
+    const types = ["In Person", "Online"];
+    if (!types.includes(type)) {
+      throwerror("Invalid section type");
+    }
+    return type;
+  },
+  time: (time, timeName) => {
+    const timeSplit = time.split(":");
+
+    if (timeSplit.length !== 2) {
+      throwerror(`Invalid ${timeName}`);
+    }
+
+    const hr = timeSplit[0];
+    const min = timeSplit[1].substring(0, 2);
+    const period = timeSplit[1].substring(2);
+
+    if (period.length !== 3 || period[0] !== " ")
+      throwerror(`Invalid period in ${timeName}`);
+
+    if (isNaN(parseInt(hr))) throwerror(`Invalid hour in ${timeName}`);
+
+    if (
+      (parseInt(hr) < 10 && hr.length > 1) ||
+      parseInt(hr) < 1 ||
+      parseInt(hr) > 12
+    )
+      throwerror(`Invalid hour in ${timeName}`);
+
+    if (isNaN(min) || min < 0 || min > 59)
+      throwerror(`Invalid minutes in ${timeName}`);
+
+    if (period.trim() !== "PM" && period.trim() !== "AM")
+      throwerror(`Invalid period in ${timeName}`);
+
+    return time;
+  },
+  day: (day, dayName) => {
+    day = verify.string(day, dayName);
+    const weekHelper = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+    ];
+    if (!weekHelper.includes(day)) {
+      throwerror("Invalid week value");
+    }
+    return day;
+  },
+  semester: (semester, semesterName) => {
+    semester = verify.string(semester, semesterName);
+    const semesterHelper = ["Fall", "Spring"];
+    if (!semesterHelper.includes(semester)) {
+      throwerror("Invalid semester value");
+    }
+    return semester;
+  },
+  year: (year) => {
+    const checkYear = moment(year);
+    if (!checkYear.isValid()) {
+      throwerror(`Year is not valid`);
+    }
+
+    return year;
   },
   dbid: (id) => {
     if (!(id instanceof ObjectId)) {

@@ -1,7 +1,6 @@
 import { Router } from "express";
 
 import verify from "../data_validation.js";
-import identificationVerificationHTML from "../data/identificationVerifierHTML.js";
 import getUserByID from "../data/users/getUserInfoByID.js";
 import getUnregisteredIdentificationByUserID from "../data/getUnregisteredUserIdentification.js";
 import setPassword from "../data/users/setPasswordByID.js";
@@ -73,7 +72,16 @@ router.patch("/setpassword", async (req, res) => {
 
     const result = await setPassword(req.session.registrationuserid, password);
 
-    return res.json({ successful: result.acknowledged });
+    if (result.acknowledged) {
+      // Prevent user from accessing password setting page
+      delete req.session.registrationuserid;
+      return res.json({ successful: result.acknowledged });
+    } else {
+      throw {
+        status: 500,
+        message: "Password setting request not acknowledged by database",
+      };
+    }
   } catch (e) {
     if (e.status !== 500 && e.status) {
       res.status(e.status);
@@ -101,9 +109,7 @@ router.get("/:userid", async (req, res) => {
 
     return res.render("public/registration", {
       identification: identification.type,
-      identificationverification: identificationVerificationHTML(
-        identification.type
-      ),
+      identificationverification: `registerby${identification.type}`,
     });
   } catch (e) {
     return routeError(res, e);
@@ -129,9 +135,7 @@ router.post("/:userid", async (req, res) => {
   } else {
     res.render("public/registration", {
       identification: identification.type,
-      identificationverification: identificationVerificationHTML(
-        identification.type
-      ),
+      identificationverification: `registerby${identification.type}`,
       error: "Invalid identification",
     });
   }
