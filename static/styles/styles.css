@@ -9,8 +9,7 @@
   --activeBgColor: var(--whiteColor);
   --purpleAccent: #8167a9;
   --greenAccent: #00bf98;
-  --codeBg: #373737;
-  --codeHead: #000000;
+  --fadeGrey: #a1a1a147;
   --transparentColor: #00000000;
   --glassColor1: #ffffff40;
   --glassColor2: #3b3b3b40;
@@ -47,10 +46,6 @@ body {
   transition: all 0.2s linear;
 }
 
-.start-header.scroll-on .navbar-brand img {
-  -webkit-transition: all 0.2s linear;
-  transition: all 0.2s linear;
-}
 .navigation-wrap {
   position: fixed;
   width: 100%;
@@ -76,17 +71,6 @@ body {
   visibility: hidden;
   transition: all 0.2s linear;
   color: #e35555;
-}
-.navbar {
-  padding: 0;
-}
-
-.navbar-brand img {
-  height: 130px;
-  width: auto;
-  display: block;
-  -webkit-transition: all 0.2s linear;
-  transition: all 0.2s linear;
 }
 
 .nav-link {
@@ -127,6 +111,8 @@ body {
 .nav-item {
   position: relative;
   transition: all 200ms linear;
+  margin-top: auto !important;
+  margin-bottom: auto !important;
 }
 
 .bg-light {
@@ -182,7 +168,7 @@ h1 span {
   border-radius: 5px;
   position: relative;
   display: block;
-  margin: 0 35px;
+  margin: 1.5rem;
   text-align: center;
   opacity: 1;
   transform: translate(0);
@@ -321,7 +307,7 @@ input.autofill:active::after {
 
 .btnSubmit {
   transition: all 0.2s linear;
-  background: var(--activeBgColor);
+  background-color: var(--activeBgColor);
   color: var(--activeTextColor);
   border-radius: 5px;
 }
@@ -329,6 +315,18 @@ input.autofill:active::after {
 .btnSubmit:hover {
   background-color: var(--greenAccent);
   color: white;
+}
+
+.btnNavbar {
+  transition: all 0.2s linear;
+  background-color: var(--activeBgColor);
+  color: var(--activeTextColor);
+  border-radius: 0px;
+  border: 0;
+}
+
+.btnNavbar:hover {
+  background-color: var(--fadeGrey);
 }
 
 .opacityMin {
