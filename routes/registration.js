@@ -1,7 +1,6 @@
 import { Router } from "express";
 
 import verify from "../data_validation.js";
-import identificationVerificationHTML from "../data/identificationVerifierHTML.js";
 import getUserByID from "../data/users/getUserInfoByID.js";
 import getUnregisteredIdentificationByUserID from "../data/getUnregisteredUserIdentification.js";
 import setPassword from "../data/users/setPasswordByID.js";
@@ -101,9 +100,7 @@ router.get("/:userid", async (req, res) => {
 
     return res.render("public/registration", {
       identification: identification.type,
-      identificationverification: identificationVerificationHTML(
-        identification.type
-      ),
+      identificationverification: `registerby${identification.type}`,
     });
   } catch (e) {
     return routeError(res, e);
@@ -129,9 +126,7 @@ router.post("/:userid", async (req, res) => {
   } else {
     res.render("public/registration", {
       identification: identification.type,
-      identificationverification: identificationVerificationHTML(
-        identification.type
-      ),
+      identificationverification: `registerby${identification.type}`,
       error: "Invalid identification",
     });
   }

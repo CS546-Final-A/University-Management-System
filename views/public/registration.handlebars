@@ -1,5 +1,5 @@
 <form id="registration" method="POST">
-    {{{identificationverification}}}
+    {{> (lookup. 'identificationverification') }}
     <input type="hidden" name="idtype" value="{{identification}}">
     <input type="hidden" id="_csrf" name="_csrf" value="{{_csrf}}">
     <br><input type="submit" id="submit" value="Register"></input>
