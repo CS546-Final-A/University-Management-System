@@ -1,8 +1,12 @@
 import { ObjectId } from "mongodb";
 import xss from "xss";
 
-function throwerror(message) {
+export function throwerror(message) {
   const error = { status: 400, message: message };
+  throw error;
+}
+export function throwErrorWithStatus(status, message) {
+  const error = { status: status, message: message };
   throw error;
 }
 
@@ -120,6 +124,35 @@ const verify = {
       throwerror("Not an ObjectId");
     }
     return id;
+  },
+  validateMongoId: (id, stringName) => {
+    if (!ObjectId.isValid(id)) {
+      throwerror(`${stringName} is not an ObjectId`);
+    }
+    return new ObjectId(id);
+  },
+  string: (string, stringName) => {
+    if (typeof string !== "string") throwerror(`${stringName} is not a string`);
+    if (!string.trim()) throwerror(`${stringName} is not a string`);
+    return string.trim();
+  },
+  number: (number, numberName) => {
+    if (typeof number !== "number" || isNaN(number) || number < 0)
+      throw new Error(`${numberName} is not a valid number`);
+    return number;
+  },
+  numberInteger: (number, numberName) => {
+    verify.number(number, numberName);
+    if (!Number.isInteger(number))
+      throw new Error(`${numberName} is not a valid number`);
+    return number;
+  },
+  isAlphaString: (string, stringName) => {
+    string = verify.string(string, stringName);
+    if (!/^[a-zA-Z ]*$/.test(string)) {
+      throwerror(`${stringName} should only have alphabets`);
+    }
+    return string;
   },
 };
 
