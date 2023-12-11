@@ -55,12 +55,25 @@ app.use(
   })
 );
 
-const handlebars = exphbs.create({
-  defaultLayout: "main",
-  partialsDir: ["views/partials/"],
-});
+// Define the eq helper
+const eqHelper = function (a, b) {
+  if (a === b) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
-app.engine("handlebars", handlebars.engine);
+// Register the eq helper with Handlebars
+app.engine(
+  "handlebars",
+  engine({
+    helpers: {
+      eq: eqHelper,
+    },
+  })
+);
+
 app.set("view engine", "handlebars");
 app.set("views", "./views");
 
