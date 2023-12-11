@@ -72,7 +72,16 @@ router.patch("/setpassword", async (req, res) => {
 
     const result = await setPassword(req.session.registrationuserid, password);
 
-    return res.json({ successful: result.acknowledged });
+    if (result.acknowledged) {
+      // Prevent user from accessing password setting page
+      delete req.session.registrationuserid;
+      return res.json({ successful: result.acknowledged });
+    } else {
+      throw {
+        status: 500,
+        message: "Password setting request not acknowledged by database",
+      };
+    }
   } catch (e) {
     if (e.status !== 500 && e.status) {
       res.status(e.status);
