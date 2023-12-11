@@ -10,26 +10,27 @@
         <label for="department-filter">Department:</label>
         <select id="department-filter">
             <option value="">All</option>
-            {{#each departments}}
+            {{#each courses.uniqueDepartmentNames}}
             <option value="{{this}}">{{this}}</option>
             {{/each}}
         </select>
         <br>
 
-        <br>
-        <label for="instructor-filter">Instructor:</label>
+
+        {{!-- <label for="instructor-filter">Instructor:</label>
         <select id="instructor-filter">
             <option value="">All</option>
-            {{#each instructors}}
+            {{#each uniqu}}
             <option value="{{this}}">{{this}}</option>
             {{/each}}
         </select>
-        <br>
+        <br> --}}
         <label for="delivery-mode-filter">Delivery Mode:</label>
         <select id="delivery-mode-filter">
             <option value="">All</option>
-            <option value="In-person">In-person</option>
-            <option value="Online">Online</option>
+            {{#each courses.uniqueSectionTypes}}
+            <option value="{{this}}">{{this}}</option>
+            {{/each}}
         </select>
         <br>
         <label for="meeting-days-filter">Meeting Days:</label>
@@ -44,7 +45,7 @@
         <button id="filter-button">Apply</button>
     </div>
     <div class="courses">
-
+        
         {{#each courses}}
         <div class="course">
             <div class="details">
@@ -65,5 +66,6 @@
 
         
     </div>
-
+    <script src="/scripts/course-listing.js"></script>
+   
 </div>

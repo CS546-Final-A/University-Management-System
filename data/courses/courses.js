@@ -85,14 +85,6 @@ export const getAllCourses = async () => {
     .aggregate([
       {
         $lookup: {
-          from: "sections",
-          localField: "_id",
-          foreignField: "courseId",
-          as: "sections",
-        },
-      },
-      {
-        $lookup: {
           from: "users",
           localField: "sections.sectionInstructor",
           foreignField: "_id",
@@ -118,12 +110,6 @@ export const getAllCourses = async () => {
           departmentName: "$department.departmentName",
           courseDescription: 1,
           // Include all fields from the "sections" collection
-          sectionId: "$sections._id",
-          sectionType: "$sections.sectionType",
-          sectionNumber: "$sections.sectionName",
-          sectionCapacity: "$sections.sectionCapacity",
-          sectionDay: "$sections.sectionDay",
-          sectionType: "$sections.sectionType",
           instructors: "$instructor",
         },
       },
