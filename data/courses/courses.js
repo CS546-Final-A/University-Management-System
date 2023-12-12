@@ -129,6 +129,28 @@ export const getCourseById = async (courseId) => {
   }
   return existingCourse;
 };
+
+export const getCoursesByIds = async (courseIds) => {
+  courseIds.forEach((courseId) => {
+    courseId = verify.validateMongoId(courseId, "courseId");
+  });
+
+  const coursesCollection = await courses();
+  const objectIds = courseIds.map((courseId) => new ObjectId(courseId));
+
+  const coursesList = await coursesCollection
+    .find({
+      _id: { $in: objectIds },
+    })
+    .toArray();
+
+  if (!coursesList || coursesList.length === 0) {
+    throwErrorWithStatus(400, "No courses found with the provided courseIds");
+  }
+
+  return coursesList;
+};
+
 export const updateCourse = async (
   courseId,
   courseNumber,

@@ -1,6 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import getSectionById from "../../data/sections/sections.js";
+import { getSectionById } from "../../data/sections/sections.js";
 import { getCourseById } from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
 router.route("/:sectionId").get(async (req, res) => {
