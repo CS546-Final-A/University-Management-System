@@ -4,7 +4,20 @@
         <img src="./icons/dashboardCourse.svg" alt="loginIcon"> Workspace
     </div>
     <div class="card-body">
+        <div class="row">
+            {{#each workspace}}
 
+            <div class="col-md-4 col-12">
+                <a class="text-decoration-none" href="/workspace/{{sectionId}}">
+                    <div class="card">
+                        <div class="card-header">{{courseNumber}}: {{courseName}}</div>
+                        <div class="card-body">Section: {{sectionName}} | Delivery: {{sectionType}}</div>
+                    </div>
+                </a>
+            </div>
+
+            {{/each}}
+        </div>
     </div>
 </div>
 {{/if}}

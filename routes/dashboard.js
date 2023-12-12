@@ -27,10 +27,31 @@ router.get("/", async (req, res) => {
     for (let i = 0; i < requestedSections.length; i++) {
       tempArr.push(requestedSections[i].courseId);
     }
-
     const requestedCourses = await courseData.getCoursesByIds(tempArr);
-    console.log(requestedCourses);
+    tempArr = [];
 
+    for (let i = 0; i < requestedSections.length; i++) {
+      for (let j = 0; j < requestedCourses.length; j++) {
+        if (
+          requestedSections[i].courseId.toString() ===
+          requestedCourses[j]._id.toString()
+        ) {
+          tempArr.push({
+            courseName: requestedCourses[j].courseName,
+            courseNumber: requestedCourses[j].courseNumber,
+            sectionType: requestedSections[i].sectionType,
+            sectionName: requestedSections[i].sectionName,
+            sectionId: requestedSections[i]._id.toString(),
+          });
+          break;
+        }
+      }
+    }
+
+    renderObjs = {
+      ...renderObjs,
+      workspace: tempArr,
+    };
     return res.render("public/dashboard", renderObjs);
   }
 });
