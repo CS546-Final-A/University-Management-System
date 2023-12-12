@@ -46,7 +46,7 @@ $("#selectSemester").click(async function (e) {
   const semester = $("#semester").val();
   // console.log(year, semester);
 
-  window.location.href = `/courses/${year}/${semester}/listings`;
+  window.location.href = `/courses/${year}/${semester}/listings/`;
 });
 
 $(".courseRedirect").click(async function (e) {
