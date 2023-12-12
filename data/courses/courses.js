@@ -3,7 +3,7 @@ import verify, {
   throwErrorWithStatus,
   throwerror,
 } from "../../data_validation.js";
-import { validateCourse } from "./courseHelper.js";
+import { validateCourse, validateSection } from "./courseHelper.js";
 import { ObjectId } from "mongodb";
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,9 +81,44 @@ export const deleteDepartment = async (departmentId) => {
 export const getAllCourses = async () => {
   let courseList = [];
   const courseCollection = await courses();
-  courseList = await courseCollection.find({}).toArray();
+  courseList = await courseCollection
+    .aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "sections.sectionInstructor",
+          foreignField: "_id",
+          as: "instructor",
+        },
+      },
+      {
+        $lookup: {
+          from: "departments",
+          localField: "courseDepartmentId",
+          foreignField: "_id",
+          as: "department",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          // Include all other fields from the "courses" collection
+          courseName: 1,
+          courseNumber: 1,
+          courseDepartmentId: 1,
+          courseCredits: 1,
+          departmentName: "$department.departmentName",
+          courseDescription: 1,
+          // Include all fields from the "sections" collection
+          instructors: "$instructor",
+        },
+      },
+    ])
+    .toArray();
+  console.log(courseList);
   return courseList;
 };
+
 export const registerCourse = async (
   courseNumber,
   courseName,
@@ -197,4 +232,150 @@ export const deleteCourse = async (courseId) => {
 // Sections
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-export const getSectionByCourseId = async (courseId) => {};
+export const getSectionsByCourseId = async (courseId) => {
+  courseId = verify.validateMongoId(courseId, "courseId");
+  const courseCollection = await courses();
+  const sections = await courseCollection.findOne(
+    { _id: courseId },
+    { sections: 1 }
+  );
+  if (!sections) {
+    throwErrorWithStatus(400, `Course was not found`);
+  }
+  return sections;
+};
+
+export const getSectionById = async (sectionId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  const courseCollection = await courses();
+  const course = await courseCollection.findOne({
+    "sections.sectionId": sectionId,
+  });
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+  const section = course.sections.find(
+    (section) => section.sectionId.toString() === sectionId.toString()
+  );
+  return section;
+};
+
+export const registerSection = async (
+  courseId,
+  sectionName,
+  sectionType,
+  sectionStartTime,
+  sectionEndTime,
+  sectionDay,
+  sectionCapacity,
+  sectionYear,
+  sectionSemester,
+  sectionLocation,
+  sectionDescription
+) => {
+  courseId = verify.validateMongoId(courseId, "courseId");
+
+  let newSection = validateSection(
+    sectionName,
+    sectionType,
+    sectionStartTime,
+    sectionEndTime,
+    sectionDay,
+    sectionCapacity,
+    sectionYear,
+    sectionSemester,
+    sectionLocation,
+    sectionDescription
+  );
+
+  const courseCollection = await courses();
+  newSection.sectionId = new ObjectId();
+  const updateInfo = await courseCollection.update(
+    { _id: courseId },
+    { $push: { sections: newSection } }
+  );
+  if (!updateInfo) {
+    throwErrorWithStatus(
+      400,
+      `Section was not added to the course successfully!`
+    );
+  }
+  return updateInfo;
+};
+
+export const updateSection = async (
+  sectionId,
+  sectionName,
+  sectionType,
+  sectionStartTime,
+  sectionEndTime,
+  sectionDay,
+  sectionCapacity,
+  sectionYear,
+  sectionSemester,
+  sectionLocation,
+  sectionDescription
+) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  let updatedSection = validateSection(
+    sectionName,
+    sectionType,
+    sectionStartTime,
+    sectionEndTime,
+    sectionDay,
+    sectionCapacity,
+    sectionYear,
+    sectionSemester,
+    sectionLocation,
+    sectionDescription
+  );
+  const courseCollection = await courses();
+
+  const course = await courseCollection.findOne({
+    "sections.sectionId": sectionId,
+  });
+
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+
+  updatedSection.sectionId = sectionId;
+  const updateInfo = await courseCollection.updateOne(
+    { "sections.sectionId": sectionId },
+    {
+      $set: {
+        "sections.$": updatedSection,
+      },
+    },
+    { returnDocument: "after" }
+  );
+  if (!updateInfo) {
+    throwErrorWithStatus(
+      400,
+      `Section was not added to the course successfully!`
+    );
+  }
+  return updateInfo;
+};
+
+export const deletesection = async (sectionId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+
+  const courseCollection = await courses();
+  const section = await courseCollection.findOne({
+    "sections.sectionId": sectionId,
+  });
+
+  if (!section) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+  const deletionInfo = db.courseCollection.updateOne(
+    { "sections.sectionId": sectionId },
+    { $pull: { sections: { sectionId: sectionId } } }
+  );
+
+  if (!deletionInfo) {
+    throwerror("Section was not deleted successfully!");
+  }
+};
+
