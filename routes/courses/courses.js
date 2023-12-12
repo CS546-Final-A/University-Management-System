@@ -8,25 +8,19 @@ const router = Router();
 router.get("/", async (req, res) => {
   let uniqueSectionYearandSemester =
     await courseDataFunctions.getUniqueSectionYearandSemester();
-  // console.log(
-  //   util.inspect(
-  //     uniqueSectionYearandSemester,
-  //     false,
-  //     null,
-  //     true /* enable colors */
-  //   )
-  // );
-  console.log("yes");
   res.render("courses/index", {
     uniqueYear: uniqueSectionYearandSemester[0],
     uniqueSemester: uniqueSectionYearandSemester[1],
   });
 });
 
+router.get("/landing", async (req, res) => {
+  res.render("courses/landing");
+});
+
 router.get("/:year/:semester/listings", async (req, res) => {
   const { year, semester } = req.params;
 
-  console.log(year, semester);
   let {
     searchTerm,
     departmentFilter,
@@ -51,8 +45,6 @@ router.get("/:year/:semester/listings", async (req, res) => {
   let uniqueInstructors =
     await courseDataFunctions.getUniqueInstructorNamesandId();
 
-  // // console.log(department);
-  // console.log(instructors);
 
   data.uniqueDepartmentNames = uniqueDepartmentNames;
   data.uniqueInstructors = uniqueInstructors;
@@ -62,7 +54,6 @@ router.get("/:year/:semester/listings", async (req, res) => {
   data.map((course) => {
     course.departmentName = course.departmentName[0];
   });
-  // console.log(util.inspect(data, false, null, true /* enable colors */));
   res.render("courses/listings", {
     courses: data,
   });

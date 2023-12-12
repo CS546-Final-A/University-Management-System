@@ -370,6 +370,7 @@ export const getSectionById = async (sectionId) => {
 export const registerSection = async (
   courseId,
   sectionName,
+  sectionInstructor,
   sectionType,
   sectionStartTime,
   sectionEndTime,
@@ -384,6 +385,7 @@ export const registerSection = async (
 
   let newSection = validateSection(
     sectionName,
+    sectionInstructor,
     sectionType,
     sectionStartTime,
     sectionEndTime,

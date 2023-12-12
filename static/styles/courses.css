@@ -80,3 +80,23 @@ a {
 .filter button:hover {
   background-color: #8167a9;
 }
+
+.menuContainer{
+  display: flex;
+  gap: 1rem;
+}
+
+.menuCard {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  background-color: white;
+  padding: 5rem;
+  border-radius: 15px;
+  color: #8167a9;
+  cursor: pointer;
+}
+
+.menuCard:hover {
+  background-color: #8167a9;
+  color: white;
+}
+
