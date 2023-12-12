@@ -3,6 +3,7 @@ h1 {
 }
 a {
   color: #8167a9;
+  cursor: pointer;
 }
 .course-listing {
   display: flex;
@@ -41,8 +42,9 @@ a {
 .course-listing .courses .course h2 {
   margin-top: 1rem;
 }
-.course-listing .courses .course h2 a {
+.course-listing .courses .course h2 {
   text-decoration: none;
+  cursor: pointer;
   color: unset;
 }
 /* Style for the filter container */
