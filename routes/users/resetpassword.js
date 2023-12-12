@@ -2,6 +2,8 @@ import { Router } from "express";
 
 import verify from "../../data_validation.js";
 
+import initiatePasswordReset from "../../data/users/initiatePasswordReset.js";
+
 const router = Router();
 
 router.get("/", (req, res) => {
