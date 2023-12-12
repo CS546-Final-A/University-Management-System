@@ -212,7 +212,8 @@ export const getAllCourses = async (
 
   if (departmentFilter) {
     courseList = courseList.filter((course) => {
-      let x = course.departmentName[0].toLowerCase();
+      console.log(course.courseDepartmentId);
+      let x = course.courseDepartmentId.toString();
       return x.includes(departmentFilter.toLowerCase());
     });
   }
