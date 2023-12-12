@@ -10,4 +10,27 @@ router.get("/", (req, res) => {
   });
 });
 
+router.put("/", async (req, res) => {
+  try {
+    const email = verify.email(req.body.email);
+
+    const result = await initiatePasswordReset(email);
+
+    res.json({ successful: result.successful });
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      if (e.message) {
+        console.log(e.message);
+      } else {
+        console.log(e);
+      }
+      res.status(500);
+      res.json({ error: "Internal Server Error" });
+    }
+  }
+});
+
 export default router;
