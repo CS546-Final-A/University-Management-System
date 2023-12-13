@@ -15,7 +15,7 @@ export const validateCourse = (
     !courseCredits ||
     !courseDescription
   ) {
-    throwErrorWithStatus(400, "Missing parameters");
+    throwErrorWithStatus(400, "Missing inputs");
   }
 
   courseNumber = verify.numberInteger(courseNumber, "courseNumber");
@@ -33,5 +33,61 @@ export const validateCourse = (
     courseDepartmentId,
     courseCredits,
     courseDescription,
+  };
+};
+
+export const validateSection = (
+  sectionName,
+  sectionInstructor,
+  sectionType,
+  sectionStartTime,
+  sectionEndTime,
+  sectionDay,
+  sectionCapacity,
+  sectionYear,
+  sectionSemester,
+  sectionLocation,
+  sectionDescription
+) => {
+  if (
+    !sectionName |
+    !sectionInstructor |
+    !sectionType |
+    !sectionStartTime |
+    !sectionEndTime |
+    !sectionDay |
+    !sectionCapacity |
+    !sectionYear |
+    !sectionSemester |
+    !sectionLocation |
+    !sectionDescription
+  ) {
+    throwErrorWithStatus(400, "Missing inputs");
+  }
+
+  sectionName = verify.isAlphaString(sectionName, "sectionName");
+  sectionInstructor = verify.validateMongoId(sectionInstructor, "sectionInstructor");
+  sectionType = verify.sectionType(sectionType);
+  sectionStartTime = verify.time(sectionStartTime, "sectionStartTime");
+  sectionEndTime = verify.time(sectionEndTime, "sectionEndTime");
+  sectionDay = verify.day(sectionDay, "sectionDay");
+  sectionCapacity = verify.numberInteger(sectionCapacity, "sectionCapacity");
+  sectionYear = verify.year(sectionYear);
+  sectionSemester = verify.semester(sectionSemester, "sectionSemester");
+  sectionLocation = verify.string(sectionLocation, "sectionLocation");
+  sectionDescription = verify.string(sectionDescription, "sectionDescription");
+
+  return {
+    sectionName,
+    sectionInstructor,
+    sectionType,
+    sectionStartTime,
+    sectionEndTime,
+    sectionDay,
+    sectionCapacity,
+    sectionYear,
+    sectionSemester,
+    sectionLocation,
+    sectionDescription,
   };
 };

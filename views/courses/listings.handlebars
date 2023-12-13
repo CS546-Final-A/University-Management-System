@@ -10,32 +10,27 @@
         <label for="department-filter">Department:</label>
         <select id="department-filter">
             <option value="">All</option>
-            {{#each departments}}
-            <option value="{{this}}">{{this}}</option>
+            {{#each courses.uniqueDepartmentNames}}
+            <option value="{{this.id}}">{{this.name}}</option>
             {{/each}}
         </select>
         <br>
-        <label for="level-filter">Level:</label>
-        <select id="level-filter">
-            <option value="">All</option>
-            <option value="1XX">1XX</option>
-            <option value="2XX">2XX</option>
-            <option value="3XX">3XX</option>
-        </select>
-        <br>
+
+
         <label for="instructor-filter">Instructor:</label>
         <select id="instructor-filter">
             <option value="">All</option>
-            {{#each instructors}}
-            <option value="{{this}}">{{this}}</option>
+            {{#each courses.uniqueInstructors}}
+            <option value="{{this.id}}">{{this.name}}</option>
             {{/each}}
         </select>
         <br>
         <label for="delivery-mode-filter">Delivery Mode:</label>
         <select id="delivery-mode-filter">
             <option value="">All</option>
-            <option value="In-person">In-person</option>
-            <option value="Online">Online</option>
+            {{#each courses.uniqueSectionTypes}}
+            <option value="{{this}}">{{this}}</option>
+            {{/each}}
         </select>
         <br>
         <label for="meeting-days-filter">Meeting Days:</label>
@@ -50,35 +45,29 @@
         <button id="filter-button">Apply</button>
     </div>
     <div class="courses">
-
+        
         {{#each courses}}
         <div class="course">
-
-
             <div class="details">
-                <h2><a href="/courses/{{this.course_id}}?semester={{this.semester}}">{{this.course_id}} :
-                        {{this.name}}</a></h2>
-
-                <p>Department: {{this.department}}</p>
-                <p>Level: {{this.level}}</p>
-                <p>Instructor: {{this.instructor}}</p>
-                <p>Delivery Mode: {{this.delivery_mode}}</p>
-                <p>Status: {{this.Status}}</p>
+                <h2 class="courseRedirect" data-id="{{this._id}}">{{this.courseNumber}} -
+                        {{this.courseName}}</a></h2>
+                <p>{{this.courseDescription}}</p>
+                <p>Department: {{this.departmentName}}</p>
+                
+                <p>Credits: {{this.courseCredits}}</p>
+                {{!-- <p>Delivery Mode: {{this.delivery_mode}}</p>
+                <p>Status: {{this.Status}}</p> --}}
             </div>
-
-
-
-            {{!-- <p>Prerequisites: {{this.prerequisites}}</p>
-            <p>Corequisites: {{this.corequisites}}</p>
-            <p>Restrictions: {{this.restrictions}}</p>
-            <p>Notes: {{this.notes}}</p> --}}
             <div class="actions">
-                <a href="/courses/{{this.course_id}}">View</a>
+                <a class="courseRedirect" data-id="{{this._id}}">View</a>
             </div>
         </div>
-
-
         {{/each}}
-    </div>
 
+        
+    </div>
+    <script src="/scripts/course-listing.js"></script>
+    <script>
+        console.log("{{courses.year}}")
+    </script>
 </div>

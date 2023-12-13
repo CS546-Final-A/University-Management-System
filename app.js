@@ -40,20 +40,20 @@ app.use("/", (req, res, next) => {
   next();
 });
 
-// app.use(
-//   lusca({
-//     csrf: true,
-//     /*csp: {
-//        ...
-//     },*/
-//     xframe: "SAMEORIGIN",
-//     p3p: "ABCDEF",
-//     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
-//     xssProtection: true,
-//     nosniff: true,
-//     referrerPolicy: "same-origin",
-//   })
-// );
+app.use(
+  lusca({
+    csrf: true,
+    /*csp: {
+       ...
+    },*/
+    xframe: "SAMEORIGIN",
+    p3p: "ABCDEF",
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    xssProtection: true,
+    nosniff: true,
+    referrerPolicy: "same-origin",
+  })
+);
 
 // Define the eq helper
 const eqHelper = function (a, b) {

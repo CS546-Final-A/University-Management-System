@@ -1,6 +1,7 @@
 #error {
     animation-duration: 4s;
     animation-timing-function: linear;
+    color: red;
     opacity: 0%;
 }
 
