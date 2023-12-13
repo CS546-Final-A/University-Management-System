@@ -39,3 +39,10 @@ $("#filter-button").click(async function (e) {
   // Redirect to the URL
   window.location.href = url;
 });
+$(".courseRedirect").click(async function (e) {
+  e.preventDefault();
+  const courseID = $(this).attr("data-id");
+  // console.log(courseID);
+  // console.log(window.location.href);
+  window.location.href = window.location.href.split("?")[0] + courseID;
+});
