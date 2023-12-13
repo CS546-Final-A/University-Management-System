@@ -1,0 +1,37 @@
+<link rel="stylesheet" href="/styles/courses.css">
+<link rel="stylesheet" href="/styles/error.css">
+<h2>Course Registration Form</h2>
+
+<div class="courseRegistrationContainer">
+    <form id="courseRegistrationForm" class="courseRegistrationForm">
+        <label for="courseNumber">Course Number:</label>
+        <input type="text" id="courseNumber" name="courseNumber" required>
+
+        <label for="courseName">Course Name:</label>
+        <input type="text" id="courseName" name="courseName" required>
+
+        <label for="courseDepartmentId">Department:</label>
+        <select id="courseDepartmentId">
+            <option value=null>None</option>
+            {{#each uniqueDepartmentNames}}
+            <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+        </select>
+
+        <label for="courseCredits">Credits:</label>
+        <input type="number" id="courseCredits" name="courseCredits" required>
+
+        <label for="courseDescription">Description:</label>
+        <textarea id="courseDescription" name="courseDescription" required></textarea>
+        <input type="hidden" id="csrf" value="{{_csrf}}">
+        <div id="error"></div>
+        <div id="status"></div>
+        <div>
+            <button type="button" onclick="registerCourse()">Register Course</button>
+            <button type="button" onclick="goBack()">Go Back</button>
+        </div>
+    </form>
+</div>
+
+<script src="/scripts/request.js"></script>
+<script src="/scripts/course-registration.js"></script>

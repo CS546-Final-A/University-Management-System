@@ -166,13 +166,7 @@ const verify = {
   },
   day: (day, dayName) => {
     day = verify.string(day, dayName);
-    const weekHelper = [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-    ];
+    const weekHelper = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
     if (!weekHelper.includes(day)) {
       throwerror("Invalid week value");
     }
@@ -213,13 +207,14 @@ const verify = {
   },
   number: (number, numberName) => {
     if (typeof number !== "number" || isNaN(number) || number < 0)
-      throw new Error(`${numberName} is not a valid number`);
+      throwerror(`${numberName} is not a valid number`);
     return number;
   },
   numberInteger: (number, numberName) => {
+    number = parseInt(number, 10);
     verify.number(number, numberName);
     if (!Number.isInteger(number))
-      throw new Error(`${numberName} is not a valid number`);
+      throwerror(`${numberName} is not a valid number`);
     return number;
   },
   isAlphaString: (string, stringName) => {

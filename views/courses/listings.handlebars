@@ -11,20 +11,20 @@
         <select id="department-filter">
             <option value="">All</option>
             {{#each courses.uniqueDepartmentNames}}
-            <option value="{{this}}">{{this}}</option>
+            <option value="{{this.id}}">{{this.name}}</option>
             {{/each}}
         </select>
         <br>
 
 
-        {{!-- <label for="instructor-filter">Instructor:</label>
+        <label for="instructor-filter">Instructor:</label>
         <select id="instructor-filter">
             <option value="">All</option>
-            {{#each uniqu}}
-            <option value="{{this}}">{{this}}</option>
+            {{#each courses.uniqueInstructors}}
+            <option value="{{this.id}}">{{this.name}}</option>
             {{/each}}
         </select>
-        <br> --}}
+        <br>
         <label for="delivery-mode-filter">Delivery Mode:</label>
         <select id="delivery-mode-filter">
             <option value="">All</option>
@@ -49,17 +49,17 @@
         {{#each courses}}
         <div class="course">
             <div class="details">
-                <h2><a href="/courses/listings/{{this.courseNumber}}?semester={{this.semester}}">{{this.courseNumber}} -
+                <h2 class="courseRedirect" data-id="{{this._id}}">{{this.courseNumber}} -
                         {{this.courseName}}</a></h2>
                 <p>{{this.courseDescription}}</p>
-                <p>Department: {{this.department.departmentName}}</p>
+                <p>Department: {{this.departmentName}}</p>
                 
                 <p>Credits: {{this.courseCredits}}</p>
                 {{!-- <p>Delivery Mode: {{this.delivery_mode}}</p>
                 <p>Status: {{this.Status}}</p> --}}
             </div>
             <div class="actions">
-                <a href="/courses/{{this.course_id}}">View</a>
+                <a class="courseRedirect" data-id="{{this._id}}">View</a>
             </div>
         </div>
         {{/each}}
@@ -67,5 +67,7 @@
         
     </div>
     <script src="/scripts/course-listing.js"></script>
-   
+    <script>
+        console.log("{{courses.year}}")
+    </script>
 </div>

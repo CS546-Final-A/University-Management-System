@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { sections } from "../../config/mongoCollections.js";
 
 const getSectionById = async (sectionId) => {
+
   if (
     !sectionId ||
     typeof sectionId !== "string" ||
@@ -19,6 +20,9 @@ const getSectionById = async (sectionId) => {
   }
   section._id = section._id.toString();
   return section;
+
+
+
 };
 
 const getSectionsByIds = async (sectionIds) => {
