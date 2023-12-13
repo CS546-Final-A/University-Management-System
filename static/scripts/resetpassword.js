@@ -25,13 +25,13 @@ function sendform() {
       });
 
       if (result.successful) {
-        alert("Your password has been set");
+        alert("Your password has been reset");
         window.location.pathname = "/login";
       } else {
         throw "Internal server error";
       }
     } catch (e) {
-      const errdiv = document.getElementById("error");
+      const errdiv = $("#error");
       errdiv.innerText = e;
     } finally {
       sending = false;
