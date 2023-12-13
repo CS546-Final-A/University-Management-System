@@ -1,8 +1,12 @@
 import { sections } from "../../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 
-// Named export for the first function
-export async function addStudentToAttendance(userId, moduleId) {
+export async function addStudentToAttendance(
+  userId,
+  moduleId,
+  latitude,
+  longitude
+) {
   const sectionsCollection = await sections();
 
   const result = await sectionsCollection.updateOne(
@@ -11,7 +15,11 @@ export async function addStudentToAttendance(userId, moduleId) {
     },
     {
       $addToSet: {
-        "sectionModules.$.attendance": userId,
+        "sectionModules.$.attendance": {
+          userId,
+          latitude,
+          longitude,
+        },
       },
     }
   );
@@ -25,7 +33,6 @@ export async function addStudentToAttendance(userId, moduleId) {
   }
 }
 
-// Named export for the second function
 export async function getAttendanceData(sectionId, moduleId) {
   const sectionsCollection = await sections();
 

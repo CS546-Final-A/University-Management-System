@@ -7,6 +7,12 @@ import {
 } from "../../data/attendance/attendance.js";
 import { getCourseById } from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
+
+function getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+}
 router.route("/:sectionId").get(async (req, res) => {
   const section = await getSectionById(req.params.sectionId);
   const course = await getCourseById(section.courseId.toString());
@@ -53,22 +59,45 @@ router
       const userType = req.session.type;
       try {
         const attendanceData = await getAttendanceData(sectionId, moduleId);
-        const attendees = [];
+        console.log(attendanceData);
+        // const attendees = [];
 
-        for (const iterator of await attendanceData) {
-          const attendee = await getUserByID(iterator, {
-            _id: 0,
-            firstname: 1,
-            lastname: 1,
-          });
+        // const position = await getCurrentPosition();
+        // console.log(position);
+        // const { latitude, longitude } = position.coords;
+        // for (const i of await attendanceData) {
+        //   let d = calculateDistance(
+        //     i.latitude,
+        //     i.longitude,
+        //     latitude,
+        //     longitude
+        //   );
+        //   console.log("d=");
+        //   console.log(d);
+        //   if (d <= 0.01) {
+        //     const attendee = await getUserByID(iterator.userId, {
+        //       _id: 0,
+        //       firstname: 1,
+        //       lastname: 1,
+        //     });
 
-          attendees.push(attendee.firstname + " " + attendee.lastname);
-        }
-        console.log(attendees);
+        //     attendees.push(attendee.firstname + " " + attendee.lastname);
+        //   }
+
+        // for (const iterator of await attendanceData) {
+        //   const attendee = await getUserByID(iterator.userId, {
+        //     _id: 0,
+        //     firstname: 1,
+        //     lastname: 1,
+        //   });
+
+        //   attendees.push(attendee.firstname + " " + attendee.lastname);
+        // }
+        // console.log(attendees);
         const name = req.session.name;
         res
           .status(200)
-          .render("workspace/attendance", { userType, name, attendees });
+          .render("workspace/attendance", { userType, name, attendanceData });
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -82,8 +111,10 @@ router
   .post(async (req, res) => {
     const moduleId = req.params.moduleId;
     const userId = req.session.userid;
+    const { latitude, longitude } = req.body;
+
     try {
-      await addStudentToAttendance(userId, moduleId);
+      await addStudentToAttendance(userId, moduleId, latitude, longitude);
 
       res.status(200).json({ message: "Attendance marked successfully" });
     } catch (error) {
