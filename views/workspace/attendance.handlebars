@@ -1,16 +1,68 @@
 <h1>Attendance</h1>
 
-{{#if (eq type 'Student')}}
-<div class="card col-12 glassEffect">
-    <div class="card-header glassEffect">
-        <img src="./icons/dashboardCourse.svg" alt="loginIcon"> Student Attendance
-    </div>
-    <div class="card-body">
+   {{#if (eq userType "Student")}}
+        <h1>Welcome, Student  {{name}}   !</h1>
+        
+        <button id = "markPresentButton">mark me present</button>
 
-    </div>
-</div>
-{{/if}}
 
-{{#if (eq type 'Professor')}}
-Prof attendance
-{{/if}}
+    {{else if (eq userType "Professor")}}
+        <h1>Welcome, Professor  {{name}} !</h1>
+
+        <button>generate shared key</button>
+
+        <button  id="downloadAttendanceButton" >download attendance</button>
+        <h1>{{attendanceData}}</h1>
+   
+    {{/if}}
+
+
+    <script>
+document.getElementById("markPresentButton").addEventListener("click", markPresent);
+
+async function markPresent() {
+const pathSegments = window.location.pathname.split('/');
+
+const sectionId = pathSegments[2];  
+const moduleId = pathSegments[4];   
+
+const response = await fetch(`/workspace/${sectionId}/modules/${moduleId}/attendance`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+           
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data.message);
+        } else {
+            console.error(`Failed to mark attendance. Status: ${response.status}`);
+        }
+    }
+
+
+    document.getElementById("downloadAttendanceButton").addEventListener("click", downloadAttendance);
+
+async function downloadAttendance() {
+    try {
+          
+        const pathSegments = window.location.pathname.split('/');
+        const sectionId = pathSegments[2];  
+        const moduleId = pathSegments[4];   
+        const response = await fetch(`/workspace/${sectionId}/modules/${moduleId}/attendance`);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Attendance data:", data.attendance);
+           
+        } else {
+            console.error(`Failed to download attendance. Status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error("Error downloading attendance:", error);
+    }
+} 
+
+    </script>
