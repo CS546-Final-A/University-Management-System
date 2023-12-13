@@ -14,6 +14,7 @@ router.route("/:sectionId").get(async (req, res) => {
   });
 
   res.render("workspace/section", {
+    layout: "sidebar",
     sectionID: `${section._id}`,
     courseId: `${section.courseId.toString()}`,
     courseName: `${course.courseName}`,
