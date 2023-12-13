@@ -89,7 +89,8 @@ router.get("/:year/:semester/listings", async (req, res) => {
     await courseDataFunctions.getUniqueDepartmentNamesandId();
   let uniqueInstructors =
     await courseDataFunctions.getUniqueInstructorNamesandId();
-
+  uniqueDepartmentNames.sort((a, b) => a.name.localeCompare(b.name));
+  uniqueInstructors.sort((a, b) => a.name.localeCompare(b.name));
   data.uniqueDepartmentNames = uniqueDepartmentNames;
   data.uniqueInstructors = uniqueInstructors;
 

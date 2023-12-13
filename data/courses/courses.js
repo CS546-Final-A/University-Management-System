@@ -218,14 +218,14 @@ export const getAllCourses = async (
     });
   }
 
-  // if (instructorFilter) {
-  //   courseList = courseList.filter((course) => {
-  //     for (let section of course.sections) {
-  //       let x = section.sectionInstructor.toString();
-  //       return x.includes(instructorFilter);
-  //     }
-  //   });
-  // }
+  if (instructorFilter) {
+    courseList = courseList.filter((course) => {
+      for (let section of course.sections) {
+        let x = section.sectionInstructor.toString();
+        return x.includes(instructorFilter);
+      }
+    });
+  }
 
   if (meetingDaysFilter) {
     courseList = courseList.filter((course) => {
