@@ -3,6 +3,7 @@ import { Router } from "express";
 import verify from "../../data_validation.js";
 
 import initiatePasswordReset from "../../data/users/initiatePasswordReset.js";
+import getPasswordResetInfo from "../../data/users/getPasswordResetInfo.js";
 
 const router = Router();
 
@@ -32,6 +33,20 @@ router.put("/", async (req, res) => {
       res.status(500);
       res.json({ error: "Internal Server Error" });
     }
+  }
+});
+
+router.get("/:requestid", async (req, res) => {
+  try {
+    const id = verify.validateMongoId(req.params.requestid, "PasswordResetID");
+    const reset = await getPasswordResetInfo(id);
+    res.render("public/passwordresetform", {
+      script: "resetpassword",
+    });
+  } catch {
+    res.render("public/requestpasswordreset", {
+      script: "requestpasswordreset",
+    });
   }
 });
 
