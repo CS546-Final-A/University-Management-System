@@ -7,15 +7,11 @@ function sendform() {
     }
     sending = true;
 
-    const csrf = document.getElementById("_csrf").value;
+    const csrf = $("#_csrf").val();
 
     try {
-      const password = verify.password(
-        document.getElementById("password").value
-      );
-      const passwordconf = verify.password(
-        document.getElementById("passwordconf").value
-      );
+      const password = verify.password($("#password").val());
+      const passwordconf = verify.password($("#passwordconf").val());
       if (password !== passwordconf) {
         throw "Passwords do not match";
       }
