@@ -1,35 +1,121 @@
-import { Router } from "express";
+import { Router, query } from "express";
 import { santizeInputs } from "../../data_validation.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
 import util from "util";
-import { unsubscribe } from "diagnostics_channel";
+import {
+  validateCourse,
+  validateSection,
+} from "../../data/courses/courseHelper.js";
 
 const router = Router();
 
-router.get("/listings", async (req, res) => {
-  console.log("params is");
-  console.log(req.query);
+router.get("/", async (req, res) => {
+  let uniqueSectionYearandSemester =
+    await courseDataFunctions.getUniqueSectionYearandSemester();
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+    uniqueYear: uniqueSectionYearandSemester[0],
+    uniqueSemester: uniqueSectionYearandSemester[1],
+  };
+  res.render("courses/landing", renderObjs);
+});
 
-  let data = await courseDataFunctions.getAllCourses();
-  // console.log(util.inspect(data, false, null, true /* enable colors */));
+router.get("/registration", async (req, res) => {
+  let uniqueDepartmentNames =
+    await courseDataFunctions.getUniqueDepartmentNamesandId();
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+    uniqueDepartmentNames: uniqueDepartmentNames,
+  };
+  res.render("courses/registration", renderObjs);
+});
 
-  // Function to get unique values from an array
-  const getUniqueValues = (array) => [...new Set(array.flat(Infinity))];
-  data = data.filter((course) => course.sectionId.length > 0);
-  const uniqueDepartmentNames = getUniqueValues(
-    data.map((course) => course.departmentName.toString())
+router.post("/registration", async (req, res) => {
+  const {
+    courseNumber,
+    courseName,
+    courseDepartmentId,
+    courseCredits,
+    courseDescription,
+  } = req.body;
+  try {
+    const course = validateCourse(
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription
+    );
+    let result = await courseDataFunctions.registerCourse(
+      course.courseNumber,
+      course.courseName,
+      course.courseDepartmentId,
+      course.courseCredits,
+      course.courseDescription
+    );
+    if (result.acknowledged) {
+
+      // res.render();
+
+    }
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      return res.json({ error: e.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+  // res.render("courses/registration");
+});
+
+router.get("/:year/:semester/listings", async (req, res) => {
+  const { year, semester } = req.params;
+
+  let {
+    searchTerm,
+    departmentFilter,
+    instructorFilter,
+    meetingDaysFilter,
+    deliveryModeFilter,
+  } = req.query;
+  let data = await courseDataFunctions.getAllCourses(
+    year,
+    semester,
+    searchTerm,
+    departmentFilter,
+    instructorFilter,
+    meetingDaysFilter,
+    deliveryModeFilter
   );
-  const uniqueDays = getUniqueValues(data.map((course) => course.sectionDay));
-  const uniqueSectionTypes = getUniqueValues(
-    data.map((course) => course.sectionType)
-  );
+  data.year = year;
+  data.semester = semester;
 
-  data.uniqueDays = uniqueDays;
+  let uniqueDepartmentNames =
+    await courseDataFunctions.getUniqueDepartmentNamesandId();
+  let uniqueInstructors =
+    await courseDataFunctions.getUniqueInstructorNamesandId();
+  uniqueDepartmentNames.sort((a, b) => a.name.localeCompare(b.name));
+  uniqueInstructors.sort((a, b) => a.name.localeCompare(b.name));
   data.uniqueDepartmentNames = uniqueDepartmentNames;
+  data.uniqueInstructors = uniqueInstructors;
+
+  let uniqueSectionTypes = ["Online", "In-Person"];
   data.uniqueSectionTypes = uniqueSectionTypes;
-  console.log("data is");
-  console.log(data);
-  res.render("courses/listings", { courses: data });
+  data.map((course) => {
+    course.departmentName = course.departmentName[0];
+  });
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+    courses: data,
+  };
+  res.render("courses/listings", renderObjs);
 });
 
 export default router;

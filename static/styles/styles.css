@@ -77,6 +77,10 @@ body {
   color: #e35555;
 }
 
+.nav{
+  gap: 10px;
+}
+
 .nav-link {
   color: var(--activeTextColor) !important;
   font-weight: 500;
