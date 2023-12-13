@@ -217,6 +217,7 @@ const verify = {
     return number;
   },
   numberInteger: (number, numberName) => {
+    number = parseInt(number, 10);
     verify.number(number, numberName);
     if (!Number.isInteger(number))
       throw new Error(`${numberName} is not a valid number`);

@@ -3,6 +3,10 @@ import { santizeInputs } from "../../data_validation.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
 import util from "util";
 import { unsubscribe } from "diagnostics_channel";
+import {
+  validateCourse,
+  validateSection,
+} from "../../data/courses/courseHelper.js";
 
 const router = Router();
 router.get("/", async (req, res) => {
@@ -16,6 +20,49 @@ router.get("/", async (req, res) => {
 
 router.get("/landing", async (req, res) => {
   res.render("courses/landing");
+});
+
+router.get("/registration", async (req, res) => {
+  let uniqueDepartmentNames =
+    await courseDataFunctions.getUniqueDepartmentNamesandId();
+  res.render("courses/registration", { uniqueDepartmentNames });
+});
+
+router.post("/registration", async (req, res) => {
+  const {
+    courseNumber,
+    courseName,
+    courseDepartmentId,
+    courseCredits,
+    courseDescription,
+  } = req.body;
+  try{
+    const course = validateCourse(
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription
+    );
+    let result = await courseDataFunctions.registerCourse(
+      course.courseNumber,
+      course.courseName,
+      course.courseDepartmentId,
+      course.courseCredits,
+      course.courseDescription
+    );
+    res.render()
+  } catch (error) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      console.log(e);
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+  // res.render("courses/registration");
 });
 
 router.get("/:year/:semester/listings", async (req, res) => {
@@ -44,7 +91,6 @@ router.get("/:year/:semester/listings", async (req, res) => {
     await courseDataFunctions.getUniqueDepartmentNamesandId();
   let uniqueInstructors =
     await courseDataFunctions.getUniqueInstructorNamesandId();
-
 
   data.uniqueDepartmentNames = uniqueDepartmentNames;
   data.uniqueInstructors = uniqueInstructors;
