@@ -386,41 +386,44 @@ export const getSectionById = async (sectionId) => {
   const section = course.sections.find(
     (section) => section.sectionId.toString() === sectionId.toString()
   );
+
+  if (section) {
+    section.courseId = course._id.toString();
+    section.courseName = course.courseName;
+    section.courseNumber = course.courseNumber;
+  }
+
   return section;
 };
 
-const getSectionsByIds = async (sectionIds) => {
-  // Validate each sectionId in the array
-  sectionIds.forEach((sectionId) => {
-    if (
-      !sectionId ||
-      typeof sectionId !== "string" ||
-      sectionId.trim() === "" ||
-      !ObjectId.isValid(sectionId)
-    ) {
-      throw new Error("All IDs provided must be valid.");
-    }
-  });
+export const getSectionsByIds = async (sectionIds) => {
+  const validatedSectionIds = sectionIds.map((sectionId) =>
+    verify.validateMongoId(sectionId, "sectionId")
+  );
 
-  const sectionsCollection = await sections();
-  const objectIds = sectionIds.map((sectionId) => new ObjectId(sectionId));
-
-  const allSections = await sectionsCollection
+  const courseCollection = await courses();
+  const coursesWithSections = await courseCollection
     .find({
-      _id: { $in: objectIds },
+      "sections.sectionId": { $in: validatedSectionIds },
     })
     .toArray();
 
-  if (!allSections || allSections.length === 0) {
-    throw new Error("No sections found with the provided sectionIds.");
-  }
+  const sections = [];
 
-  // Convert _id to string for each section
-  allSections.forEach((section) => {
-    section._id = section._id.toString();
+  coursesWithSections.forEach((course) => {
+    const matchingSections = course.sections
+      .filter((section) => sectionIds.includes(section.sectionId.toString()))
+      .map((section) => ({
+        ...section,
+        courseId: course._id.toString(),
+        courseName: course.courseName,
+        courseNumber: course.courseNumber,
+      }));
+
+    sections.push(...matchingSections);
   });
 
-  return allSections;
+  return sections;
 };
 
 export const registerSection = async (

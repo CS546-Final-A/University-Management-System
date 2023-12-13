@@ -1,5 +1,4 @@
 import { Router } from "express";
-import * as sectionData from "../data/sections/sections.js";
 import * as courseData from "../data/courses/courses.js";
 import getUserByID from "../data/users/getUserInfoByID.js";
 
@@ -16,24 +15,17 @@ router.get("/", async (req, res) => {
   const userInfo = await getUserByID(userid);
   const registeredCourses = userInfo.registeredCourses || [];
 
-  const requestedSections = await sectionData.getSectionsByIds(
+  const requestedSections = await courseData.getSectionsByIds(
     registeredCourses.map((course) => course)
   );
-  const courseIds = requestedSections.map((section) => section.courseId);
-
-  const requestedCourses = await courseData.getCoursesByIds(courseIds);
 
   const workspace = requestedSections.map((section) => {
-    const course = requestedCourses.find(
-      (c) => c._id.toString() === section.courseId.toString()
-    );
-
     return {
-      courseName: course.courseName,
-      courseNumber: course.courseNumber,
+      courseName: section.courseName,
+      courseNumber: section.courseNumber,
       sectionType: section.sectionType,
       sectionName: section.sectionName,
-      sectionId: section._id.toString(),
+      sectionId: section.sectionId.toString(),
     };
   });
 
