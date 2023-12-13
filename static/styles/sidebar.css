@@ -13,13 +13,6 @@
   border: none;
 }
 
-.line {
-  width: 100%;
-  height: 1px;
-  border-bottom: 1px dashed #ddd;
-  margin: 40px 0;
-}
-
 /* ---------------------------------------------------
     SIDEBAR STYLE
 ----------------------------------------------------- */
@@ -28,12 +21,15 @@
   display: flex;
   width: 100%;
   align-items: stretch;
+  margin-top: 90px;
 }
 
 #sidebar {
+  position: fixed;
   min-width: 250px;
   max-width: 250px;
-  background: #7386d5;
+  height: 100vh;
+  background: #252525;
   color: #fff;
   transition: all 0.3s;
 }
@@ -44,11 +40,11 @@
 
 #sidebar .sidebar-header {
   padding: 20px;
-  background: #6d7fcc;
+  background: #252525;
 }
 
 #sidebar ul.components {
-  padding: 20px 0;
+  padding: 20px 15px;
   border-bottom: 1px solid #47748b;
 }
 
@@ -58,38 +54,38 @@
 }
 
 #sidebar ul li a {
-  padding: 10px;
+  padding: 10px 20px;
   font-size: 1.1em;
   display: block;
 }
 
 #sidebar ul li a:hover {
-  color: #7386d5;
+  color: #252525;
   background: #fff;
 }
 
 #sidebar ul li.active > a,
 a[aria-expanded="true"] {
   color: #fff;
-  background: #6d7fcc;
+  background: #8f425a;
 }
 
 a[data-toggle="collapse"] {
   position: relative;
 }
 
-.dropdown-toggle::after {
+/* .dropdown-toggle::after {
   display: block;
   position: absolute;
   top: 50%;
   right: 20px;
   transform: translateY(-50%);
-}
+} */
 
 ul ul a {
   font-size: 0.9em !important;
   padding-left: 30px !important;
-  background: #6d7fcc;
+  background: #252525;
 }
 
 ul.CTAs {
@@ -106,13 +102,32 @@ ul.CTAs a {
 
 a.download {
   background: #fff;
-  color: #7386d5;
+  color: #252525;
 }
 
 a.article,
 a.article:hover {
-  background: #6d7fcc !important;
+  background: #252525 !important;
   color: #fff !important;
+}
+
+.components li a {
+  border-radius: 30px;
+}
+
+/* ---------------------------------------------------
+    CONTENT STYLE
+----------------------------------------------------- */
+
+#content {
+  width: 100%;
+  padding: 20px;
+  min-height: 100vh;
+  transition: all 0.3s;
+  margin-left: 250px;
+}
+#content.active {
+  margin-left: 0px;
 }
 
 /* ---------------------------------------------------

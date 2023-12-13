@@ -24,6 +24,7 @@ router.route("/:sectionId").get(async (req, res) => {
 
   res.render("workspace/section", {
     layout: "sidebar",
+    sideBarTitle: `${course.courseName}`,
     sectionID: `${section.sectionId}`,
     courseId: `${section.courseId.toString()}`,
     courseName: `${course.courseName}`,
@@ -46,6 +47,8 @@ router.route("/:sectionId").get(async (req, res) => {
 router.route("/:sectionId/modules").get(async (req, res) => {
   const section = await courseData.getSectionById(req.params.sectionId);
   res.render("workspace/module", {
+    layout: "sidebar",
+    // sideBarTitle: `${course.courseName}`,
     modules: section.sectionModules,
     sectionID: `${section.sectionId}`,
   });
@@ -95,9 +98,13 @@ router
         // }
         // console.log(attendees);
         const name = req.session.name;
-        res
-          .status(200)
-          .render("workspace/attendance", { userType, name, attendanceData });
+        res.status(200).render("workspace/attendance", {
+          layout: "sidebar",
+          // sideBarTitle: `${course.courseName}`,
+          userType,
+          name,
+          attendanceData,
+        });
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -126,6 +133,8 @@ router
 router.route("/:sectionId/assignments").get(async (req, res) => {
   const section = await courseData.getSectionById(req.params.sectionId);
   res.render("workspace/assignments", {
+    layout: "sidebar",
+    // sideBarTitle: `${course.courseName}`,
     assignments: section.Assignments,
     sectionID: `${section.sectionId}`,
   });
