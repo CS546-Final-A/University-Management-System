@@ -70,6 +70,9 @@ app.engine(
   engine({
     helpers: {
       eq: eqHelper,
+      gt: function (a, b, options) {
+        return a > b ? true : false;
+      },
     },
   })
 );

@@ -17,6 +17,18 @@ export const getAllInstructors = async () => {
   return instructorList;
 };
 
+export const getInstructorById = async (instructorId) => {
+  instructorId = verify.validateMongoId(instructorId, "instructorId");
+  const userCollection = await users();
+  const instructor = await userCollection.findOne({
+    _id: instructorId,
+    type: "Professor",
+  });
+  if (!instructor) {
+    throwerror("Instructor does not exists");
+  } else return instructor;
+};
+
 export const getUniqueInstructorNamesandId = async () => {
   const userCollection = await users();
   const instructors = await userCollection
@@ -283,14 +295,57 @@ export const registerCourse = async (
 };
 export const getCourseById = async (courseId) => {
   courseId = verify.validateMongoId(courseId, "courseId");
+  // console.log(courseId);
   const courseCollection = await courses();
-  const existingCourse = await courseCollection.findOne({
-    _id: courseId,
-  });
+  const existingCourse = await courseCollection
+    .aggregate([
+      { $match: { _id: courseId } },
+      {
+        $lookup: {
+          from: "departments",
+          localField: "courseDepartmentId",
+          foreignField: "_id",
+          as: "department",
+        },
+      },
+      {
+        $unwind: "$department",
+      },
 
+      {
+        $project: {
+          courseNumber: 1,
+          courseName: 1,
+          courseCredits: 1,
+          courseDescription: 1,
+          sections: 1,
+          courseDepartmentId: {
+            _id: "$department._id",
+            name: "$department.departmentName",
+          },
+        },
+      },
+    ])
+    .toArray();
+  try {
+    for (let sectionIndex in existingCourse[0].sections) {
+      let instructorId =
+        existingCourse[0].sections[sectionIndex].sectionInstructor;
+      let instructor = await getInstructorById(instructorId.toString());
+      let sectionInstructor = {
+        _id: instructor._id,
+        name: instructor.firstname + " " + instructor.lastname,
+      };
+      existingCourse[0].sections[sectionIndex].sectionInstructor =
+        sectionInstructor;
+    }
+  } catch (e) {
+    throw "Internal Server Error";
+  }
   if (!existingCourse) {
     throwErrorWithStatus(400, `Course with ${courseId} not found`);
   }
+
   return existingCourse;
 };
 export const updateCourse = async (
