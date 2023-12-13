@@ -58,9 +58,7 @@ router.post("/registration", async (req, res) => {
       course.courseDescription
     );
     if (result.acknowledged) {
-
       // res.render();
-
     }
   } catch (e) {
     if (e.status !== 500 && e.status) {

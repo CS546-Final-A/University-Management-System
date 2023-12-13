@@ -1,11 +1,10 @@
 import { Router } from "express";
 const router = Router();
-import { getSectionById } from "../../data/sections/sections.js";
 import {
   addStudentToAttendance,
   getAttendanceData,
 } from "../../data/attendance/attendance.js";
-import { getCourseById } from "../../data/courses/courses.js";
+import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
 
 function getCurrentPosition() {
@@ -14,8 +13,8 @@ function getCurrentPosition() {
   });
 }
 router.route("/:sectionId").get(async (req, res) => {
-  const section = await getSectionById(req.params.sectionId);
-  const course = await getCourseById(section.courseId.toString());
+  const section = await courseData.getSectionById(req.params.sectionId);
+  const course = await courseData.getCourseById(section.courseId.toString());
 
   const profName = await getUserByID(section.sectionInstructor, {
     _id: 0,
@@ -24,7 +23,8 @@ router.route("/:sectionId").get(async (req, res) => {
   });
 
   res.render("workspace/section", {
-    sectionID: `${section._id}`,
+    layout: "sidebar",
+    sectionID: `${section.sectionId}`,
     courseId: `${section.courseId.toString()}`,
     courseName: `${course.courseName}`,
     sectionName: `${section.sectionName}`,
@@ -44,10 +44,10 @@ router.route("/:sectionId").get(async (req, res) => {
   });
 });
 router.route("/:sectionId/modules").get(async (req, res) => {
-  const section = await getSectionById(req.params.sectionId);
+  const section = await courseData.getSectionById(req.params.sectionId);
   res.render("workspace/module", {
     modules: section.sectionModules,
-    sectionID: `${section._id}`,
+    sectionID: `${section.sectionId}`,
   });
 });
 
@@ -124,10 +124,11 @@ router
   });
 
 router.route("/:sectionId/assignments").get(async (req, res) => {
-  const section = await getSectionById(req.params.sectionId);
+  const section = await courseData.getSectionById(req.params.sectionId);
   res.render("workspace/assignments", {
     assignments: section.Assignments,
-    sectionID: `${section._id}`,
+    sectionID: `${section.sectionId}`,
   });
 });
+
 export default router;

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="/styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="/styles/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="/styles/styles.css" />
+    <link rel="stylesheet" href="/styles/sidebar.css" />
+    <script src="/scripts/jquery.min.js"></script>
+    <title>University Management System</title>
+</head>
+
+<body>
+    <div class="navigation-wrap bg-light start-header">
+        <div class="row">
+            <header class="col-12">
+                <ul id="navigationList" class="nav d-flex mx-5">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <span class="fs-5 position-relative" id="homeText">Home</span>
+                        </a>
+                    </li>
+                    {{#if name}}
+                    <li class="nav-item ms-auto dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            data-bs-auto-close="outside" aria-expanded="false"><img src="/icons/user-circle.svg"
+                                alt="user-circle-icon" /></a>
+                        <ul class="dropdown-menu p-0" id="navProfileDropdown">
+                            <li>
+                                <div class="container p-0">
+                                    <div class="m-2 px-2">
+                                        {{name}} <span class="text-muted fs-6"> {{type}} </span>
+                                    </div>
+                                    <div class="m-2 px-2">
+                                        {{email}}
+                                    </div>
+                                    <div id="switch" class="m-4">
+                                        <div id="circle"></div>
+                                    </div>
+                                    <div class="my-auto d-flex justify-content-center btnNavbar">
+                                        <a class="w-100" href="/logout"><button
+                                                class="mb-0 py-2 w-100 btnNavbar">Logout</button></a>
+                                    </div>
+
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    {{/if}}
+                </ul>
+            </header>
+        </div>
+    </div>
+
+    <div class="myContainer">
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Bootstrap Sidebar</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <p>Dummy Heading</p>
+                <li class="active">
+                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
+                    <ul class="collapse list-unstyled" id="homeSubmenu">
+                        <li>
+                            <a href="#">Home 1</a>
+                        </li>
+                        <li>
+                            <a href="#">Home 2</a>
+                        </li>
+                        <li>
+                            <a href="#">Home 3</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">About</a>
+                </li>
+                <li>
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false"
+                        class="dropdown-toggle">Pages</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                        <li>
+                            <a href="#">Page 1</a>
+                        </li>
+                        <li>
+                            <a href="#">Page 2</a>
+                        </li>
+                        <li>
+                            <a href="#">Page 3</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">Portfolio</a>
+                </li>
+                <li>
+                    <a href="#">Contact</a>
+                </li>
+            </ul>
+
+            <ul class="list-unstyled CTAs">
+                <li>
+                    <a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Download source</a>
+                </li>
+                <li>
+                    <a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Back to article</a>
+                </li>
+            </ul>
+        </nav>
+
+        {{{body}}}
+        {{!-- Bootstrap Toasts --}}
+        <div class="toast-container position-absolute top-0 end-0 p-5">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true"
+                data-bs-autohide="false">
+                <div class="toast-header">
+                    <img src="/icons/error.svg" alt="errorIcon">
+                    <strong class="me-auto" id="toastHeadMsg">Bootstrap</strong>
+                    <small>Just Now</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    Hello, world! This is a toast message.
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- JS Imports -->
+    <script src="/scripts/jquery.min.js"></script>
+    <script src="/scripts/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/bootstrap-select.min.js"></script>
+    <script src="/scripts/styles.js"></script>
+
+</body>
+
+</html>
