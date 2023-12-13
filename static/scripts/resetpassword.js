@@ -31,8 +31,7 @@ function sendform() {
         throw "Internal server error";
       }
     } catch (e) {
-      const errdiv = $("#error");
-      errdiv.innerText = e;
+      $("#error").text(e);
     } finally {
       sending = false;
     }
