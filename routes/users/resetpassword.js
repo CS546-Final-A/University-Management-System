@@ -40,7 +40,7 @@ router.get("/:requestid", async (req, res) => {
   try {
     const id = verify.validateMongoId(req.params.requestid, "PasswordResetID");
     const reset = await getPasswordResetInfo(id);
-    res.render("public/passwordresetform", {
+    res.render("public/resetpassword", {
       script: "resetpassword",
     });
   } catch {
