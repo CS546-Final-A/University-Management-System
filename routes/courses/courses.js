@@ -2,7 +2,6 @@ import { Router, query } from "express";
 import { santizeInputs } from "../../data_validation.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
 import util from "util";
-import { unsubscribe } from "diagnostics_channel";
 import {
   validateCourse,
   validateSection,
@@ -59,7 +58,7 @@ router.post("/registration", async (req, res) => {
       course.courseDescription
     );
     if (result.acknowledged) {
-      
+
       // res.render();
 
     }

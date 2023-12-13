@@ -1,14 +1,16 @@
 <link rel="stylesheet" href="/styles/courses.css">
 <div class="menuContainer">
+    {{#if (eq type 'Admin')}}
     <div id="courseRegistration" class="menuCard">
         Course Registration
     </div>
+    {{/if}}
     <div id="courseListing" class="menuCard">
         Course Enrollment
     </div>
 
-    <div class="modal fade" id="yearAndSemesterSelect" tabindex="-1" role="dialog" aria-labelledby="yearAndSemesterSelect"
-        aria-hidden="true">
+    <div class="modal fade" id="yearAndSemesterSelect" tabindex="-1" role="dialog"
+        aria-labelledby="yearAndSemesterSelect" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -33,12 +35,12 @@
                             {{/each}}
                         </select>
 
-                      
+
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="close btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button id="selectSemester" type="submit">Continue</button>    
+                    <button id="selectSemester" type="submit">Continue</button>
                 </div>
             </div>
         </div>
