@@ -6,54 +6,39 @@ import getUserByID from "../data/users/getUserInfoByID.js";
 const router = Router();
 
 router.get("/", async (req, res) => {
-  let renderObjs = {
-    name: req.session.name,
-    type: req.session.type,
-    email: req.session.email,
-  };
+  const { name, type, email, userid } = req.session;
+  const renderObjs = { name, type, email };
 
-  if (req.session.type === "Admin") {
+  if (type === "Admin") {
     return res.render("admin/dashboard", renderObjs);
-  } else {
-    const userInfo = await getUserByID(req.session.userid);
-
-    let tempArr = [];
-    for (let i = 0; i < userInfo.registeredCourses.length; i++) {
-      tempArr.push(userInfo.registeredCourses[i]);
-    }
-
-    const requestedSections = await sectionData.getSectionsByIds(tempArr);
-    tempArr = [];
-    for (let i = 0; i < requestedSections.length; i++) {
-      tempArr.push(requestedSections[i].courseId);
-    }
-    const requestedCourses = await courseData.getCoursesByIds(tempArr);
-    tempArr = [];
-
-    for (let i = 0; i < requestedSections.length; i++) {
-      for (let j = 0; j < requestedCourses.length; j++) {
-        if (
-          requestedSections[i].courseId.toString() ===
-          requestedCourses[j]._id.toString()
-        ) {
-          tempArr.push({
-            courseName: requestedCourses[j].courseName,
-            courseNumber: requestedCourses[j].courseNumber,
-            sectionType: requestedSections[i].sectionType,
-            sectionName: requestedSections[i].sectionName,
-            sectionId: requestedSections[i]._id.toString(),
-          });
-          break;
-        }
-      }
-    }
-
-    renderObjs = {
-      ...renderObjs,
-      workspace: tempArr,
-    };
-    return res.render("public/dashboard", renderObjs);
   }
+
+  const userInfo = await getUserByID(userid);
+  const registeredCourses = userInfo.registeredCourses || [];
+
+  const requestedSections = await sectionData.getSectionsByIds(
+    registeredCourses.map((course) => course)
+  );
+  const courseIds = requestedSections.map((section) => section.courseId);
+
+  const requestedCourses = await courseData.getCoursesByIds(courseIds);
+
+  const workspace = requestedSections.map((section) => {
+    const course = requestedCourses.find(
+      (c) => c._id.toString() === section.courseId.toString()
+    );
+
+    return {
+      courseName: course.courseName,
+      courseNumber: course.courseNumber,
+      sectionType: section.sectionType,
+      sectionName: section.sectionName,
+      sectionId: section._id.toString(),
+    };
+  });
+
+  renderObjs.workspace = workspace;
+  return res.render("public/dashboard", renderObjs);
 });
 
 export default router;
