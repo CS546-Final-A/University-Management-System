@@ -4,6 +4,7 @@ import verify from "../../data_validation.js";
 
 import initiatePasswordReset from "../../data/users/initiatePasswordReset.js";
 import getPasswordResetInfo from "../../data/users/getPasswordResetInfo.js";
+import routeError from "../routeerror.js";
 
 const router = Router();
 
@@ -43,10 +44,15 @@ router.get("/:requestid", async (req, res) => {
     res.render("public/resetpassword", {
       script: "resetpassword",
     });
-  } catch {
-    res.render("public/requestpasswordreset", {
-      script: "requestpasswordreset",
-    });
+  } catch (e) {
+    if (e.status === 404 || e.status === 400) {
+      res.status(e.status);
+      return res.render("public/requestpasswordreset", {
+        script: "requestpasswordreset",
+      });
+    } else {
+      return routeError(res, e);
+    }
   }
 });
 

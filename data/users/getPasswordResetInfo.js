@@ -2,7 +2,7 @@ import { passwordresets } from "../../config/mongoCollections.js";
 import verify from "../../data_validation.js";
 
 async function getPasswordResetInfo(id) {
-  id = verify.validateMongoId(id);
+  id = verify.validateMongoId(id, "PasswordResetID");
 
   const resetscol = await passwordresets();
 
