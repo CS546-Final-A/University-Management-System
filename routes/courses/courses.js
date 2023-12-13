@@ -9,17 +9,15 @@ import {
 } from "../../data/courses/courseHelper.js";
 
 const router = Router();
+
 router.get("/", async (req, res) => {
   let uniqueSectionYearandSemester =
     await courseDataFunctions.getUniqueSectionYearandSemester();
-  res.render("courses/index", {
+
+  res.render("courses/landing", {
     uniqueYear: uniqueSectionYearandSemester[0],
     uniqueSemester: uniqueSectionYearandSemester[1],
   });
-});
-
-router.get("/landing", async (req, res) => {
-  res.render("courses/landing");
 });
 
 router.get("/registration", async (req, res) => {
@@ -36,7 +34,7 @@ router.post("/registration", async (req, res) => {
     courseCredits,
     courseDescription,
   } = req.body;
-  try{
+  try {
     const course = validateCourse(
       courseNumber,
       courseName,
@@ -51,7 +49,7 @@ router.post("/registration", async (req, res) => {
       course.courseCredits,
       course.courseDescription
     );
-    res.render()
+    res.render();
   } catch (error) {
     if (e.status !== 500 && e.status) {
       res.status(e.status);

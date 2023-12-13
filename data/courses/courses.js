@@ -507,7 +507,7 @@ export const getUniqueSectionYearandSemester = async () => {
 
   for (const sections of courseList) {
     for (const section of sections.sections) {
-      console.log(section);
+      // console.log(section);
       uniqueYear.add(section.sectionYear);
       uniqueSemester.add(section.sectionSemester);
     }
