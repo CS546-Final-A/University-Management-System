@@ -13,17 +13,26 @@ const router = Router();
 router.get("/", async (req, res) => {
   let uniqueSectionYearandSemester =
     await courseDataFunctions.getUniqueSectionYearandSemester();
-
-  res.render("courses/landing", {
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
     uniqueYear: uniqueSectionYearandSemester[0],
     uniqueSemester: uniqueSectionYearandSemester[1],
-  });
+  };
+  res.render("courses/landing", renderObjs);
 });
 
 router.get("/registration", async (req, res) => {
   let uniqueDepartmentNames =
     await courseDataFunctions.getUniqueDepartmentNamesandId();
-  res.render("courses/registration", { uniqueDepartmentNames });
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+    uniqueDepartmentNames: uniqueDepartmentNames,
+  };
+  res.render("courses/registration", renderObjs);
 });
 
 router.post("/registration", async (req, res) => {
@@ -49,13 +58,15 @@ router.post("/registration", async (req, res) => {
       course.courseCredits,
       course.courseDescription
     );
-    res.render();
-  } catch (error) {
+    if (result.acknowledged) {
+      
+      // res.render();
+
+    }
+  } catch (e) {
     if (e.status !== 500 && e.status) {
-      res.status(e.status);
       return res.json({ error: e.message });
     } else {
-      console.log(e);
       res.status(500);
       res.json({ error: "Login error" });
     }
@@ -99,9 +110,13 @@ router.get("/:year/:semester/listings", async (req, res) => {
   data.map((course) => {
     course.departmentName = course.departmentName[0];
   });
-  res.render("courses/listings", {
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
     courses: data,
-  });
+  };
+  res.render("courses/listings", renderObjs);
 });
 
 export default router;

@@ -15,7 +15,7 @@ export const validateCourse = (
     !courseCredits ||
     !courseDescription
   ) {
-    throwErrorWithStatus(400, "Missing parameters");
+    throwErrorWithStatus(400, "Missing inputs");
   }
 
   courseNumber = verify.numberInteger(courseNumber, "courseNumber");
@@ -62,7 +62,7 @@ export const validateSection = (
     !sectionLocation |
     !sectionDescription
   ) {
-    throwErrorWithStatus(400, "Missing parameters");
+    throwErrorWithStatus(400, "Missing inputs");
   }
 
   sectionName = verify.isAlphaString(sectionName, "sectionName");
