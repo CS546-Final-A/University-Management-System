@@ -22,32 +22,6 @@ router.get("/", async (req, res) => {
   res.render("courses/landing", renderObjs);
 });
 
-router.get("/:courseId", async (req, res) => {
-  const { courseId } = req.params;
-  try {
-    let data = await courseDataFunctions.getCourseById(courseId);
-    // res.send(data);
-    // console.log("in");
-
-    // console.log(util.inspect(data, { showHidden: false, depth: null }));
-
-    // console.log("out");
-    res.render("courses/courseDetails", { courses: data });
-  } catch (e) {
-    if (e.status !== 500 && e.status) {
-      res.status(e.status);
-      return res.json({ error: e.message });
-    } else {
-      console.log(e);
-      res.status(500);
-      res.json({ error: "Login error" });
-    }
-  }
-  // res.render("courses/course", {
-  //   course: data,
-  // });
-});
-
 router.get("/registration", async (req, res) => {
   let uniqueDepartmentNames =
     await courseDataFunctions.getUniqueDepartmentNamesandId();
@@ -84,9 +58,7 @@ router.post("/registration", async (req, res) => {
       course.courseDescription
     );
     if (result.acknowledged) {
-
       // res.render();
-
     }
   } catch (e) {
     if (e.status !== 500 && e.status) {
@@ -97,6 +69,32 @@ router.post("/registration", async (req, res) => {
     }
   }
   // res.render("courses/registration");
+});
+
+router.get("/:courseId", async (req, res) => {
+  const { courseId } = req.params;
+  try {
+    let data = await courseDataFunctions.getCourseById(courseId);
+    // res.send(data);
+    // console.log("in");
+
+    // console.log(util.inspect(data, { showHidden: false, depth: null }));
+
+    // console.log("out");
+    res.render("courses/courseDetails", { courses: data });
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      console.log(e);
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+  // res.render("courses/course", {
+  //   course: data,
+  // });
 });
 
 router.get("/:year/:semester/listings", async (req, res) => {
