@@ -1,6 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import getSectionById from "../../data/sections/sections.js";
+import { getSectionById } from "../../data/sections/sections.js";
 import {
   addStudentToAttendance,
   getAttendanceData,
