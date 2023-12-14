@@ -2,11 +2,11 @@ import SMTPConnect from "../../config/smptConnection.js";
 
 import verify from "../../data_validation.js";
 
-async function sendPasswordResetEmail(email, resetid) {
+async function sendPasswordResetEmail(email, secret) {
   email = verify.email(email);
-  resetid = verify.dbid(resetid);
+  secret = verify.UUID(secret);
 
-  const resetdomain = `http://${process.env.SiteDomain}/resetpassword/${resetid}`;
+  const resetdomain = `http://${process.env.SiteDomain}/resetpassword/${secret}`;
 
   const emailer = await SMTPConnect();
   const message = {

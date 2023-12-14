@@ -1,8 +1,8 @@
 import { passwordresets } from "../../config/mongoCollections.js";
 import verify from "../../data_validation.js";
 
-async function getPasswordResetInfo(id) {
-  id = verify.validateMongoId(id, "PasswordResetID");
+async function getPasswordResetInfo(secret) {
+  secret = verify.UUID(secret);
 
   const resetscol = await passwordresets();
 
@@ -10,7 +10,7 @@ async function getPasswordResetInfo(id) {
   recentTime.setMinutes(-30);
 
   const reset = await resetscol.findOne({
-    _id: id,
+    secret: secret,
     requesttime: { $gte: recentTime, $lte: new Date() },
   });
 

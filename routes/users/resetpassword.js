@@ -39,10 +39,10 @@ router.put("/", async (req, res) => {
   }
 });
 
-router.get("/:requestid", async (req, res) => {
+router.get("/:secret", async (req, res) => {
   try {
-    const id = verify.validateMongoId(req.params.requestid, "PasswordResetID");
-    const reset = await getPasswordResetInfo(id);
+    const secret = verify.UUID(req.params.secret);
+    const reset = await getPasswordResetInfo(secret);
     res.render("public/resetpassword", {
       script: "resetpassword",
     });
@@ -58,10 +58,10 @@ router.get("/:requestid", async (req, res) => {
   }
 });
 
-router.patch("/:requestid", async (req, res) => {
+router.patch("/:secret", async (req, res) => {
   try {
-    const id = verify.validateMongoId(req.params.requestid, "PasswordResetID");
-    const reset = await getPasswordResetInfo(id);
+    const secret = verify.UUID(req.params.secret);
+    const reset = await getPasswordResetInfo(secret);
 
     const password = verify.password(req.body.password);
     const passwordconf = verify.password(req.body.passwordconf);

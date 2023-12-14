@@ -132,6 +132,16 @@ const verify = {
     }
     return new ObjectId(id);
   },
+  UUID: (id) => {
+    if (typeof id !== "string") {
+      throwerror("Argument is not a string");
+    }
+    id = id.trim();
+    if (!/^[\w\d]{8}-[\w\d]{4}-[\w\d]{4}-[\w\d]{4}-[\w\d]{12}$/.test(id)) {
+      throwerror("Invalid UUID");
+    }
+    return id;
+  },
   string: (string, stringName) => {
     if (typeof string !== "string") throwerror(`${stringName} is not a string`);
     if (!string.trim()) throwerror(`${stringName} is not a string`);
@@ -139,13 +149,13 @@ const verify = {
   },
   number: (number, numberName) => {
     if (typeof number !== "number" || isNaN(number) || number < 0)
-      throw new Error(`${numberName} is not a valid number`);
+      throwerror(`${numberName} is not a valid number`);
     return number;
   },
   numberInteger: (number, numberName) => {
     verify.number(number, numberName);
     if (!Number.isInteger(number))
-      throw new Error(`${numberName} is not a valid number`);
+      throwerror(`${numberName} is not a valid number`);
     return number;
   },
   isAlphaString: (string, stringName) => {

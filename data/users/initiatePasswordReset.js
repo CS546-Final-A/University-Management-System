@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+
 import { passwordresets, users } from "../../config/mongoCollections.js";
 import verify from "../../data_validation.js";
 
@@ -32,7 +34,23 @@ async function initiatePasswordReset(email) {
     return { successful: true };
   }
 
+  let secret = randomUUID();
+
+  let duplicatesecret = await resetscol.findOne({
+    secret: secret,
+  });
+
+  while (duplicatesecret) {
+    // Regenerate secret until a unique one is generated
+    secret = randomUUID();
+
+    duplicatesecret = await resetscol.findOne({
+      secret: secret,
+    });
+  }
+
   const insertion = await resetscol.insertOne({
+    secret: secret,
     userid: user._id,
     requesttime: new Date(),
   });
@@ -43,7 +61,7 @@ async function initiatePasswordReset(email) {
   }
 
   try {
-    await sendPasswordResetEmail(email, insertion.insertedId);
+    await sendPasswordResetEmail(email, secret);
     return { successful: true };
   } catch (e) {
     // Clean up
