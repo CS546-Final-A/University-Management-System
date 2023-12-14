@@ -11,7 +11,7 @@ import dashboard from "./dashboard.js";
 import user_management from "./administration/users.js";
 import courses from "./courses/courses.js";
 import workspace from "./workspace/workspace.js";
-import * as a from "../data/assignments/assignments.js";
+import sections from "./sections/sections.js";
 
 function route(app) {
   app.use("/scripts", express.static("./static/scripts"));
@@ -32,6 +32,7 @@ function route(app) {
   app.use("/users", user_management);
 
   app.use("/courses", courses);
+  app.use("/sections", sections);
   app.use("/workspace", workspace);
 }
 

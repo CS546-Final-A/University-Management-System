@@ -8,6 +8,8 @@ import verify, {
   throwErrorWithStatus,
   throwerror,
 } from "../../data_validation.js";
+
+import { validateAssignment } from "../../data/assignments/assignmentsHelper.js";
 import { ObjectId } from "mongodb";
 
 export async function createAssignment(
@@ -21,41 +23,20 @@ export async function createAssignment(
 
   assignmentMaxScore
 ) {
-  if (!assignmentName || typeof assignmentName !== "string") {
-    throwerror("Invalid assignment name", 400);
-  }
-  if (!assignmentDescription || typeof assignmentDescription !== "string") {
-    throwerror("Invalid assignment description", 400);
-  }
-  if (!assignmentWeight || typeof assignmentWeight !== "number") {
-    throwerror("Invalid assignment weight", 400);
-  }
-  if (!assignmentDueDate || typeof assignmentDueDate !== "string") {
-    throwerror("Invalid assignment due date", 400);
-  }
-  if (!assignmentSectionId || typeof assignmentSectionId !== "string") {
-    throwerror("Invalid assignment section id", 400);
-  }
-  if (assignmentWeight < 0 || assignmentWeight > 100) {
-    throwerror("Invalid assignment weight", 400);
-  }
-  if (!assignmentMaxScore || typeof assignmentMaxScore !== "number") {
-    throwerror("Invalid assignment max score", 400);
-  }
-  assignmentDueDate = new Date(assignmentDueDate);
-
-  if (assignmentDueDate < Date.now()) {
-    throwerror("Invalid assignment due date", 400);
-  }
-
-  assignmentSectionId = verify.validateMongoId(
-    assignmentSectionId,
-    "sectionId"
-  );
   userId = verify.validateMongoId(userId, "userId");
   //   check if sectionInstructor is the same as the user id
 
   const courseCollection = await courses();
+  let assignmentValidated = validateAssignment(
+    userId,
+    assignmentName,
+    assignmentDescription,
+    assignmentWeight,
+    assignmentDueDate,
+    assignmentSectionId,
+    submissionLimit,
+    assignmentMaxScore
+  );
 
   const course = await courseCollection.findOne({
     sections: {
@@ -69,20 +50,10 @@ export async function createAssignment(
       400
     );
   }
-
+  assignmentValidated.submissions = [];
   const assignmentCollection = await assignments();
-  const assignment = {
-    assignmentName: assignmentName,
-    assignmentDescription: assignmentDescription,
-    assignmentDueDate: assignmentDueDate,
-    assignmentSectionId: assignmentSectionId,
-    assignmentWeight: assignmentWeight,
-    submissionLimit: submissionLimit,
-    assignmentMaxScore: assignmentMaxScore,
-    submissions: [],
-  };
 
-  const insertInfo = await assignmentCollection.insertOne(assignment);
+  const insertInfo = await assignmentCollection.insertOne(assignmentValidated);
 
   if (insertInfo.insertedCount === 0) throw "Could not add assignment";
   const newId = insertInfo.insertedId;
@@ -97,7 +68,10 @@ export async function createAssignment(
   }
 
   const assignmentObj = await getAssignmentById(newId);
-  return assignmentObj;
+
+  if (!assignmentObj) throwerror("Assignment not found", 404);
+
+  return "success";
 }
 
 export async function getAssignmentById(assignmentId) {
@@ -118,18 +92,46 @@ export async function getAssignmentById(assignmentId) {
   return assignment;
 }
 
-// await createAssignment(
-//   "6576226840fef531e101838c",
-//   "Assignment 1",
-//   "Assignment 1 Description",
-//   10,
-//   "2024-10-10",
-//   "657639234daa9f93cf1ecac0",
-//   100,
-//   100
-// ).then((assignment) => console.log(assignment));
+export async function getAssignmentsBySectionId(sectionId) {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
 
-// ...
+  const courseCollection = await courses();
+  const section = await courseCollection.findOne(
+    {
+      sections: {
+        $elemMatch: { sectionId: sectionId },
+      },
+    },
+    { $match: { "sections.sectionId": sectionId } }
+  );
+
+  if (!section) {
+    throwErrorWithStatus(400, "Invalid section id");
+  }
+
+  const assignmentIds = section.sections[0].assignments;
+
+  if (!assignmentIds) {
+    return [];
+  }
+
+  const assignmentCollection = await assignments();
+  const assignmentList = await assignmentCollection
+    .find({ _id: { $in: assignmentIds } })
+    .toArray();
+
+  if (!assignmentList) {
+    throwerror("Assignments not found", 404);
+  }
+
+  for (let i = 0; i < assignmentList.length; i++) {
+    assignmentList[i]._id = assignmentList[i]._id.toString();
+    assignmentList[i].assignmentSectionId =
+      assignmentList[i].assignmentSectionId.toString();
+  }
+
+  return assignmentList;
+}
 
 export async function updateAssignment(assignmentId, updatedAssignmentData) {
   assignmentId = verify.validateMongoId(assignmentId, "assignmentId");
@@ -164,13 +166,13 @@ const updatedData = {
   submissionLimit: 10,
 };
 
-await updateAssignment("657a4ebfb0ac71b2041be093", updatedData).then(
-  (updatedAssignment) => console.log(updatedAssignment)
-);
+// await updateAssignment("657a4ebfb0ac71b2041be093", updatedData).then(
+//   (updatedAssignment) => console.log(updatedAssignment)
+// );
 
 // ...
 
-export async function deleteAssignment(assignmentId) {
+export async function deleteAssignmentById(assignmentId) {
   assignmentId = verify.validateMongoId(assignmentId, "assignmentId");
 
   const assignmentCollection = await assignments();
@@ -211,9 +213,9 @@ export async function deleteAssignment(assignmentId) {
 
 // ...
 
-await deleteAssignment("657a43ee83fa3564e5fd8ca3").then((deletedAssignmentId) =>
-  console.log(deletedAssignmentId)
-);
+// await deleteAssignment("657a43ee83fa3564e5fd8ca3").then((deletedAssignmentId) =>
+//   console.log(deletedAssignmentId)
+// );
 
 // ...
 
@@ -240,9 +242,9 @@ export async function getAllAssignmentsBySectionId(sectionId) {
 
 // ...
 
-await getAllAssignmentsBySectionId("657639234daa9f93cf1ecac0").then(
-  (assignments) => console.log(assignments)
-);
+// await getAllAssignmentsBySectionId("657639234daa9f93cf1ecac0").then(
+//   (assignments) => console.log(assignments)
+// );
 
 export async function submitAssignment(assignmentId, studentId, file) {
   assignmentId = verify.validateMongoId(assignmentId, "assignmentId");

@@ -1,0 +1,33 @@
+<body>
+    <div class="container mt-5">
+        <h2>Assignment Details</h2>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th scope="row">Assignment Name</th>
+                    <td>{{assignment.assignmentName}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Assignment Description</th>
+                    <td>{{assignment.assignmentDescription}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Due Date</th>
+                    <td>{{assignment.assignmentDueDate}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Assignment Weight</th>
+                    <td>{{assignment.assignmentWeight}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Submission Limit</th>
+                    <td>{{assignment.submissionLimit}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Max Score</th>
+                    <td>{{assignment.assignmentMaxScore}}</td>
+                </tr>
+            </tbody>
+        </table>
+        {{!-- <a href="{{backLink}}" class="btn btn-primary">Back to Assignments</a> --}}
+    </div>
