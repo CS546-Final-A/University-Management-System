@@ -123,7 +123,7 @@ router.post("/:userid", async (req, res) => {
       identification: identification.type,
       identificationverification: `users/registerby${identification.type}`,
       error: "Invalid identification",
-      script: "users/egistration",
+      script: "users/registration",
     });
   }
 });
