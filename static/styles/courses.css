@@ -3,6 +3,7 @@ h1 {
 }
 a {
   color: #8167a9;
+  cursor: pointer;
 }
 .course-listing {
   display: flex;
@@ -41,8 +42,9 @@ a {
 .course-listing .courses .course h2 {
   margin-top: 1rem;
 }
-.course-listing .courses .course h2 a {
+.course-listing .courses .course h2 {
   text-decoration: none;
+  cursor: pointer;
   color: unset;
 }
 /* Style for the filter container */
@@ -78,3 +80,80 @@ a {
 .filter button:hover {
   background-color: #8167a9;
 }
+
+/* Course Landing/Dashboard */
+
+.menuContainer{
+  display: flex;
+  gap: 1rem;
+}
+
+.menuCard {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  background-color: white;
+  padding: 5rem;
+  border-radius: 15px;
+  color: #8167a9;
+  cursor: pointer;
+}
+
+.menuCard:hover {
+  background-color: #8167a9;
+  color: white;
+}
+
+/* Course Registration Form */
+.courseRegistrationContainer{
+  display:flex;
+  justify-content: center;
+}
+
+.courseRegistrationForm{
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 20px;
+}
+
+h2 {
+  color: #333;
+}
+
+form {
+  max-width: 400px;
+  margin: 20px 0;
+}
+
+label {
+  display: block;
+  margin: 10px 0 5px;
+  color: #333;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  max-height: 200px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+

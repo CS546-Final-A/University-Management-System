@@ -1,2 +1,27 @@
-<h1>Hello {{name}}</h1>
-<a href="logout">Logout</a>
+{{#if (eq type 'Student')}}
+<div class="card col-12 glassEffect">
+    <div class="card-header glassEffect">
+        <img src="./icons/dashboardCourse.svg" alt="loginIcon"> Workspace
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {{#each workspace}}
+
+            <div class="col-md-4 col-12">
+                <a class="text-decoration-none" href="/workspace/{{sectionId}}">
+                    <div class="card">
+                        <div class="card-header">{{courseNumber}}: {{courseName}}</div>
+                        <div class="card-body">Section: {{sectionName}} | Delivery: {{sectionType}}</div>
+                    </div>
+                </a>
+            </div>
+
+            {{/each}}
+        </div>
+    </div>
+</div>
+{{/if}}
+
+{{#if (eq type 'Professor')}}
+TEST Professor
+{{/if}}

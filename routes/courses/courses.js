@@ -1,114 +1,119 @@
-import { Router } from "express";
+import { Router, query } from "express";
 import { santizeInputs } from "../../data_validation.js";
+import * as courseDataFunctions from "../../data/courses/courses.js";
+import util from "util";
+import {
+  validateCourse,
+  validateSection,
+} from "../../data/courses/courseHelper.js";
+
 const router = Router();
 
-const dummyCourses = [
-  {
-    course_id: "CS 505",
-    name: "Introduction to Computer Science",
-    department: "Computer Science",
-    level: 500,
-    instructor: "John Doe",
-    delivery_mode: "In-person",
-    Status: "Active",
-    semester: "fall-2023",
-  },
-  {
-    course_id: "AAI 224",
-    name: "Artificial Intelligence",
-    department: "Artificial Intelligence",
-    level: 200,
-    instructor: "Jane Smith",
-    delivery_mode: "Online",
-    Status: "Active",
-    semester: "spring-2021",
-  },
-  {
-    course_id: "ML 400",
-    name: "Machine Learning",
-    department: "Machine Learning",
-    level: 400,
-    instructor: "David Johnson",
-    delivery_mode: "In-person",
-    Status: "Active",
-    semester: "fall-2023",
-  },
-  {
-    course_id: "CS 100",
-    name: "Introduction to Programming",
-    department: "Computer Science",
-    level: 100,
-    instructor: "Sarah Williams",
-    delivery_mode: "Online",
-    Status: "Active",
-    semester: "spring-2021",
-  },
-  {
-    course_id: "ENG 200",
-    name: "English Literature",
-    department: "English",
-    level: 200,
-    instructor: "Michael Brown",
-    delivery_mode: "In-person",
-    Status: "Active",
-    semester: "fall-2023",
-  },
-  {
-    course_id: "MAT 300",
-    name: "Advanced Mathematics",
-    department: "Mathematics",
-    level: 300,
-    instructor: "Emily Davis",
-    delivery_mode: "Online",
-    Status: "Active",
-    semester: "spring-2021",
-  },
-  {
-    course_id: "PHY 500",
-    name: "Quantum Physics",
-    department: "Physics",
-    level: 500,
-    instructor: "Robert Wilson",
-    delivery_mode: "In-person",
-    Status: "Active",
-    semester: "fall-2023",
-  },
-  {
-    course_id: "CHE 400",
-    name: "Organic Chemistry",
-    department: "Chemistry",
-    level: 400,
-    instructor: "Jennifer Thompson",
-    delivery_mode: "Online",
-    Status: "Active",
-    semester: "spring-2021",
-  },
-  {
-    course_id: "HIS 200",
-    name: "World History",
-    department: "History",
-    level: 200,
-    instructor: "Daniel Anderson",
-    delivery_mode: "In-person",
-    Status: "Active",
-    semester: "fall-2023",
-  },
-  {
-    course_id: "PSY 600",
-    name: "Psychology",
-    department: "Psychology",
-    level: 600,
-    instructor: "Laura Martinez",
-    delivery_mode: "Online",
-    Status: "Active",
-    semester: "spring-2021",
-  },
-];
+router.get("/", async (req, res) => {
+  let uniqueSectionYearandSemester =
+    await courseDataFunctions.getUniqueSectionYearandSemester();
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+    uniqueYear: uniqueSectionYearandSemester[0],
+    uniqueSemester: uniqueSectionYearandSemester[1],
+  };
+  res.render("courses/landing", renderObjs);
+});
 
-router.get("/listings", (req, res) => {
-  // req = santizeInputs(req);
-  // console.log(req.body.data);
-  res.render("courses/listings", { courses: dummyCourses });
+router.get("/registration", async (req, res) => {
+  let uniqueDepartmentNames =
+    await courseDataFunctions.getUniqueDepartmentNamesandId();
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+    uniqueDepartmentNames: uniqueDepartmentNames,
+  };
+  res.render("courses/registration", renderObjs);
+});
+
+router.post("/registration", async (req, res) => {
+  const {
+    courseNumber,
+    courseName,
+    courseDepartmentId,
+    courseCredits,
+    courseDescription,
+  } = req.body;
+  try {
+    const course = validateCourse(
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription
+    );
+    let result = await courseDataFunctions.registerCourse(
+      course.courseNumber,
+      course.courseName,
+      course.courseDepartmentId,
+      course.courseCredits,
+      course.courseDescription
+    );
+    if (result.acknowledged) {
+      // res.render();
+    }
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      return res.json({ error: e.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+  // res.render("courses/registration");
+});
+
+router.get("/:year/:semester/listings", async (req, res) => {
+  const { year, semester } = req.params;
+
+  let {
+    searchTerm,
+    departmentFilter,
+    instructorFilter,
+    meetingDaysFilter,
+    deliveryModeFilter,
+  } = req.query;
+  let data = await courseDataFunctions.getAllCourses(
+    year,
+    semester,
+    searchTerm,
+    departmentFilter,
+    instructorFilter,
+    meetingDaysFilter,
+    deliveryModeFilter
+  );
+  data.year = year;
+  data.semester = semester;
+
+  let uniqueDepartmentNames =
+    await courseDataFunctions.getUniqueDepartmentNamesandId();
+  let uniqueInstructors =
+    await courseDataFunctions.getUniqueInstructorNamesandId();
+  uniqueDepartmentNames.sort((a, b) => a.name.localeCompare(b.name));
+  uniqueInstructors.sort((a, b) => a.name.localeCompare(b.name));
+  data.uniqueDepartmentNames = uniqueDepartmentNames;
+  data.uniqueInstructors = uniqueInstructors;
+
+  let uniqueSectionTypes = ["Online", "In-Person"];
+  data.uniqueSectionTypes = uniqueSectionTypes;
+  data.map((course) => {
+    course.departmentName = course.departmentName[0];
+  });
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+    courses: data,
+  };
+  res.render("courses/listings", renderObjs);
 });
 
 export default router;

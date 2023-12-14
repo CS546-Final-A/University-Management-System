@@ -47,7 +47,7 @@ app.use(
   lusca({
     csrf: true,
     /*csp: {
-       ... 
+       ...
     },*/
     xframe: "SAMEORIGIN",
     p3p: "ABCDEF",
@@ -58,12 +58,23 @@ app.use(
   })
 );
 
+// Define the eq helper
+const eqHelper = function (a, b) {
+  if (a === b) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const handlebars = exphbs.create({
   defaultLayout: "main",
   partialsDir: ["views/partials/"],
+  helpers: { eq: eqHelper },
 });
 
 app.engine("handlebars", handlebars.engine);
+
 app.set("view engine", "handlebars");
 app.set("views", "./views");
 

@@ -10,7 +10,9 @@ async function login(email, password) {
 
   const user = await usercol.findOne(
     { email: email, status: "Active" },
-    { projection: { password: 1, type: 1 } }
+    {
+      projection: { password: 1, type: 1, firstname: 1, lastname: 1, email: 1 },
+    }
   );
 
   if (!user) {
@@ -21,6 +23,8 @@ async function login(email, password) {
       successful: true,
       id: user._id,
       type: user.type,
+      email: user.email,
+      name: user.firstname + " " + user.lastname,
     };
     return accountdetails;
   } else {
