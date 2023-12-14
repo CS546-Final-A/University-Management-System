@@ -1,7 +1,9 @@
-import { users } from "../config/mongoCollections.js";
+import { randomUUID } from "crypto";
 
-import verify from "../data_validation.js";
-import sendRegistrationEmail from "./emails/sendRegistrationEmail.js";
+import { users } from "../../config/mongoCollections.js";
+
+import verify from "../../data_validation.js";
+import sendRegistrationEmail from "../emails/sendRegistrationEmail.js";
 
 async function createUser(firstname, lastname, email, identification, type) {
   firstname = verify.name(firstname);
@@ -45,6 +47,16 @@ async function createUser(firstname, lastname, email, identification, type) {
     throw error;
   }
 
+  let secret = randomUUID();
+
+  let duplicatesecret = await usercol.findOne({ registrationcode: secret });
+
+  while (duplicatesecret) {
+    secret = randomUUID();
+
+    duplicatesecret = await usercol.findOne({ registrationcode: secret });
+  }
+
   const userdata = {
     firstname: firstname,
     lastname: lastname,
@@ -52,6 +64,7 @@ async function createUser(firstname, lastname, email, identification, type) {
     identification: publicID,
     type: type,
     status: "Initalized",
+    registrationcode: secret,
   };
 
   const insertion = await usercol.insertOne(userdata);
@@ -61,13 +74,12 @@ async function createUser(firstname, lastname, email, identification, type) {
     throw error;
   }
 
-  const userid = insertion.insertedId;
   try {
-    await sendRegistrationEmail(email, userid);
+    await sendRegistrationEmail(email, secret);
     return { successful: true };
   } catch (e) {
     // cleanup on failed email and rethrow the error
-    await usercol.deleteOne({ _id: userid });
+    await usercol.deleteOne({ _id: insertion.insertedId });
     throw e;
   }
 }
