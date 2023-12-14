@@ -7,7 +7,7 @@ async function getPasswordResetInfo(secret) {
   const resetscol = await passwordresets();
 
   const recentTime = new Date();
-  recentTime.setMinutes(-30);
+  recentTime.setMinutes(recentTime.getMinutes() - 30);
 
   const reset = await resetscol.findOne({
     secret: secret,

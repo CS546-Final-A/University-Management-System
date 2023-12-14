@@ -4,7 +4,7 @@ async function cleanup() {
   const resetscol = await passwordresets();
 
   const recentTime = new Date();
-  recentTime.setMinutes(-30);
+  recentTime.setMinutes(recentTime.getMinutes() - 30);
 
   const result = await resetscol.deleteMany({
     $or: [
