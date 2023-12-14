@@ -11,6 +11,7 @@ import dashboard from "./dashboard.js";
 import user_management from "./administration/users.js";
 import courses from "./courses/courses.js";
 import workspace from "./workspace/workspace.js";
+import * as a from "../data/assignments/assignments.js";
 
 function route(app) {
   app.use("/scripts", express.static("./static/scripts"));
