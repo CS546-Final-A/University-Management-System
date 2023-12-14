@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/styles/bootstrap.min.css" />
-    <link rel="stylesheet" href="/styles/bootstrap-select.min.css" />
-    <link rel="stylesheet" href="/styles/styles.css" />
+    <link rel="stylesheet" href="/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/bootstrap-select.min.css">
+    <link rel="stylesheet" href="/styles/styles.css">
 
     <title>University Management System</title>
 </head>
@@ -17,34 +17,45 @@
     <div class="navigation-wrap bg-light start-header">
         <div class="row">
             <header class="col-12">
-                <nav class="navbar navbar-expand-md navbar-light mx-3">
-                    <ul class="navbar-nav py-4 py-md-0">
-                        <li class="nav-item ps-4 ps-md-0 ms-0 ms-md-4">
-                            <a class="nav-link" href="/"><svg width="65px" height="65px" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <g stroke-width="0"></g>
-                                    <g stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC"
-                                        stroke-width="0.096"></g>
-                                    <g>
-                                        <path
-                                            d="M8.66667 6C7.19391 6 6 7.19391 6 8.66667V10.303M6 17.3939V10.303M6 10.303H8.66667"
-                                            stroke="#8167a9" stroke-width="2.4" stroke-linecap="round"
-                                            stroke-linejoin="round"></path>
-                                        <path
-                                            d="M17.3333 17.3938V13.3938C17.3333 11.921 16.1394 10.7271 14.6667 10.7271C13.1939 10.7271 12 11.921 12 13.3938V17.3938V9.3938"
-                                            stroke="#8167a9" stroke-width="2.4" stroke-linecap="round"
-                                            stroke-linejoin="round"></path>
-                                    </g>
-                                </svg>
-                                <span class="fs-5 position-relative" id="homeText">Home</span>
-                            </a>
-                        </li>
-                    </ul>
+                <ul id="navigationList" class="nav d-flex mx-5">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <span class="fs-5 position-relative" id="homeText">Home</span>
+                        </a>
+                    </li>
+                    {{#if name}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/courses/">
+                            <span class="fs-5 position-relative" id="coursesText">Courses</span>
+                        </a>
+                    </li>
+                    <li class="nav-item ms-auto dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            data-bs-auto-close="outside" aria-expanded="false"><img src="/icons/user-circle.svg"
+                                alt="user-circle-icon" /></a>
+                        <ul class="dropdown-menu p-0" id="navProfileDropdown">
+                            <li>
+                                <div class="container p-0">
+                                    <div class="m-2 px-2">
+                                        {{name}} <span class="text-muted fs-6"> {{type}} </span>
+                                    </div>
+                                    <div class="m-2 px-2">
+                                        {{email}}
+                                    </div>
+                                    <div id="switch" class="m-4">
+                                        <div id="circle"></div>
+                                    </div>
+                                    <div class="my-auto d-flex justify-content-center btnNavbar">
+                                        <a class="w-100" href="/logout"><button
+                                                class="mb-0 py-2 w-100 btnNavbar">Logout</button></a>
+                                    </div>
 
-                    <div id="switch" class="ms-auto">
-                        <div id="circle"></div>
-                    </div>
-                </nav>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    {{/if}}
+                </ul>
             </header>
         </div>
     </div>
@@ -56,7 +67,7 @@
             <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true"
                 data-bs-autohide="false">
                 <div class="toast-header">
-                    <img src="./icons/error.svg" alt="errorIcon">
+                    <img src="/icons/error.svg" alt="errorIcon">
                     <strong class="me-auto" id="toastHeadMsg">Bootstrap</strong>
                     <small>Just Now</small>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -71,10 +82,15 @@
 
 
     <!-- JS Imports -->
-    <script src="/scripts/jquery.min.js"></script>
-    <script src="/scripts/bootstrap.bundle.min.js"></script>
-    <script src="/scripts/bootstrap-select.min.js"></script>
-    <script src="/scripts/styles.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/jquery.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/bootstrap.bundle.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/bootstrap-select.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/styles.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/verification.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/request.js"></script>
+    {{#if script}}
+    {{> (lookup . 'script') }}
+    {{/if}}
 </body>
 
 </html>

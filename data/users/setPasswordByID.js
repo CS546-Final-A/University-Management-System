@@ -16,7 +16,10 @@ async function setPassword(id, password) {
   const usercol = await users();
   const result = await usercol.updateOne(
     { _id: new ObjectId(id), status: { $not: { $eq: "Disabled" } } },
-    { $set: { password: password, status: "Active" } }
+    {
+      $set: { password: password, status: "Active" },
+      $unset: { registrationcode: "" },
+    }
   );
 
   if (!result.acknowledged) {

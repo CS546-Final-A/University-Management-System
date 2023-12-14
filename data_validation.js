@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import moment from "moment";
 import xss from "xss";
 
 export function throwerror(message) {
@@ -12,8 +13,8 @@ export function throwErrorWithStatus(status, message) {
 
 export function santizeInputs(req) {
   // Sanitizes all inputs in a request object
-  for (let key in req.body.data) {
-    req.body.data[key] = xss(req.body.data[key]);
+  for (let key in req.body) {
+    req.body[key] = xss(req.body[key]);
   }
   return req;
 }
@@ -120,6 +121,73 @@ const verify = {
     }
     return type;
   },
+  sectionType: (type) => {
+    if (typeof type !== "string") {
+      throwerror("Invalid section type");
+    }
+    type = type.trim();
+
+    const types = ["In Person", "Online"];
+    if (!types.includes(type)) {
+      throwerror("Invalid section type");
+    }
+    return type;
+  },
+  time: (time, timeName) => {
+    const timeSplit = time.split(":");
+
+    if (timeSplit.length !== 2) {
+      throwerror(`Invalid ${timeName}`);
+    }
+
+    const hr = timeSplit[0];
+    const min = timeSplit[1].substring(0, 2);
+    const period = timeSplit[1].substring(2);
+
+    if (period.length !== 3 || period[0] !== " ")
+      throwerror(`Invalid period in ${timeName}`);
+
+    if (isNaN(parseInt(hr))) throwerror(`Invalid hour in ${timeName}`);
+
+    if (
+      (parseInt(hr) < 10 && hr.length > 1) ||
+      parseInt(hr) < 1 ||
+      parseInt(hr) > 12
+    )
+      throwerror(`Invalid hour in ${timeName}`);
+
+    if (isNaN(min) || min < 0 || min > 59)
+      throwerror(`Invalid minutes in ${timeName}`);
+
+    if (period.trim() !== "PM" && period.trim() !== "AM")
+      throwerror(`Invalid period in ${timeName}`);
+
+    return time;
+  },
+  day: (day, dayName) => {
+    day = verify.string(day, dayName);
+    const weekHelper = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    if (!weekHelper.includes(day)) {
+      throwerror("Invalid week value");
+    }
+    return day;
+  },
+  semester: (semester, semesterName) => {
+    semester = verify.string(semester, semesterName);
+    const semesterHelper = ["Fall", "Spring"];
+    if (!semesterHelper.includes(semester)) {
+      throwerror("Invalid semester value");
+    }
+    return semester;
+  },
+  year: (year) => {
+    const checkYear = moment(year);
+    if (!checkYear.isValid()) {
+      throwerror(`Year is not valid`);
+    }
+
+    return year;
+  },
   dbid: (id) => {
     if (!(id instanceof ObjectId)) {
       throwerror("Not an ObjectId");
@@ -132,6 +200,16 @@ const verify = {
     }
     return new ObjectId(id);
   },
+  UUID: (id) => {
+    if (typeof id !== "string") {
+      throwerror("Argument is not a string");
+    }
+    id = id.trim();
+    if (!/^[\w\d]{8}-[\w\d]{4}-[\w\d]{4}-[\w\d]{4}-[\w\d]{12}$/.test(id)) {
+      throwerror("Invalid UUID");
+    }
+    return id;
+  },
   string: (string, stringName) => {
     if (typeof string !== "string") throwerror(`${stringName} is not a string`);
     if (!string.trim()) throwerror(`${stringName} is not a string`);
@@ -139,13 +217,14 @@ const verify = {
   },
   number: (number, numberName) => {
     if (typeof number !== "number" || isNaN(number) || number < 0)
-      throw new Error(`${numberName} is not a valid number`);
+      throwerror(`${numberName} is not a valid number`);
     return number;
   },
   numberInteger: (number, numberName) => {
+    number = parseInt(number, 10);
     verify.number(number, numberName);
     if (!Number.isInteger(number))
-      throw new Error(`${numberName} is not a valid number`);
+      throwerror(`${numberName} is not a valid number`);
     return number;
   },
   isAlphaString: (string, stringName) => {

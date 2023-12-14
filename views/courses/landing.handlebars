@@ -1,0 +1,49 @@
+<link rel="stylesheet" href="/styles/courses.css">
+<div class="menuContainer">
+    {{#if (eq type 'Admin')}}
+    <div id="courseRegistration" class="menuCard">
+        Course Registration
+    </div>
+    {{/if}}
+    <div id="courseListing" class="menuCard">
+        Course Enrollment
+    </div>
+
+    <div class="modal fade" id="yearAndSemesterSelect" tabindex="-1" role="dialog"
+        aria-labelledby="yearAndSemesterSelect" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="yearAndSemesterSelectLabel">Select Year and Semester</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label for="year">Select Year:</label>
+                        <select id="year" name="selectedYear">
+                            {{#each uniqueYear}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                        </select>
+
+                        <label for="semester">Select Semester:</label>
+                        <select id="semester" name="selectedSemester">
+                            {{#each uniqueSemester}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                        </select>
+
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="close btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="selectSemester" type="submit">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

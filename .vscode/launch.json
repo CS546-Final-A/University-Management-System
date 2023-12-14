@@ -6,7 +6,7 @@
       "request": "launch",
       "name": "Launch Node",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\app.js"
+      "program": "${workspaceFolder}/app.js"
     },
     {
       "name": "Launch Edge",

@@ -1,12 +1,19 @@
 import { Router } from "express";
 
 import verify from "../../data_validation.js";
-import createUser from "../../data/createuser.js";
+import createUser from "../../data/administration/createuser.js";
 
 const router = Router();
 
 router.get("/create", (req, res) => {
-  res.render("admin/createuser", { style: ["error"] });
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+    script: "users/createuser",
+  };
+
+  res.render("admin/createuser", renderObjs);
 });
 
 router.put("/create", async (req, res) => {

@@ -1,12 +1,18 @@
 import { Router } from "express";
 
-import login from "../data/login.js";
-import verify from "../data_validation.js";
+import login from "../../data/users/login.js";
+import verify from "../../data_validation.js";
 
 const router = Router();
 
 router.get("/", (req, res) => {
-  res.render("public/login", { style: ["login", "error"] });
+  let renderObjs = {
+    name: req.session.name,
+    type: req.session.type,
+    email: req.session.email,
+    script: "login",
+  };
+  res.render("public/login", renderObjs);
 });
 
 router.post("/", async (req, res) => {
@@ -19,6 +25,8 @@ router.post("/", async (req, res) => {
     if (result.successful) {
       req.session.userid = result.id;
       req.session.type = result.type;
+      req.session.name = result.name;
+      req.session.email = result.email;
     }
 
     res.json({ loggedin: result.successful });
@@ -27,7 +35,11 @@ router.post("/", async (req, res) => {
       res.status(e.status);
       return res.json({ error: e.message });
     } else {
-      console.log(e);
+      if (e.message) {
+        console.log("Error: " + e.message);
+      } else {
+        console.log("Error: " + e);
+      }
       res.status(500);
       res.json({ error: "Login error" });
     }
