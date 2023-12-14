@@ -4,11 +4,13 @@ import verify from "../../data_validation.js";
 
 const UNIVERSITYNAME = "Stevens Institute of Technology";
 
-async function sendRegistrationEmail(email, userid) {
+async function sendRegistrationEmail(email, registrationcode) {
   email = verify.email(email);
-  userid = verify.dbid(userid);
+  registrationcode = verify.UUID(registrationcode);
 
   const emailer = await SMTPConnect();
+
+  const registrationlink = `http://${process.env.SiteDomain}/register/${registrationcode}`;
 
   const message = {
     from: `account-registration@${process.env.MailServerDomain}`,
@@ -16,14 +18,14 @@ async function sendRegistrationEmail(email, userid) {
     subject: `Welcome to ${UNIVERSITYNAME}`,
     text: `Congratulations, you have been selected to join the ${UNIVERSITYNAME} family. Please use the link below to create your ${UNIVERSITYNAME} account.
     
-    ${process.env.SiteDomain}/register/${userid}`,
+    ${registrationlink}`,
     html: `
     <!doctype html>
     <html>
         <body>
             <p>Congratulations, you have been selected to join the ${UNIVERSITYNAME} family. Please use the link below to create your ${UNIVERSITYNAME} account.</p><br>
-            <a href="http://${process.env.SiteDomain}/register/${userid}">Register Now</a><br>
-            <a href="http://${process.env.SiteDomain}/register/${userid}">http://${process.env.SiteDomain}/register/${userid}</a>
+            <a href="${registrationlink}">Register Now</a><br>
+            <a href="${registrationlink}">${registrationlink}</a>
         </body>
     </html>
     `,

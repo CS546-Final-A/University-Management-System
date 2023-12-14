@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import verify from "../../data_validation.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
-import getUnregisteredIdentificationByUserID from "../../data/users/getUnregisteredUserIdentification.js";
+import getRegistrationInfo from "../../data/users/getRegistrationInfo.js";
 import setPassword from "../../data/users/setPasswordByID.js";
 import routeError from "../routeerror.js";
 
@@ -83,18 +83,18 @@ router.patch("/setpassword", async (req, res) => {
   }
 });
 
-router.get("/:userid", async (req, res) => {
+router.get("/:registrationcode", async (req, res) => {
   if (req.session.registrationuserid) {
     return res.redirect("/register/setpassword");
   }
   try {
-    const id = req.params.userid;
+    const registrationcode = verify.UUID(req.params.registrationcode);
 
-    const identification = await getUnregisteredIdentificationByUserID(id);
+    const user = await getRegistrationInfo(registrationcode);
 
     return res.render("public/registration", {
-      identification: identification.type,
-      identificationverification: `users/registerby${identification.type}`,
+      identification: user.identification.type,
+      identificationverification: `users/registerby${user.identification.type}`,
       script: "users/registration",
     });
   } catch (e) {
@@ -102,21 +102,24 @@ router.get("/:userid", async (req, res) => {
   }
 });
 
-router.post("/:userid", async (req, res) => {
+router.post("/:registrationcode", async (req, res) => {
   if (req.session.registrationuserid) {
     return res.redirect("/register/setpassword");
   }
-  let identification;
+  let user;
   try {
-    const id = req.params.userid;
-    identification = await getUnregisteredIdentificationByUserID(id);
+    const registrationcode = verify.UUID(req.params.registrationcode);
+    user = await getRegistrationInfo(registrationcode);
   } catch (e) {
     return routeError(res, e);
   }
   const idnum = req.body.idconf;
   const idtype = req.body.idtype;
-  if (identification.type === idtype && identification.number === idnum) {
-    req.session.registrationuserid = req.params.userid;
+  if (
+    user.identification.type === idtype &&
+    user.identification.number === idnum
+  ) {
+    req.session.registrationuserid = user._id;
     return res.redirect("/register/setpassword");
   } else {
     res.render("public/registration", {
