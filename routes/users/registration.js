@@ -1,26 +1,10 @@
 import { Router } from "express";
 
-import verify from "../data_validation.js";
-import getUserByID from "../data/users/getUserInfoByID.js";
-import getUnregisteredIdentificationByUserID from "../data/getUnregisteredUserIdentification.js";
-import setPassword from "../data/users/setPasswordByID.js";
-
-function routeError(res, e) {
-  if (e.status) {
-    res.status(e.status);
-    if (e.status >= 500) {
-      console.log("Error:");
-      console.log(e.message);
-      e.message = "Internal server error";
-    }
-    return res.render("public/error", { error: e.message });
-  } else {
-    console.log("Error:");
-    console.log(e);
-    res.status(500);
-    return res.render("public/error", { error: "Internal server error" });
-  }
-}
+import verify from "../../data_validation.js";
+import getUserByID from "../../data/users/getUserInfoByID.js";
+import getUnregisteredIdentificationByUserID from "../../data/users/getUnregisteredUserIdentification.js";
+import setPassword from "../../data/users/setPasswordByID.js";
+import routeError from "../routeerror.js";
 
 const router = Router();
 
@@ -47,6 +31,7 @@ router.get("/setpassword", async (req, res) => {
       throw e;
     }
 
+    userinfo.script = "users/setpassword";
     return res.render("public/setpassword", userinfo);
   } catch (e) {
     return routeError(res, e);
@@ -109,7 +94,8 @@ router.get("/:userid", async (req, res) => {
 
     return res.render("public/registration", {
       identification: identification.type,
-      identificationverification: `registerby${identification.type}`,
+      identificationverification: `users/registerby${identification.type}`,
+      script: "users/registration",
     });
   } catch (e) {
     return routeError(res, e);
@@ -135,8 +121,9 @@ router.post("/:userid", async (req, res) => {
   } else {
     res.render("public/registration", {
       identification: identification.type,
-      identificationverification: `registerby${identification.type}`,
+      identificationverification: `users/registerby${identification.type}`,
       error: "Invalid identification",
+      script: "users/egistration",
     });
   }
 });

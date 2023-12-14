@@ -2,13 +2,16 @@ import "dotenv/config";
 import express from "express";
 import session from "express-session";
 import lusca from "lusca";
-import { engine } from "express-handlebars";
+import exphbs from "express-handlebars";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
 import SMTPConnect from "./config/smptConnection.js";
 import { dbConnection } from "./config/mongoConnection.js";
 import route from "./routes/index.js";
+
+import scheduler from "./cronjobs/index.js";
+import cleanupresets from "./cronjobs/cleanupresets.js";
 
 const smptconnection = SMTPConnect();
 const databaseconnection = dbConnection();
@@ -64,15 +67,13 @@ const eqHelper = function (a, b) {
   }
 };
 
-// Register the eq helper with Handlebars
-app.engine(
-  "handlebars",
-  engine({
-    helpers: {
-      eq: eqHelper,
-    },
-  })
-);
+const handlebars = exphbs.create({
+  defaultLayout: "main",
+  partialsDir: ["views/partials/"],
+  helpers: { eq: eqHelper },
+});
+
+app.engine("handlebars", handlebars.engine);
 
 app.set("view engine", "handlebars");
 app.set("views", "./views");
@@ -90,6 +91,17 @@ smptconnection.verify(function (error, success) {
 
 if (await databaseconnection) {
   console.log("Connected to Database Server");
+  try {
+    cleanupresets().then((result) => {
+      console.log(result);
+    });
+  } catch (e) {
+    console.log(
+      "Failed to perform deletion of expired password reset requests"
+    );
+    console.log(e);
+  }
+  scheduler.startById("id_1");
 } else {
   throw "Failed to connect to database";
 }

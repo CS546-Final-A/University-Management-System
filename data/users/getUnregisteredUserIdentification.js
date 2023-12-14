@@ -1,4 +1,4 @@
-import { users } from "../config/mongoCollections.js";
+import { users } from "../../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 
 async function getUserByID(id) {
