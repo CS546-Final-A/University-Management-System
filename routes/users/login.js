@@ -10,6 +10,7 @@ router.get("/", (req, res) => {
     name: req.session.name,
     type: req.session.type,
     email: req.session.email,
+    script: "login",
   };
   res.render("public/login", renderObjs);
 });

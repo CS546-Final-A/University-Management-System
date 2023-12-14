@@ -31,6 +31,7 @@ router.get("/setpassword", async (req, res) => {
       throw e;
     }
 
+    userinfo.script = "users/setpassword";
     return res.render("public/setpassword", userinfo);
   } catch (e) {
     return routeError(res, e);
@@ -93,7 +94,8 @@ router.get("/:userid", async (req, res) => {
 
     return res.render("public/registration", {
       identification: identification.type,
-      identificationverification: `registerby${identification.type}`,
+      identificationverification: `users/registerby${identification.type}`,
+      script: "users/registration",
     });
   } catch (e) {
     return routeError(res, e);
@@ -119,8 +121,9 @@ router.post("/:userid", async (req, res) => {
   } else {
     res.render("public/registration", {
       identification: identification.type,
-      identificationverification: `registerby${identification.type}`,
+      identificationverification: `users/registerby${identification.type}`,
       error: "Invalid identification",
+      script: "users/egistration",
     });
   }
 });

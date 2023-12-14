@@ -12,7 +12,7 @@ const router = Router();
 
 router.get("/", (req, res) => {
   res.render("public/requestpasswordreset", {
-    script: "requestpasswordreset",
+    script: "users/requestpasswordreset",
   });
 });
 
@@ -44,13 +44,13 @@ router.get("/:secret", async (req, res) => {
     const secret = verify.UUID(req.params.secret);
     const reset = await getPasswordResetInfo(secret);
     res.render("public/resetpassword", {
-      script: "resetpassword",
+      script: "users/resetpassword",
     });
   } catch (e) {
     if (e.status === 404 || e.status === 400) {
       res.status(e.status);
       return res.render("public/requestpasswordreset", {
-        script: "requestpasswordreset",
+        script: "users/requestpasswordreset",
       });
     } else {
       return routeError(res, e);

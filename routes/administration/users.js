@@ -10,6 +10,7 @@ router.get("/create", (req, res) => {
     name: req.session.name,
     type: req.session.type,
     email: req.session.email,
+    script: "users/createuser",
   };
 
   res.render("admin/createuser", renderObjs);
