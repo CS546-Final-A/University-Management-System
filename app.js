@@ -10,6 +10,9 @@ import SMTPConnect from "./config/smptConnection.js";
 import { dbConnection } from "./config/mongoConnection.js";
 import route from "./routes/index.js";
 
+import scheduler from "./cronjobs/index.js";
+import cleanupresets from "./cronjobs/cleanupresets.js";
+
 const smptconnection = SMTPConnect();
 const databaseconnection = dbConnection();
 
@@ -77,6 +80,17 @@ smptconnection.verify(function (error, success) {
 
 if (await databaseconnection) {
   console.log("Connected to Database Server");
+  try {
+    cleanupresets().then((result) => {
+      console.log(result);
+    });
+  } catch (e) {
+    console.log(
+      "Failed to perform deletion of expired password reset requests"
+    );
+    console.log(e);
+  }
+  scheduler.startById("id_1");
 } else {
   throw "Failed to connect to database";
 }
