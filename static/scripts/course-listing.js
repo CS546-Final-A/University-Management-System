@@ -44,5 +44,5 @@ $(".courseRedirect").click(async function (e) {
   const courseID = $(this).attr("data-id");
   // console.log(courseID);
   // console.log(window.location.href);
-  window.location.href = window.location.href.split("?")[0] + courseID;
+  window.location.href = "/courses/" + courseID;
 });

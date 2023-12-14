@@ -15,14 +15,6 @@ $("#selectSemester").click(async function (e) {
   window.location.href = `/courses/${year}/${semester}/listings/`;
 });
 
-$(".courseRedirect").click(async function (e) {
-  e.preventDefault();
-  const courseID = $(this).attr("data-id");
-  // console.log(courseID);
-  // console.log(window.location.href);
-  window.location.href = window.location.href.split("?")[0] + courseID;
-});
-
 $("#yearAndSemesterSelect .close").on("click", function (e) {
   $("#yearAndSemesterSelect").modal("hide");
 });

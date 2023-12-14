@@ -1,0 +1,62 @@
+<div class="container mt-5">
+    {{#each courses}}
+    <div class="card mb-4 w-100" style="display: flex; flex-direction: column;">
+        <div class="card-header">
+            <h2>{{this.courseNumber}} : {{this.courseName}}</h2>
+        </div>
+        <div class="card-body" style="flex: 1;">
+            <p>{{this.courseDescription}}</p>
+            <div style="display: flex;">
+                <div style="flex: 1 0 200px;">
+                    <div class="mb-3">
+                        <strong>Department:</strong> {{this.courseDepartmentId.name}}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Credits:</strong> {{this.courseCredits}}
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <div class="table-responsive">
+                        <table class="table table-striped h-100">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Instructor</th>
+                                    <th>Type</th>
+                                    <th>Time</th>
+                                    <th>Day</th>
+                                    <th>Location</th>
+                                    <th>Description</th>
+                                    <th>Capacity</th>
+                                    <th>Enrollments</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each this.sections}}
+                                <tr>
+                                    <td>{{this.sectionName}}</td>
+                                    <td>{{this.sectionInstructor.name}}</td>
+                                    <td>{{this.sectionType}}</td>
+                                    <td>{{this.sectionStartTime}} - {{this.sectionEndTime}}</td>
+                                    <td>{{this.sectionDay}}</td>
+                                    <td>{{this.sectionLocation}}</td>
+                                    <td>{{this.sectionDescription}}</td>
+                                    <td>{{this.sectionCapacity}}</td>
+                                    <td>{{this.enrolledStudents.length}}</td>
+                                    {{#if (gt this.sectionCapacity this.enrolledStudents.length)}}
+                                    <td><button class="btn btn-primary">Enroll</button></td>
+                                    {{else}}
+                                    <td>Capacity Full</td>
+                                    {{/if}}
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
