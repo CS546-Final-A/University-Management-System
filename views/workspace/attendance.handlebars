@@ -7,8 +7,7 @@
 
     {{else if (eq userType "Professor")}}
     <h1>Welcome, Professor {{name}}!</h1>
-<button id = "markProfPresentButton">mark me present</button>
-    <button id="calAttendanceButton">Calculate Attendance</button>
+<button id = "markProfPresentButton">start taking attendance</button>
     <h1>Attendance Data</h1>
     <ul>
         {{#each studentsWithinRange}}
@@ -58,6 +57,9 @@ async function markPresent() {
     if (response.ok) {
       const data = await response.json();
       console.log(data.message);
+      if (markProfPresentButton) {
+       markProfPresentButton.disabled = true;
+       markProfPresentButton.innerHTML = "Timer started";}
     } else {
       console.error(`Failed to mark attendance. Status: ${response.status}`);
     }

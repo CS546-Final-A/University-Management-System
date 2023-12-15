@@ -82,7 +82,7 @@ export async function getAttendanceData(moduleId) {
       .toArray();
 
     if (attendanceData.length > 0) {
-      return attendanceData[0].attendance;
+      return attendanceData[0].attendance || [];
     } else {
       console.log(`Attendance data not found for module ${moduleId}.`);
       return [];

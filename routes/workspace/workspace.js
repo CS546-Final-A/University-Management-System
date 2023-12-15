@@ -18,7 +18,7 @@ router.route("/:sectionId").get(async (req, res) => {
     lastname: 1,
   });
 
-  res.render("workspace/section", {
+  res.render("workspace/home", {
     layout: "sidebar",
     sideBarTitle: `${course.courseName}`,
     sectionID: `${section.sectionId}`,
@@ -98,6 +98,7 @@ router
       try {
         const attendanceData = await getAttendanceData(moduleId);
         console.log(attendanceData);
+
         const professor = await attendanceData.find(
           (entry) => entry.type === "Professor"
         );

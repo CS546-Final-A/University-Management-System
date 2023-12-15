@@ -12,12 +12,13 @@ export async function addModuleToSection(
   try {
     const coursesCollection = await courses();
     const newModuleId = new ObjectId();
-
+    const attendance = [];
     const newModule = {
       moduleId: newModuleId,
       moduleName,
       moduleDescription,
       moduleDate,
+      attendance,
     };
 
     const result = await coursesCollection.updateOne(
