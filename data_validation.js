@@ -174,7 +174,7 @@ const verify = {
   },
   semester: (semester, semesterName) => {
     semester = verify.string(semester, semesterName);
-    const semesterHelper = ["Fall", "Spring"];
+    const semesterHelper = ["Fall", "Spring", "Summer", "Winter"];
     if (!semesterHelper.includes(semester)) {
       throwerror("Invalid semester value");
     }
