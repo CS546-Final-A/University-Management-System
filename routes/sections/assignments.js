@@ -100,6 +100,9 @@ router.get("/edit/:assignmentID", async (req, res) => {
         message: "You do not have edit rights for this assignment",
       };
     }
+
+    res.locals.assignment.assignmentDueDate =
+      res.locals.assignment.assignmentDueDate.toISOString().substring(0, 10);
     res.render("assignments/edit");
   } catch (e) {
     routeError(res, e);
