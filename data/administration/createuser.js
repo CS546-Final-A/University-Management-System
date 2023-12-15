@@ -65,6 +65,7 @@ async function createUser(firstname, lastname, email, identification, type) {
     type: type,
     status: "Initalized",
     registrationcode: secret,
+    registeredCourses: [],
   };
 
   const insertion = await usercol.insertOne(userdata);
