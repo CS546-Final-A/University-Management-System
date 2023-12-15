@@ -1,76 +1,74 @@
 <h1>Attendance</h1>
 
-   {{#if (eq userType "Student")}}
-        <h1>Welcome, Student  {{name}}   !</h1>
-        <button id = "markPresentButton">mark me present</button>
+{{#if (eq userType "Student")}}
+<h1>Welcome, Student {{name}} !</h1>
+<button id="markPresentButton">mark me present</button>
 
 
-    {{else if (eq userType "Professor")}}
-    <h1>Welcome, Professor {{name}}!</h1>
-<button id = "markProfPresentButton">mark me present</button>
-    <button id="calAttendanceButton">Calculate Attendance</button>
-    <h1>Attendance Data</h1>
-    <ul>
-        {{#each studentsWithinRange}}
-        <li>
-            <strong>Name:</strong> {{this.name}} <br>
-            <strong>User ID:</strong> {{this.userId}} <br>
-            <strong>Distance:</strong> {{this.distanceFromProfessor}} <br>
-           
-        </li>
-        {{/each}}
-    </ul>
+{{else if (eq userType "Professor")}}
+<h1>Welcome, Professor {{name}}!</h1>
+<button id="markProfPresentButton">mark me present</button>
+<button id="calAttendanceButton">Calculate Attendance</button>
+<h1>Attendance Data</h1>
+<ul>
+  {{#each studentsWithinRange}}
+  <li>
+    <strong>Name:</strong> {{this.name}} <br>
+    <strong>User ID:</strong> {{this.userId}} <br>
+    <strong>Distance:</strong> {{this.distanceFromProfessor}} <br>
+
+  </li>
+  {{/each}}
+</ul>
 
 {{/if}}
 
-    <script>
-document.addEventListener("DOMContentLoaded", function() {
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
     const markPresentButton = document.getElementById("markPresentButton");
-     const markProfPresentButton = document.getElementById("markProfPresentButton");
+    const markProfPresentButton = document.getElementById("markProfPresentButton");
     const calAttendanceButton = document.getElementById("calAttendanceButton");
 
- if (markProfPresentButton) {
-        markProfPresentButton.addEventListener("click", markPresent);
+    if (markProfPresentButton) {
+      markProfPresentButton.addEventListener("click", markPresent);
     }
     if (markPresentButton) {
-        markPresentButton.addEventListener("click", markPresent);
+      markPresentButton.addEventListener("click", markPresent);
     }
-});
+  });
 
-async function markPresent() {
-  try {
-    const pathSegments = window.location.pathname.split('/');
-    const sectionId = pathSegments[2];  
-    const moduleId = pathSegments[4];   
-    const position = await getCurrentPosition();
-    const { latitude, longitude } = position.coords;
-    const response = await fetch(`/workspace/${sectionId}/modules/${moduleId}/attendance`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        latitude,
-        longitude,
-      }),
-    });
+  async function markPresent() {
+    try {
+      const pathSegments = window.location.pathname.split('/');
+      const sectionId = pathSegments[2];
+      const moduleId = pathSegments[4];
+      const position = await getCurrentPosition();
+      const { latitude, longitude } = position.coords;
+      const response = await fetch(`/workspace/${sectionId}/modules/${moduleId}/attendance`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          latitude,
+          longitude,
+        }),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data.message);
-    } else {
-      console.error(`Failed to mark attendance. Status: ${response.status}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.message);
+      } else {
+        console.error(`Failed to mark attendance. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error marking attendance:", error);
     }
-  } catch (error) {
-    console.error("Error marking attendance:", error);
   }
-}
-    function getCurrentPosition() {
-        return new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
-        });
-    }
-    </script>
-
-
-    
+  function getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+  }
+</script>

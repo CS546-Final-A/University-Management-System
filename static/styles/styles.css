@@ -147,8 +147,6 @@ h1 {
 }
 
 h2 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
   border-bottom: 1px solid #8167a9;
 }
 p {
@@ -254,7 +252,6 @@ body .myContainer {
 
 input,
 button {
-  margin-bottom: 5px;
   border: 1px solid var(--activeTextColor);
   background: var(--activeBgColor);
   color: var(--activeTextColor);

@@ -57,15 +57,10 @@
   padding: 7px 20px;
   font-size: 1.1em;
   display: block;
+  transition: all 0.1s linear;
 }
 
-#sidebar ul li a:hover {
-  color: #252525;
-  background: #fff;
-}
-
-#sidebar ul li.active > a,
-a[aria-expanded="true"] {
+#sidebar ul li.active > a {
   color: #fff;
   background: #8f425a;
 }
@@ -85,7 +80,6 @@ a[data-toggle="collapse"] {
 ul ul a {
   font-size: 0.9em !important;
   padding-left: 30px !important;
-  background: #252525;
 }
 
 ul.CTAs {
@@ -122,7 +116,6 @@ a.article:hover {
 #content {
   width: 100%;
   padding: 20px;
-  min-height: 100vh;
   transition: all 0.3s;
   margin-left: 250px;
 }
@@ -240,4 +233,51 @@ a.article:hover {
   -ms-transform: translateY(-13px) rotate(90deg);
   -o-transform: translateY(-13px) rotate(90deg);
   transform: translateY(-13px) rotate(90deg);
+}
+
+/* Hover Ripple */
+
+.hover {
+  z-index: 2;
+  --width: 100%;
+  --time: 0.5s;
+  position: relative;
+
+  color: #ffffff;
+  background: #222;
+  overflow: hidden;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  cursor: pointer;
+}
+
+.hover text {
+  position: relative;
+  z-index: 2;
+
+  transition: all var(--time);
+}
+
+.hover:hover text {
+  color: #000000;
+}
+
+.hover span {
+  position: absolute;
+  display: block;
+  content: "";
+  z-index: 0;
+  width: 0;
+  height: 0;
+
+  border-radius: 100%;
+  background: #ffffff;
+
+  transform: translate(-50%, -50%);
+  transition: width var(--time), padding-top var(--time);
+}
+
+.hover:hover span {
+  width: calc(var(--width) * 2.35);
+  padding-top: calc(var(--width) * 2.35);
 }

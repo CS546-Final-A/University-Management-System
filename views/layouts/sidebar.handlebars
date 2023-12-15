@@ -76,19 +76,20 @@
 
             <ul class="list-unstyled components">
                 <li class="active py-1">
-                    <a href="/workspace/{{sectionID}}">Home</a>
+                    <a class="hover" href="/workspace/{{sectionID}}"><span></span><text>Home</text></a>
                 </li>
                 <li class="py-1">
-                    <a href="/workspace/{{sectionID}}/modules">Modules</a>
+                    <a class="hover" href="/workspace/{{sectionID}}/modules"><span></span><text>Modules</text></a>
                 </li>
                 <li class="py-1">
-                    <a href="/workspace/{{sectionID}}/assignments">Assignments</a>
+                    <a class="hover"
+                        href="/workspace/{{sectionID}}/assignments"><span></span><text>Assignments</text></a>
                 </li>
             </ul>
         </nav>
 
         <!-- Page Content  -->
-        <div id="content">
+        <div id="content" class="mt-4">
             {{{body}}}
         </div>
     </div>
