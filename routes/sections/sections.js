@@ -2,7 +2,6 @@ import { Router, query } from "express";
 import verify, { santizeInputs } from "../../data_validation.js";
 import * as assignmentDataFunctions from "../../data/assignments/assignments.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
-import getUserByID from "../../data/users/getUserInfoByID.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 
 import util from "util";
