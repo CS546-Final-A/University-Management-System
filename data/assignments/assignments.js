@@ -214,35 +214,6 @@ export async function deleteAssignmentById(assignmentId) {
 //   console.log(deletedAssignmentId)
 // );
 
-// ...
-
-export async function getAllAssignmentsBySectionId(sectionId) {
-  sectionId = verify.validateMongoId(sectionId, "sectionId");
-
-  const assignmentCollection = await assignments();
-  const assignmentList = await assignmentCollection
-    .find({ assignmentSectionId: sectionId })
-    .toArray();
-
-  if (!assignmentList) {
-    throwErrorWithStatus(400, "Assignments not found");
-  }
-
-  for (let i = 0; i < assignmentList.length; i++) {
-    assignmentList[i]._id = assignmentList[i]._id.toString();
-    assignmentList[i].assignmentSectionId =
-      assignmentList[i].assignmentSectionId.toString();
-  }
-
-  return assignmentList;
-}
-
-// ...
-
-// await getAllAssignmentsBySectionId("657639234daa9f93cf1ecac0").then(
-//   (assignments) => console.log(assignments)
-// );
-
 export async function submitAssignment(
   assignmentId,
   studentId,
@@ -368,6 +339,7 @@ export async function deleteAssignmentSubmission(assignmentId, studentId) {
 export async function addScoreToSubmission(assignmentId, studentId, score) {
   assignmentId = verify.validateMongoId(assignmentId, "assignmentId");
   studentId = verify.validateMongoId(studentId, "studentId");
+  score = verify.number(score, "score");
 
   const assignmentCollection = await assignments();
   const assignment = await assignmentCollection.findOne({

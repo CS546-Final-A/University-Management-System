@@ -437,6 +437,7 @@ router.get("/:sectionId/assignments/:assignmentId/submit", async (req, res) => {
 
 router.post(
   "/:sectionId/assignments/:assignmentId/submit",
+
   fileUpload({ createParentPath: true }),
   filesPayloadExists,
   fileExtLimiter([".zip"]),
@@ -472,6 +473,7 @@ router.post(
       Object.keys(files).forEach((key) => {
         const filepath = path.join(
           "files",
+          "Assignmentas",
           assignmentId.toString(),
           userId.toString(),
           files[key].name

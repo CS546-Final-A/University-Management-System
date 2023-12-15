@@ -5,6 +5,11 @@ import verify, {
 
 function parseDateString(dateString) {
   // Split the date string into year, month, and day
+
+  if (dateString instanceof Date) {
+    return dateString;
+  }
+  console.log(dateString);
   const parts = dateString.split("-");
 
   // Ensure that the date string has three parts
