@@ -2,6 +2,7 @@ import { Router, query } from "express";
 import verify, { santizeInputs } from "../../data_validation.js";
 import * as assignmentDataFunctions from "../../data/assignments/assignments.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
+import belongsincourse from "../../data/courses/belongsincourse.js";
 
 import util from "util";
 import {
@@ -24,13 +25,41 @@ import { validateAssignment } from "../../data/assignments/assignmentsHelper.js"
 import { get } from "http";
 const router = Router();
 
+router.use("/:sectionID*", async (req, res, next) => {
+  res.locals.sectionID = req.params.sectionID;
+  res.locals.layout = "sidebar";
+  try {
+    const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
+    if (await belongsincourse(req.session.userid, sectionID)) {
+      next();
+    } else {
+      res.status(403);
+      res.render("public/error", {
+        error: "You are not enrolled in this course",
+      });
+    }
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.render("public/error", {
+        error: e.message,
+      });
+    } else {
+      console.log(e);
+      res.status(500);
+      return res.render("public/error", {
+        error: "Internal Server Error",
+      });
+    }
+  }
+});
+
 router.get("/:sectionId/assignments/create", async (req, res) => {
   try {
     let renderObjs = {
       name: req.session.name,
       type: req.session.type,
       email: req.session.email,
-      sectionId: req.params.sectionId,
     };
     //TODO: get all the assignments for this section and pass it to the renderObjs
     let section = await courseDataFunctions.getSectionById(
@@ -107,7 +136,6 @@ router.get("/:sectionId/assignments/:assignmentId", async (req, res) => {
       name: req.session.name,
       type: req.session.type,
       email: req.session.email,
-      sectionId: req.params.sectionId,
       assignmentId: req.params.assignmentId,
     };
     let sectionId = req.params.sectionId;
@@ -139,7 +167,6 @@ router.get("/:sectionId/assignments", async (req, res) => {
       name: req.session.name,
       type: req.session.type,
       email: req.session.email,
-      sectionId: req.params.sectionId,
     };
     let sectionId = req.params.sectionId;
     sectionId = verify.validateMongoId(sectionId);
@@ -169,7 +196,6 @@ router.get("/:sectionId/assignments/edit/:assignmentId/", async (req, res) => {
       name: req.session.name,
       type: req.session.type,
       email: req.session.email,
-      sectionId: req.params.sectionId,
       assignmentId: req.params.assignmentId,
     };
     let sectionId = req.params.sectionId;
@@ -516,7 +542,6 @@ router.get(
         name: req.session.name,
         type: req.session.type,
         email: req.session.email,
-        sectionId: req.params.sectionId,
         assignmentId: req.params.assignmentId,
       };
       let sectionId = req.params.sectionId;
@@ -583,7 +608,6 @@ router.get("/:sectionId/assignments/:assignmentId/scores", async (req, res) => {
       name: req.session.name,
       type: req.session.type,
       email: req.session.email,
-      sectionId: req.params.sectionId,
       assignmentId: req.params.assignmentId,
     };
 
