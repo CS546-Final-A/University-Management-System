@@ -4,13 +4,15 @@ import signin from "./middleware/signedin.js";
 import adminsOnly from "./middleware/admin.js";
 import ratelimit from "./middleware/limits.js";
 
-import login from "./login.js";
-import register from "./registration.js";
-import logout from "./logout.js";
+import login from "./users/login.js";
+import resetpassword from "./users/resetpassword.js";
+import register from "./users/registration.js";
+import logout from "./users/logout.js";
 import dashboard from "./dashboard.js";
 import user_management from "./administration/users.js";
 import courses from "./courses/courses.js";
 import workspace from "./workspace/workspace.js";
+import sections from "./sections/sections.js";
 
 function route(app) {
   app.use("/scripts", express.static("./static/scripts"));
@@ -22,6 +24,9 @@ function route(app) {
   app.use("/register", ratelimit.registration);
   app.use("/register", register);
 
+  app.use("/resetpassword", ratelimit.passwordresets); // Limit users to 1000 requests per 15 minutes
+  app.use("/resetpassword", resetpassword);
+
   app.use("/", ratelimit.general); // Limit users to 1000 requests per 15 minutes
   app.use("/", signin); // Only allow signed in users to access routes below this one
   app.use("/logout", logout);
@@ -31,6 +36,7 @@ function route(app) {
   app.use("/users", user_management);
 
   app.use("/courses", courses);
+  app.use("/sections", sections);
   app.use("/workspace", workspace);
 }
 

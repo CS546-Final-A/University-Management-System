@@ -441,7 +441,44 @@ export const getSectionById = async (sectionId) => {
   const section = course.sections.find(
     (section) => section.sectionId.toString() === sectionId.toString()
   );
+
+  if (section) {
+    section.courseId = course._id.toString();
+    section.courseName = course.courseName;
+    section.courseNumber = course.courseNumber;
+  }
+
   return section;
+};
+
+export const getSectionsByIds = async (sectionIds) => {
+  const validatedSectionIds = sectionIds.map((sectionId) =>
+    verify.validateMongoId(sectionId, "sectionId")
+  );
+
+  const courseCollection = await courses();
+  const coursesWithSections = await courseCollection
+    .find({
+      "sections.sectionId": { $in: validatedSectionIds },
+    })
+    .toArray();
+
+  const sections = [];
+
+  coursesWithSections.forEach((course) => {
+    const matchingSections = course.sections
+      .filter((section) => sectionIds.includes(section.sectionId.toString()))
+      .map((section) => ({
+        ...section,
+        courseId: course._id.toString(),
+        courseName: course.courseName,
+        courseNumber: course.courseNumber,
+      }));
+
+    sections.push(...matchingSections);
+  });
+
+  return sections;
 };
 
 export const registerSection = async (

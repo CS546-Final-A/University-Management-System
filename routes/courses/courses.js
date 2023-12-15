@@ -18,6 +18,7 @@ router.get("/", async (req, res) => {
     email: req.session.email,
     uniqueYear: uniqueSectionYearandSemester[0],
     uniqueSemester: uniqueSectionYearandSemester[1],
+    script: "courses/landing",
   };
   res.render("courses/landing", renderObjs);
 });
@@ -30,6 +31,7 @@ router.get("/registration", async (req, res) => {
     type: req.session.type,
     email: req.session.email,
     uniqueDepartmentNames: uniqueDepartmentNames,
+    script: "courses/registration",
   };
   res.render("courses/registration", renderObjs);
 });
@@ -138,6 +140,7 @@ router.get("/:year/:semester/listings", async (req, res) => {
     type: req.session.type,
     email: req.session.email,
     courses: data,
+    script: "courses/listings",
   };
   res.render("courses/listings", renderObjs);
 });
