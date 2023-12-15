@@ -1,9 +1,9 @@
-<h1>Scores for {{assignment.assignmentName}} {{assignment._id}}</h1>
+<h1>Scores for {{assignment.assignmentName}}</h1>
 
 {{#each students}}
 <h3>Student: {{name}}</h3>
 <ul>
-    <form action="/sections/{{../sectionId}}/assignments/{{../assignment._id}}/scores" method="post">
+    <form action="/sections/{{../sectionID}}/assignments/view/{{../assignment._id}}/scores" method="post">
 
         <input type="hidden" name="studentId" value="{{this._id}}">
         <p>Current Recorded Score: {{this.score}}</p>

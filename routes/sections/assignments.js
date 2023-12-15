@@ -376,7 +376,9 @@ router.post("/view/:assignmentID/scores", async (req, res) => {
       score
     );
 
-    res.redirect(`/sections/${sectionId}/assignments/${assignmentID}/scores`);
+    res.redirect(
+      `/sections/${sectionId}/assignments/view/${assignmentID}/scores`
+    );
   } catch (e) {
     routeError(res, e);
   }

@@ -430,7 +430,7 @@ export async function updateSubmissionScore(assignmentId, studentId, score) {
   }
 
   let currentScores = assignment.scores;
-  if (!currentScores[0]) currentScores = [];
+  if (!currentScores) currentScores = [];
   let found = false;
   currentScores.map((currentScore) => {
     if (currentScore.studentId.toString() === studentId.toString()) {
