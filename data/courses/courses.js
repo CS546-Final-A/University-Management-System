@@ -17,6 +17,18 @@ export const getAllInstructors = async () => {
   return instructorList;
 };
 
+export const getInstructorById = async (instructorId) => {
+  instructorId = verify.validateMongoId(instructorId, "instructorId");
+  const userCollection = await users();
+  const instructor = await userCollection.findOne({
+    _id: instructorId,
+    type: "Professor",
+  });
+  if (!instructor) {
+    throwerror("Instructor does not exists");
+  } else return instructor;
+};
+
 export const getUniqueInstructorNamesandId = async () => {
   const userCollection = await users();
   const instructors = await userCollection
@@ -253,14 +265,18 @@ export const registerCourse = async (
   courseName,
   courseDepartmentId,
   courseCredits,
-  courseDescription
+  courseDescription,
+  courseSemester,
+  courseYear,
 ) => {
   let newCourse = validateCourse(
     courseNumber,
     courseName,
     courseDepartmentId,
     courseCredits,
-    courseDescription
+    courseDescription,
+    courseSemester,
+    courseYear,
   );
 
   const courseCollection = await courses();
@@ -278,19 +294,63 @@ export const registerCourse = async (
   if (!department) {
     throwErrorWithStatus(400, "Department not found");
   }
+  newCourse.sections = [];
   const insertInfo = await courseCollection.insertOne(newCourse);
   return insertInfo;
 };
 export const getCourseById = async (courseId) => {
   courseId = verify.validateMongoId(courseId, "courseId");
+  // console.log(courseId);
   const courseCollection = await courses();
-  const existingCourse = await courseCollection.findOne({
-    _id: courseId,
-  });
+  const existingCourse = await courseCollection
+    .aggregate([
+      { $match: { _id: courseId } },
+      {
+        $lookup: {
+          from: "departments",
+          localField: "courseDepartmentId",
+          foreignField: "_id",
+          as: "department",
+        },
+      },
+      {
+        $unwind: "$department",
+      },
 
+      {
+        $project: {
+          courseNumber: 1,
+          courseName: 1,
+          courseCredits: 1,
+          courseDescription: 1,
+          sections: 1,
+          courseDepartmentId: {
+            _id: "$department._id",
+            name: "$department.departmentName",
+          },
+        },
+      },
+    ])
+    .toArray();
+  try {
+    for (let sectionIndex in existingCourse[0].sections) {
+      let instructorId =
+        existingCourse[0].sections[sectionIndex].sectionInstructor;
+      let instructor = await getInstructorById(instructorId.toString());
+      let sectionInstructor = {
+        _id: instructor._id,
+        name: instructor.firstname + " " + instructor.lastname,
+      };
+      existingCourse[0].sections[sectionIndex].sectionInstructor =
+        sectionInstructor;
+    }
+  } catch (e) {
+    throw "Internal Server Error";
+  }
   if (!existingCourse) {
     throwErrorWithStatus(400, `Course with ${courseId} not found`);
   }
+
   return existingCourse;
 };
 
@@ -573,4 +633,27 @@ export const getUniqueSectionYearandSemester = async () => {
   }
 
   return [uniqueYear, uniqueSemester];
+};
+
+export const checkStudentInSection = async (sectionId, studentId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  studentId = verify.validateMongoId(studentId, "studentId");
+
+  const courseCollection = await courses();
+  const course = await courseCollection.findOne(
+    {
+      "sections.sectionId": sectionId,
+    },
+    {
+      $match: {
+        sections: { $elemMatch: { sectionId: sectionId, students: studentId } },
+      },
+    },
+    { $project: { sections: 1 } }
+  );
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+
+  return course;
 };

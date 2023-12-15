@@ -43,34 +43,34 @@ app.use("/", (req, res, next) => {
   next();
 });
 
-app.use(
-  lusca({
-    csrf: true,
-    /*csp: {
-       ...
-    },*/
-    xframe: "SAMEORIGIN",
-    p3p: "ABCDEF",
-    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
-    xssProtection: true,
-    nosniff: true,
-    referrerPolicy: "same-origin",
-  })
-);
+// app.use(
+//   lusca({
+//     csrf: true,
+//     /*csp: {
+//        ...
+//     },*/
+//     xframe: "SAMEORIGIN",
+//     p3p: "ABCDEF",
+//     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+//     xssProtection: true,
+//     nosniff: true,
+//     referrerPolicy: "same-origin",
+//   })
+// );
 
 // Define the eq helper
 const eqHelper = function (a, b) {
-  if (a === b) {
-    return true;
-  } else {
-    return false;
-  }
+  return a === b;
+};
+
+const gtHelper = function (a, b) {
+  return a > b;
 };
 
 const handlebars = exphbs.create({
   defaultLayout: "main",
   partialsDir: ["views/partials/"],
-  helpers: { eq: eqHelper },
+  helpers: { eq: eqHelper, gt: gtHelper },
 });
 
 app.engine("handlebars", handlebars.engine);
