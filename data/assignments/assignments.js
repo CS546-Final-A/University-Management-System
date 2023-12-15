@@ -99,7 +99,10 @@ export async function getAssignmentsBySectionId(sectionId) {
         $elemMatch: { sectionId: sectionId },
       },
     },
-    { $match: { "sections.sectionId": sectionId } }
+    {
+      $match: { "sections.sectionId": sectionId },
+      $sort: { assignmentDueDate: 1 },
+    }
   );
 
   if (!section) {

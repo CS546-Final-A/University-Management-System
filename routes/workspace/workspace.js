@@ -7,6 +7,7 @@ import {
 import { addModuleToSection } from "../../data/modules/modules.js";
 import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
+import { getAssignmentsBySectionId } from "../../data/assignments/assignments.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 import verify from "../../data_validation.js";
 
@@ -288,17 +289,12 @@ router
   });
 
 router.route("/:sectionId/assignments").get(async (req, res) => {
-  let renderObjs = {};
-  const section = await courseData.getSectionById(req.params.sectionId);
+  const renderObjs = { layout: "sidebar" };
+  renderObjs.assignments = await getAssignmentsBySectionId(
+    req.params.sectionId
+  );
 
-  renderObjs = {
-    ...renderObjs,
-    layout: "sidebar",
-    // sideBarTitle: `${course.courseName}`,
-    assignments: section.Assignments,
-    sectionID: `${section.sectionId}`,
-  };
-  res.render("workspace/assignments", renderObjs);
+  res.render("assignments/list", renderObjs);
 });
 
 export default router;
