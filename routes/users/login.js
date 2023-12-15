@@ -13,7 +13,7 @@ export let renderObjs = {
 };
 
 router.get("/", (req, res) => {
-  let renderObjs = {
+  renderObjs = {
     ...renderObjs,
     script: "login",
   };

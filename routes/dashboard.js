@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as courseData from "../data/courses/courses.js";
 import getUserByID from "../data/users/getUserInfoByID.js";
-import * as loginRoute from "../routes/login.js";
+import * as loginRoute from "../routes/users/login.js";
 
 const router = Router();
 
