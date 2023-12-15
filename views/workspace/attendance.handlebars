@@ -2,12 +2,34 @@
 
    {{#if (eq userType "Student")}}
         <h1>Welcome, Student  {{name}}   !</h1>
-        <button id = "markPresentButton">mark me present</button>
 
+        <button id = "markPresentButton">mark me present</button>
+{{!-- 
+if professor not in db => wait for prof button
+
+else if prof in db and time left and userId not in db  => mark me present button
+
+else if prof in db and time left and userId in db  => Marked button
+
+if prof in db and time not left and userId not in db => you missed attendance for this week button
+
+
+
+
+
+
+
+ --}}
 
     {{else if (eq userType "Professor")}}
     <h1>Welcome, Professor {{name}}!</h1>
-<button id = "markProfPresentButton">start taking attendance</button>
+
+   {{#if (eq needButton true)}}
+  <button id="markProfPresentButton">Start taking attendance</button>
+{{else}}
+  <button id="markedProfPresentButton" disabled> Marked!</button>
+{{/if}}
+
     <h1>Attendance Data</h1>
     <ul>
         {{#each studentsWithinRange}}
@@ -57,9 +79,8 @@ async function markPresent() {
     if (response.ok) {
       const data = await response.json();
       console.log(data.message);
-      if (markProfPresentButton) {
-       markProfPresentButton.disabled = true;
-       markProfPresentButton.innerHTML = "Timer started";}
+        window.location.reload(); 
+    
     } else {
       console.error(`Failed to mark attendance. Status: ${response.status}`);
     }

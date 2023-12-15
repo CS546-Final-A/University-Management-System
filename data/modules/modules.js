@@ -1,8 +1,5 @@
 import { courses } from "../../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
-/////////
-// function not working properly. gotta lokk into it
-/////////
 export async function addModuleToSection(
   sectionId,
   moduleName,

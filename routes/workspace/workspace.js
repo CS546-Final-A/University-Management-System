@@ -102,6 +102,9 @@ router
         const professor = await attendanceData.find(
           (entry) => entry.type === "Professor"
         );
+        let needButton = true;
+        if (professor) needButton = false;
+
         let studentsWithinRange = [];
         // console.log(professor);
         if (professor) {
@@ -130,7 +133,7 @@ router
                   distanceFromProfessor: distance,
                 };
               })
-              .filter((student) => student.distanceFromProfessor <= 100);
+              .filter((student) => student.distanceFromProfessor <= 20);
           }
         }
         // console.log(studentsWithinRange);
@@ -139,9 +142,11 @@ router
           res.status(200).render("workspace/attendance", {
             layout: "sidebar",
             // sideBarTitle: `${course.courseName}`,
+            sectionID: sectionId,
             userType,
             name,
             studentsWithinRange,
+            needButton,
           });
         }
       } catch (error) {
@@ -155,7 +160,7 @@ router
     }
   })
   .post(async (req, res) => {
-    console.log(req.session);
+    console.log(req);
     const moduleId = req.params.moduleId;
     const userId = req.session.userid;
     const name = req.session.name;
@@ -170,9 +175,13 @@ router
         latitude,
         longitude,
         type
+        //  timestamp
       );
 
       res.status(200).json({ message: "Attendance marked successfully" });
+      // if(type==="Professor"){
+      //   db mein timestamp jayenge
+      // }
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal server error" });
