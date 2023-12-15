@@ -17,10 +17,11 @@ function getCurrentPosition() {
   });
 }
 
-router.use("/:sectionId", async (req, res, next) => {
+router.use("/:sectionID*", async (req, res, next) => {
+  res.locals.sectionID = req.params.sectionID;
   try {
-    const sectionId = verify.validateMongoId(req.params.sectionId);
-    if (await belongsincourse(req.session.userid, sectionId)) {
+    const sectionID = verify.validateMongoId(req.params.sectionID, "SectionID");
+    if (await belongsincourse(req.session.userid, sectionID)) {
       next();
     } else {
       res.status(403);
@@ -60,7 +61,6 @@ router.route("/:sectionId").get(async (req, res) => {
     ...renderObjs,
     layout: "sidebar",
     sideBarTitle: course[0].courseName,
-    sectionID: section.sectionId,
     courseId: section.courseId.toString(),
     courseName: course[0].courseName,
     sectionName: section.sectionName,
@@ -92,7 +92,6 @@ router
       layout: "sidebar",
       // sideBarTitle: `${course.courseName}`,
       modules: section.sectionModules,
-      sectionID: `${section.sectionId}`,
       userType,
     };
     res.render("workspace/module", renderObjs);
@@ -186,7 +185,6 @@ router
             ...renderObjs,
             layout: "sidebar",
             // sideBarTitle: `${course.courseName}`,
-            sectionID: sectionId,
             userType,
             name,
             studentsWithinRange,
@@ -237,7 +235,6 @@ router
         ...renderObjs,
         layout: "sidebar",
         // sideBarTitle: `${course.courseName}`,
-        sectionID: sectionId,
         userType,
         name,
         n,
