@@ -286,7 +286,7 @@ router
   });
 
 router.route("/:sectionId/assignments").get(async (req, res) => {
-  const renderObjs = { layout: "sidebar" };
+  const renderObjs = { layout: "sidebar", script: "assignments/list" };
   renderObjs.assignments = await getAssignmentsBySectionId(
     req.params.sectionId
   );
