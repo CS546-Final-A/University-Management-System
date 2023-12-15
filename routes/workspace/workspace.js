@@ -7,9 +7,9 @@ import {
 import { addModuleToSection } from "../../data/modules/modules.js";
 import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
-import { getAssignmentsBySectionId } from "../../data/assignments/assignments.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 import verify from "../../data_validation.js";
+import assignmentRoutes from "./assignments.js";
 
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
@@ -20,7 +20,7 @@ function getCurrentPosition() {
 router.use("/:sectionID*", async (req, res, next) => {
   res.locals.sectionID = req.params.sectionID;
   try {
-    const sectionID = verify.validateMongoId(req.params.sectionID, "SectionID");
+    const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
     if (await belongsincourse(req.session.userid, sectionID)) {
       next();
     } else {
@@ -48,7 +48,7 @@ router.use("/:sectionID*", async (req, res, next) => {
 router.route("/:sectionId").get(async (req, res) => {
   let renderObjs = {};
 
-  const section = await courseData.getSectionById(req.params.sectionId);
+  const section = await courseData.getSectionById(res.locals.sectionId);
   const course = await courseData.getCourseById(section.courseId.toString());
 
   const profName = await getUserByID(section.sectionInstructor, {
@@ -84,7 +84,7 @@ router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
     let renderObjs = {};
-    const section = await courseData.getSectionById(req.params.sectionId);
+    const section = await courseData.getSectionById(res.locals.sectionId);
     const userType = req.session.type;
 
     renderObjs = {
@@ -285,13 +285,6 @@ router
     }
   });
 
-router.route("/:sectionId/assignments").get(async (req, res) => {
-  const renderObjs = { layout: "sidebar", script: "assignments/list" };
-  renderObjs.assignments = await getAssignmentsBySectionId(
-    req.params.sectionId
-  );
-
-  res.render("assignments/list", renderObjs);
-});
+router.use("/:sectionId/assignments", assignmentRoutes);
 
 export default router;
