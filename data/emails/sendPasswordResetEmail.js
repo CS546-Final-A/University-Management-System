@@ -53,7 +53,7 @@ async function notifyOfChangedPassword(email) {
   const message = {
     from: `account-services@${process.env.MailServerDomain}`,
     to: email,
-    subject: `Password reset`,
+    subject: `Password Updated`,
     text: `Your password has been changed. If you did not make this change, please notify abuse@${process.env.MailServerDomain}.`,
     html: `
     <!doctype html>
