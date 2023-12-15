@@ -1,0 +1,36 @@
+<div class="container mt-5">
+    <h2>Edit Assignment</h2>
+    <form method="post" action="/sections/{{sectionId}}/assignments/edit/{{assignment._id}}">
+        <div class="form-group">
+            <label for="assignmentName">Assignment Name</label>
+            <input type="text" class="form-control" id="assignmentName" name="assignmentName"
+                value="{{assignment.assignmentName}}" required>
+        </div>
+        <div class="form-group">
+            <label for="assignmentDescription">Assignment Description</label>
+            <textarea class="form-control" id="assignmentDescription" name="assignmentDescription" rows="4"
+                required>{{assignment.assignmentDescription}}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="assignmentWeight">Assignment Weight</label>
+            <input type="number" class="form-control" id="assignmentWeight" name="assignmentWeight"
+                value="{{assignment.assignmentWeight}}" required>
+        </div>
+        <div class="form-group">
+            <label for="assignmentDueDate">Due Date</label>
+            <input type="date" class="form-control" id="assignmentDueDate" name="assignmentDueDate"
+                value="{{assignment.assignmentDueDate}}" required>
+        </div>
+        <div class="form-group">
+            <label for="submissionLimit">Submission Limit</label>
+            <input type="number" class="form-control" id="submissionLimit" name="submissionLimit"
+                value="{{assignment.submissionLimit}}" required>
+        </div>
+        <div class="form-group">
+            <label for="assignmentMaxScore">Max Score</label>
+            <input type="number" class="form-control" id="assignmentMaxScore" name="assignmentMaxScore"
+                value="{{assignment.assignmentMaxScore}}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Assignment</button>
+    </form>
+</div>

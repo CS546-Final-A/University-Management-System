@@ -1,23 +1,40 @@
-const registerCourse = async () => {
+const courseSubmit = async () => {
   const courseNumber = document.getElementById("courseNumber").value;
   const courseName = document.getElementById("courseName").value;
   const courseDepartmentId =
     document.getElementById("courseDepartmentId").value;
   const courseCredits = document.getElementById("courseCredits").value;
   const courseDescription = document.getElementById("courseDescription").value;
+  const courseSemester = document.getElementById("courseSemester").value;
+  const courseYear = document.getElementById("courseYear").value;
 
   try {
     const csrf = document.getElementById("csrf").value;
 
-    let requestData = validateCourse(courseNumber, courseName, courseDepartmentId, courseCredits, courseDescription)
-    await request("POST", "/courses/registration", csrf, requestData);
+    let requestData = {
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription,
+      courseSemester,
+      courseYear,
+    };
+    
+    const result = await request("POST", "/courses/registration", csrf, requestData);
+    console.log(result);
+    if(result?.error) {
+      document.getElementById("status").innerText = result.error;
+    } else if (result?.acknowledged) {
+      window.location.href = "/courses/" + result.insertedId;
+    }
   } catch (e) {
     document.getElementById("status").innerText = "";
-      if (e.error) {
-        setError(e.error);
-      } else {
-        setError(e.message);
-      }
+    if (e.error) {
+      setError(e.error);
+    } else {
+      setError(e.message);
+    }
   }
 };
 
