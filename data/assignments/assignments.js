@@ -261,7 +261,7 @@ export async function submitAssignment(
   if (!assignment) {
     throwErrorWithStatus(400, "Assignment not found");
   }
-  let submissionArray;
+  let submissionArray = [];
   if (assignment.submissions.length > 0) {
     submissionArray = assignment.submissions.filter((submission) => {
       return submission.studentId.toString() == studentId.toString();

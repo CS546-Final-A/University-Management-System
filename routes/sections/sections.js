@@ -112,13 +112,13 @@ router.get("/:sectionId/assignments/:assignmentId", async (req, res) => {
     let sectionId = req.params.sectionId;
     let assignmentId = req.params.assignmentId;
     assignmentId = verify.validateMongoId(assignmentId);
-
     let assignment = await assignmentDataFunctions.getAssignmentById(
       assignmentId
     );
     if (!assignment) {
       throw new Error("Assignment not found");
     }
+
     renderObjs.assignment = assignment;
 
     res.render("assignments/view", renderObjs);
@@ -228,7 +228,9 @@ router.post("/:sectionId/assignments/edit/:assignmentId/", async (req, res) => {
       assignment
     );
 
-    res.redirect("/sections/" + sectionId + "/assignments");
+    res.redirect(
+      "/sections/" + sectionId + "/assignments/" + assignmentId + "/"
+    );
   } catch (e) {
     if (e.status !== 500 && e.status) {
       return res.json({ error: e.message });
@@ -502,3 +504,61 @@ router.post(
     }
   }
 );
+
+router.get(
+  "/:sectionId/assignments/:assignmentId/submissions",
+  async (req, res) => {
+    try {
+      let renderObjs = {
+        name: req.session.name,
+        type: req.session.type,
+        email: req.session.email,
+        sectionId: req.params.sectionId,
+        assignmentId: req.params.assignmentId,
+      };
+      let sectionId = req.params.sectionId;
+      let assignmentId = req.params.assignmentId;
+      assignmentId = verify.validateMongoId(assignmentId);
+      let section = await courseDataFunctions.getSectionById(sectionId);
+      if (!section) {
+        throw new Error("Section not found");
+      }
+      renderObjs.section = section;
+      let assignment = await assignmentDataFunctions.getAssignmentById(
+        assignmentId
+      );
+      if (!assignment) {
+        throw new Error("Assignment not found");
+      }
+      renderObjs.assignment = assignment;
+      renderObjs.submissions = groupSubmissionsByStudentId(
+        assignment.submissions
+      );
+      console.log(renderObjs.submissions);
+      res.render("assignments/submissions", renderObjs);
+    } catch (e) {
+      if (e.status !== 500 && e.status) {
+        return res.json({ error: e.message });
+      } else {
+        res.status(500);
+        res.json({ error: "Login error" });
+      }
+    }
+  }
+);
+
+function groupSubmissionsByStudentId(submissions) {
+  const groupedSubmissions = {};
+
+  submissions.forEach((submission) => {
+    const studentId = submission.studentId;
+
+    if (!groupedSubmissions[studentId]) {
+      groupedSubmissions[studentId] = [];
+    }
+
+    groupedSubmissions[studentId].push(submission);
+  });
+
+  return groupedSubmissions;
+}

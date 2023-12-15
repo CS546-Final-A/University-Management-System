@@ -549,30 +549,9 @@ export const deletesection = async (sectionId) => {
 
 export const getUniqueSectionYearandSemester = async () => {
   const courseCollection = await courses();
-  const courseList = await courseCollection
-    .find({
-      $and: [
-        { "sections.sectionYear": { $exists: true } },
-        { "sections.sectionSemester": { $exists: true } },
-      ],
-    })
-    .project({
-      sections: { sectionYear: 1, sectionSemester: 1 },
-    })
-    .toArray();
-
-  const uniqueYear = new Set([]);
-  const uniqueSemester = new Set([]);
-
-  for (const sections of courseList) {
-    for (const section of sections.sections) {
-      // console.log(section);
-      uniqueYear.add(section.sectionYear);
-      uniqueSemester.add(section.sectionSemester);
-    }
-  }
-
-  return [uniqueYear, uniqueSemester];
+  const distinctYear = await courseCollection.distinct("courseYear");
+  const distinctSemester = await courseCollection.distinct("courseSemester");
+  return [distinctYear, distinctSemester];
 };
 
 export const checkStudentInSection = async (sectionId, studentId) => {
