@@ -20,10 +20,10 @@
                 <td>{{this.submissionLimit}}</td>
                 <td>{{this.assignmentMaxScore}}</td>
                 <td>
-                    <a href="view/{{this._id}}" class="btn btn-primary">View</a>
+                    <a href="view/{{this._id}}/" class="btn btn-primary">View</a>
                     {{#if (eq ../session_type "Professor")}}
-                    <a href="edit/{{this._id}}" class="btn btn-warning">Edit</a>
-                    <a href="delete/{{this._id}}" class="btn btn-danger">Delete</a>
+                    <a href="edit/{{this._id}}/" class="btn btn-warning">Edit</a>
+                    <a href="delete/{{this._id}}/" class="btn btn-danger">Delete</a>
                     {{/if}}
                 </td>
             </tr>
