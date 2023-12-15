@@ -203,7 +203,7 @@ h1 span {
   inset: 0px 0px auto auto;
   margin: 0px;
   transform: translate3d(0px, 62px, 0px);
-  transition: opacity 200ms linear;
+  transition: all 200ms linear;
 }
 .nav-item .dropdown-menu.show {
   opacity: 1;
