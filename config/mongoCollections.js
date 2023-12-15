@@ -15,6 +15,8 @@ const getCollectionFn = async (collection) => {
 
 /* Now, you can list your collections here: */
 export const users = await getCollectionFn("users");
+export const passwordresets = await getCollectionFn("passwordresets");
 export const courses = await getCollectionFn("courses");
 export const sections = await getCollectionFn("sections");
 export const departments = await getCollectionFn("departments");
+export const assignments = await getCollectionFn("assignments");
