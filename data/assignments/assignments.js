@@ -246,6 +246,7 @@ export async function submitAssignment(
   }
 
   const submission = {
+    _id: new ObjectId(),
     studentId: studentId,
     file: file,
     submissionDate: Date.now(),
@@ -390,4 +391,61 @@ export async function getAssignmentScore(assignmentId, studentId) {
   });
   if (!submission.score) throwErrorWithStatus(400, "Score not found");
   return submission.score;
+}
+
+export async function getSubmissionById(submissionId) {
+  submissionId = verify.validateMongoId(submissionId, "submissionId");
+
+  const assignmentCollection = await assignments();
+  const assignment = await assignmentCollection.findOne({
+    "submissions._id": submissionId,
+  });
+
+  if (!assignment) {
+    throwErrorWithStatus(400, "Assignment not found");
+  }
+
+  const submission = assignment.submissions.filter((submission) => {
+    return submission._id.toString() == submissionId.toString();
+  });
+
+  return submission[0];
+}
+
+export async function updateSubmissionScore(assignmentId, studentId, score) {
+  assignmentId = verify.validateMongoId(assignmentId, "assignmentId");
+  studentId = verify.validateMongoId(studentId, "studentId");
+  score = verify.number(score, "score");
+
+  const assignmentCollection = await assignments();
+  const assignment = await assignmentCollection.findOne({
+    _id: assignmentId,
+  });
+
+  if (!assignment) {
+    throwErrorWithStatus(400, "Assignment not found");
+  }
+
+  let currentScores = assignment.scores;
+  if (!currentScores[0]) currentScores = [];
+  let found = false;
+  currentScores.map((currentScore) => {
+    if (currentScore.studentId.toString() === studentId.toString()) {
+      currentScore.score = score;
+      found = true;
+    }
+  });
+  if (!found) {
+    currentScores.push({ studentId: studentId, score: score });
+  }
+  let insertedAssignment = await assignmentCollection.updateOne(
+    { _id: assignmentId },
+    { $set: { scores: currentScores } }
+  );
+
+  if (!insertedAssignment.matchedCount) {
+    throw "Could not update assignment with submission";
+  }
+
+  return insertedAssignment;
 }

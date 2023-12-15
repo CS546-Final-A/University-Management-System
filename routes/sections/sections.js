@@ -21,6 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import { validateAssignment } from "../../data/assignments/assignmentsHelper.js";
+import { get } from "http";
 const router = Router();
 
 router.get("/:sectionId/assignments/create", async (req, res) => {
@@ -473,7 +474,7 @@ router.post(
       Object.keys(files).forEach((key) => {
         const filepath = path.join(
           "files",
-          "Assignmentas",
+          "Assignments",
           assignmentId.toString(),
           userId.toString(),
           files[key].name
@@ -554,6 +555,7 @@ function groupSubmissionsByStudentId(submissions) {
 
   submissions.forEach((submission) => {
     const studentId = submission.studentId;
+    submission.submissionDate = new Date(submission.submissionDate);
 
     if (!groupedSubmissions[studentId]) {
       groupedSubmissions[studentId] = [];
@@ -564,3 +566,106 @@ function groupSubmissionsByStudentId(submissions) {
 
   return groupedSubmissions;
 }
+
+function getScore(scores, studentId) {
+  if (!scores) return null;
+  for (let i = 0; i < scores.length; i++) {
+    if (scores[i].studentId.toString() == studentId.toString()) {
+      return scores[i].score;
+    }
+  }
+  return null;
+}
+
+router.get("/:sectionId/assignments/:assignmentId/scores", async (req, res) => {
+  try {
+    let renderObjs = {
+      name: req.session.name,
+      type: req.session.type,
+      email: req.session.email,
+      sectionId: req.params.sectionId,
+      assignmentId: req.params.assignmentId,
+    };
+
+    let sectionId = req.params.sectionId;
+    let assignmentId = req.params.assignmentId;
+
+    assignmentId = verify.validateMongoId(assignmentId);
+
+    let section = await courseDataFunctions.getSectionById(sectionId);
+    if (!section) {
+      throw new Error("Section not found");
+    }
+
+    renderObjs.section = section;
+    renderObjs.sectionId = sectionId.toString();
+    let assignment = await assignmentDataFunctions.getAssignmentById(
+      assignmentId
+    );
+    if (!assignment) {
+      throw new Error("Assignment not found");
+    }
+    assignment._id = assignment._id.toString();
+    renderObjs.assignment = assignment;
+
+    let allStudents = await courseDataFunctions.getStudentsInSection(sectionId);
+    let submissions = assignment.submissions;
+
+    // Group submissions by student ID
+    let groupedSubmissions = groupSubmissionsByStudentId(submissions);
+    let scores = assignment.scores;
+
+    // Create a list of all students with or without submissions
+    renderObjs.students = allStudents.map((student) => {
+      return {
+        _id: student.studentId.toString(),
+        name: student.firstname + " " + student.lastname,
+        submissions: groupedSubmissions[student.studentId] || [],
+        score: getScore(scores, student.studentId),
+      };
+    });
+    console.log(util.inspect(renderObjs, { depth: Infinity }));
+    res.render("assignments/scores", renderObjs);
+  } catch (e) {
+    console.log(e);
+    if (e.status !== 500 && e.status) {
+      return res.json({ error: e.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Error displaying scores" });
+    }
+  }
+});
+
+router.post(
+  "/:sectionId/assignments/:assignmentId/scores",
+  async (req, res) => {
+    let { sectionId, assignmentId } = req.params;
+    let { studentId, score } = req.body;
+
+    try {
+      // Validate the score
+      // Ensure that you have a function to validate the score in your data functions
+      score = parseFloat(score);
+      score = verify.number(score);
+      studentId = verify.validateMongoId(studentId);
+      assignmentId = verify.validateMongoId(assignmentId);
+      // Validate and update the score in the database
+      // Ensure that you have a function to update the score in your data functions
+      let result = await assignmentDataFunctions.updateSubmissionScore(
+        assignmentId,
+        studentId,
+        score
+      );
+
+      res.redirect(`/sections/${sectionId}/assignments/${assignmentId}/scores`);
+    } catch (e) {
+      if (e.status !== 500 && e.status) {
+        return res.json({ error: e.message });
+      } else {
+        res.status(500);
+        res.json({ error: "Error submitting score" });
+      }
+    }
+  }
+);

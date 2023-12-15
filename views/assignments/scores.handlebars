@@ -1,0 +1,31 @@
+<h1>Scores for {{assignment.assignmentName}} {{assignment._id}}</h1>
+
+{{#each students}}
+<h3>Student: {{name}}</h3>
+<ul>
+    <form action="/sections/{{../sectionId}}/assignments/{{../assignment._id}}/scores" method="post">
+
+        <input type="hidden" name="studentId" value="{{this._id}}">
+        <p>Current Recorded Score: {{this.score}}</p>
+        <label for="score">Score:</label>
+        <input type="text" name="score" value="">
+        <button type="submit">Submit Score</button>
+    </form>
+    {{#each submissions}}
+    <li>
+        <p>File Name: {{this.file}}</p>
+
+
+        <p>Submission Date : {{this.submissionDate}}</p>
+
+
+        <button>
+            <a href="/download/assignments/{{../../assignment._id}}/submissions/{{_id}}">Download Submission</a>
+        </button>
+        <!-- Add a form for the professor to input the score -->
+
+    </li>
+    {{/each}}
+    </form>
+</ul>
+{{/each}}

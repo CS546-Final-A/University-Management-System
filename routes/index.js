@@ -3,7 +3,7 @@ import express from "express";
 import signin from "./middleware/signedin.js";
 import adminsOnly from "./middleware/admin.js";
 import ratelimit from "./middleware/limits.js";
-
+import downloads from "./download/downloads.js";
 import login from "./users/login.js";
 import resetpassword from "./users/resetpassword.js";
 import register from "./users/registration.js";
@@ -34,7 +34,7 @@ function route(app) {
 
   app.use("/users", adminsOnly);
   app.use("/users", user_management);
-
+  app.use("/download", downloads);
   app.use("/courses", courses);
   app.use("/sections", sections);
   app.use("/workspace", workspace);

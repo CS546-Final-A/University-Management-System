@@ -481,6 +481,40 @@ export const getSectionsByIds = async (sectionIds) => {
   return sections;
 };
 
+export const getStudentsInSection = async (sectionId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  const courseCollection = await courses();
+  const course = await courseCollection.findOne({
+    "sections.sectionId": sectionId,
+  });
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+  const section = course.sections.find(
+    (section) => section.sectionId.toString() === sectionId.toString()
+  );
+
+  const userIds = section.students;
+  const userCollection = await users();
+  const userList = await userCollection
+    .find({ _id: { $in: userIds } })
+    .toArray();
+
+  const mappedStudents = section.students.map((student) => {
+    const user = userList.find(
+      (user) => user._id.toString() === student.toString()
+    );
+    return {
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      studentId: student,
+    };
+  });
+
+  return mappedStudents;
+};
+
 export const registerSection = async (
   courseId,
   sectionName,
