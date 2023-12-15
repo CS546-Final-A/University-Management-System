@@ -20,10 +20,10 @@
                 <td>{{this.submissionLimit}}</td>
                 <td>{{this.assignmentMaxScore}}</td>
                 <td>
-                    <a href="/sections/{{../sectionID}}/assignments/{{this._id}}" class="btn btn-primary">View</a>
+                    <a href="assignments/view/{{this._id}}" class="btn btn-primary">View</a>
                     {{#if (eq ../session_type "Professor")}}
-                    <a href="/sections/{{../sectionID}}/assignments/edit/{{this._id}}" class="btn btn-warning">Edit</a>
-                    <a href="/sections/{{../sectionID}}/assignments/delete/{{this._id}}" class="btn btn-danger">Delete</a>
+                    <a href="assignments/edit/{{this._id}}" class="btn btn-warning">Edit</a>
+                    <a href="assignments/delete/{{this._id}}" class="btn btn-danger">Delete</a>
                     {{/if}}
                 </td>
             </tr>
@@ -33,6 +33,6 @@
 
     </table>
     {{#if (eq session_type "Professor")}}
-    <a href="create" class="btn btn-primary">Create Assignment</a>
+    <a href="assignments/create" class="btn btn-primary">Create Assignment</a>
     {{/if}}
 </div>
