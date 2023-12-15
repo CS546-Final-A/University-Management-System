@@ -9,7 +9,6 @@ import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 import verify from "../../data_validation.js";
-import * as loginRoute from "../../routes/users/login.js";
 
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
@@ -45,7 +44,7 @@ router.use("/:sectionId", async (req, res, next) => {
 });
 
 router.route("/:sectionId").get(async (req, res) => {
-  let renderObjs = loginRoute.renderObjs;
+  let renderObjs = {};
 
   const section = await courseData.getSectionById(req.params.sectionId);
   const course = await courseData.getCourseById(section.courseId.toString());
@@ -83,7 +82,7 @@ router.route("/:sectionId").get(async (req, res) => {
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
-    let renderObjs = loginRoute.renderObjs;
+    let renderObjs = {};
     const section = await courseData.getSectionById(req.params.sectionId);
     const userType = req.session.type;
 
@@ -136,7 +135,7 @@ const toRadians = (degrees) => {
 router
   .route("/:sectionId/modules/:moduleId/attendance")
   .get(async (req, res) => {
-    let renderObjs = loginRoute.renderObjs;
+    let renderObjs = {};
     const { sectionId, moduleId } = req.params;
     if (req.session.type === "Professor") {
       const userType = req.session.type;
@@ -289,7 +288,7 @@ router
   });
 
 router.route("/:sectionId/assignments").get(async (req, res) => {
-  let renderObjs = loginRoute.renderObjs;
+  let renderObjs = {};
   const section = await courseData.getSectionById(req.params.sectionId);
 
   renderObjs = {

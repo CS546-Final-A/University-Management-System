@@ -3,6 +3,7 @@ import express from "express";
 import signin from "./middleware/signedin.js";
 import adminsOnly from "./middleware/admin.js";
 import ratelimit from "./middleware/limits.js";
+import sessionLocals from "./middleware/sessionlocals.js";
 
 import login from "./users/login.js";
 import resetpassword from "./users/resetpassword.js";
@@ -29,6 +30,7 @@ function route(app) {
 
   app.use("/", ratelimit.general); // Limit users to 1000 requests per 15 minutes
   app.use("/", signin); // Only allow signed in users to access routes below this one
+  app.use("/", sessionLocals);
   app.use("/logout", logout);
   app.use("/dashboard", dashboard);
 
