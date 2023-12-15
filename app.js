@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import session from "express-session";
+import MongoStore from "connect-mongo";
 import lusca from "lusca";
 import exphbs from "express-handlebars";
 import { fileURLToPath } from "url";
@@ -32,6 +33,10 @@ app.use(
     secret: process.env.CookieSecret,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.mongoServerUrl,
+      dbName: "UMS",
+    }),
   })
 );
 
