@@ -7,7 +7,8 @@ export async function addStudentToAttendance(
   moduleId,
   latitude,
   longitude,
-  type
+  type,
+  timeStamp
 ) {
   try {
     const coursesCollection = await courses();
@@ -29,6 +30,7 @@ export async function addStudentToAttendance(
             latitude: parseFloat(latitude),
             longitude: parseFloat(longitude),
             type,
+            timeStamp,
           },
         },
       },
