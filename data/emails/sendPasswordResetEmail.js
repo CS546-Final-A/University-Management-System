@@ -46,4 +46,38 @@ async function sendPasswordResetEmail(email, secret) {
   return messagesent;
 }
 
-export default sendPasswordResetEmail;
+async function notifyOfChangedPassword(email) {
+  email = verify.email(email);
+  const emailer = await SMTPConnect();
+
+  const message = {
+    from: `account-services@${process.env.MailServerDomain}`,
+    to: email,
+    subject: `Password reset`,
+    text: `Your password has been changed. If you did not make this change, please notify abuse@${process.env.MailServerDomain}.`,
+    html: `
+    <!doctype html>
+    <html>
+        <body>
+            <p>Your password has been changed. If you did not make this change, please notify abuse@${process.env.MailServerDomain}.</p>
+        </body>
+    </html>
+    `,
+  };
+  let messagesent;
+
+  try {
+    messagesent = await emailer.sendMail(message);
+  } catch (e) {
+    // Throw only the response message
+    const error = { status: 500, message: e.response };
+    throw error;
+  }
+  if (messagesent.rejected.length) {
+    const error = { status: 400, message: "Email rejected" };
+    throw error;
+  }
+  return messagesent;
+}
+
+export { sendPasswordResetEmail, notifyOfChangedPassword };

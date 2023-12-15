@@ -1,8 +1,11 @@
 import { ObjectId } from "mongodb";
-import hash from "../hashPassword.js";
 
 import { users } from "../../config/mongoCollections.js";
+import getUserByID from "./getUserInfoByID.js";
+
 import verify from "../../data_validation.js";
+import hash from "../hashPassword.js";
+import { notifyOfChangedPassword } from "../emails/sendPasswordResetEmail.js";
 
 async function setPassword(id, password) {
   try {
@@ -29,6 +32,9 @@ async function setPassword(id, password) {
     throw { status: 404, message: "No such user" };
   }
 
+  const useremail = await getUserByID(id, { _id: 0, email: 1 });
+
+  await notifyOfChangedPassword(useremail.email);
   return result;
 }
 
