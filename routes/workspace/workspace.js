@@ -4,10 +4,12 @@ import {
   addStudentToAttendance,
   getAttendanceData,
 } from "../../data/attendance/attendance.js";
+import { addModuleToSection } from "../../data/modules/modules.js";
 import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 import verify from "../../data_validation.js";
+import * as loginRoute from "../../routes/users/login.js";
 
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
@@ -43,6 +45,8 @@ router.use("/:sectionId", async (req, res, next) => {
 });
 
 router.route("/:sectionId").get(async (req, res) => {
+  let renderObjs = loginRoute.renderObjs;
+
   const section = await courseData.getSectionById(req.params.sectionId);
   const course = await courseData.getCourseById(section.courseId.toString());
 
@@ -52,89 +56,146 @@ router.route("/:sectionId").get(async (req, res) => {
     lastname: 1,
   });
 
-  res.render("workspace/section", {
+  renderObjs = {
+    ...renderObjs,
     layout: "sidebar",
-    sideBarTitle: `${course.courseName}`,
-    sectionID: `${section.sectionId}`,
-    courseId: `${section.courseId.toString()}`,
-    courseName: `${course.courseName}`,
-    sectionName: `${section.sectionName}`,
-    sectionInstructor: `${section.sectionInstructor}`,
-    fN: `${profName.firstname}`,
-    lN: `${profName.lastname}`,
-    sectionType: `${section.sectionType}`,
-    sectionStartTime: `${section.sectionStartTime}`,
-    sectionEndTime: `${section.sectionEndTime}`,
-    sectionDay: `${section.sectionDay}`,
-    sectionCapacity: `${section.sectionCapacity}`,
-    sectionYear: `${section.sectionYear}`,
-    sectionSemester: `${section.sectionSemester}`,
-    students: `${section.students}`,
-    sectionLocation: `${section.sectionLocation}`,
-    sectionDescription: `${section.sectionDescription}`,
-  });
+    sideBarTitle: course[0].courseName,
+    sectionID: section.sectionId,
+    courseId: section.courseId.toString(),
+    courseName: course[0].courseName,
+    sectionName: section.sectionName,
+    sectionInstructor: section.sectionInstructor,
+    fN: profName.firstname,
+    lN: profName.lastname,
+    sectionType: section.sectionType,
+    sectionStartTime: section.sectionStartTime,
+    sectionEndTime: section.sectionEndTime,
+    sectionDay: section.sectionDay,
+    sectionCapacity: section.sectionCapacity,
+    sectionYear: section.sectionYear,
+    sectionSemester: section.sectionSemester,
+    studentCount: section.students.length,
+    sectionLocation: section.sectionLocation,
+    sectionDescription: section.sectionDescription,
+  };
+  res.render("workspace/home", renderObjs);
 });
-router.route("/:sectionId/modules").get(async (req, res) => {
-  const section = await courseData.getSectionById(req.params.sectionId);
-  res.render("workspace/module", {
-    layout: "sidebar",
-    // sideBarTitle: `${course.courseName}`,
-    modules: section.sectionModules,
-    sectionID: `${section.sectionId}`,
-  });
-});
+router
+  .route("/:sectionId/modules")
+  .get(async (req, res) => {
+    let renderObjs = loginRoute.renderObjs;
+    const section = await courseData.getSectionById(req.params.sectionId);
+    const userType = req.session.type;
 
+    renderObjs = {
+      ...renderObjs,
+      layout: "sidebar",
+      // sideBarTitle: `${course.courseName}`,
+      modules: section.sectionModules,
+      sectionID: `${section.sectionId}`,
+      userType,
+    };
+    res.render("workspace/module", renderObjs);
+  })
+  .post(async (req, res) => {
+    const { sectionId } = req.params;
+    const { moduleName, moduleDescription, moduleDate } = req.body;
+    try {
+      await addModuleToSection(
+        sectionId,
+        moduleName,
+        moduleDescription,
+        moduleDate
+      );
+
+      res.status(200).json({ message: "module added successfully" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  // Implementation of the Haversine formula
+  const R = 6371; // Radius of the Earth in kilometers
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c * 1000; // Convert to meters
+  return distance;
+};
+
+const toRadians = (degrees) => {
+  return degrees * (Math.PI / 180);
+};
 router
   .route("/:sectionId/modules/:moduleId/attendance")
   .get(async (req, res) => {
+    let renderObjs = loginRoute.renderObjs;
     const { sectionId, moduleId } = req.params;
     if (req.session.type === "Professor") {
       const userType = req.session.type;
       try {
-        const attendanceData = await getAttendanceData(sectionId, moduleId);
+        const attendanceData = await getAttendanceData(moduleId);
         console.log(attendanceData);
-        // const attendees = [];
 
-        // const position = await getCurrentPosition();
-        // console.log(position);
-        // const { latitude, longitude } = position.coords;
-        // for (const i of await attendanceData) {
-        //   let d = calculateDistance(
-        //     i.latitude,
-        //     i.longitude,
-        //     latitude,
-        //     longitude
-        //   );
-        //   console.log("d=");
-        //   console.log(d);
-        //   if (d <= 0.01) {
-        //     const attendee = await getUserByID(iterator.userId, {
-        //       _id: 0,
-        //       firstname: 1,
-        //       lastname: 1,
-        //     });
+        const professor = await attendanceData.find(
+          (entry) => entry.type === "Professor"
+        );
+        let needButton = true;
+        if (professor) needButton = false;
 
-        //     attendees.push(attendee.firstname + " " + attendee.lastname);
-        //   }
+        let studentsWithinRange = [];
+        // console.log(professor);
+        if (professor) {
+          const professorLocation = {
+            latitude: professor.latitude,
+            longitude: professor.longitude,
+          };
 
-        // for (const iterator of await attendanceData) {
-        //   const attendee = await getUserByID(iterator.userId, {
-        //     _id: 0,
-        //     firstname: 1,
-        //     lastname: 1,
-        //   });
-
-        //   attendees.push(attendee.firstname + " " + attendee.lastname);
-        // }
-        // console.log(attendees);
-        const name = req.session.name;
-        res.status(200).render("workspace/attendance", {
-          layout: "sidebar",
-          // sideBarTitle: `${course.courseName}`,
-          userType,
-          name,
-          attendanceData,
-        });
+          if (attendanceData) {
+            studentsWithinRange = attendanceData
+              .filter((entry) => entry.type === "Student")
+              .map((student) => {
+                const studentLocation = {
+                  latitude: student.latitude,
+                  longitude: student.longitude,
+                };
+                const distance = calculateDistance(
+                  professorLocation.latitude,
+                  professorLocation.longitude,
+                  studentLocation.latitude,
+                  studentLocation.longitude
+                );
+                return {
+                  name: student.name,
+                  userId: student.userId,
+                  distanceFromProfessor: distance,
+                };
+              })
+              .filter((student) => student.distanceFromProfessor <= 20);
+          }
+        }
+        // console.log(studentsWithinRange);
+        if (studentsWithinRange) {
+          const name = req.session.name;
+          renderObjs = {
+            ...renderObjs,
+            layout: "sidebar",
+            // sideBarTitle: `${course.courseName}`,
+            sectionID: sectionId,
+            userType,
+            name,
+            studentsWithinRange,
+            needButton,
+          };
+          res.status(200).render("workspace/attendance", renderObjs);
+        }
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -142,18 +203,39 @@ router
     } else {
       const userType = req.session.type;
       const name = req.session.name;
-      res.render("workspace/attendance", { userType, name });
+      renderObjs = {
+        ...renderObjs,
+        layout: "sidebar",
+        // sideBarTitle: `${course.courseName}`,
+        userType,
+        name,
+      };
+      res.render("workspace/attendance", renderObjs);
     }
   })
   .post(async (req, res) => {
+    console.log(req);
     const moduleId = req.params.moduleId;
     const userId = req.session.userid;
+    const name = req.session.name;
+    const type = req.session.type;
     const { latitude, longitude } = req.body;
 
     try {
-      await addStudentToAttendance(userId, moduleId, latitude, longitude);
+      await addStudentToAttendance(
+        name,
+        userId,
+        moduleId,
+        latitude,
+        longitude,
+        type
+        //  timestamp
+      );
 
       res.status(200).json({ message: "Attendance marked successfully" });
+      // if(type==="Professor"){
+      //   db mein timestamp jayenge
+      // }
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal server error" });
@@ -161,13 +243,17 @@ router
   });
 
 router.route("/:sectionId/assignments").get(async (req, res) => {
+  let renderObjs = loginRoute.renderObjs;
   const section = await courseData.getSectionById(req.params.sectionId);
-  res.render("workspace/assignments", {
+
+  renderObjs = {
+    ...renderObjs,
     layout: "sidebar",
     // sideBarTitle: `${course.courseName}`,
     assignments: section.Assignments,
     sectionID: `${section.sectionId}`,
-  });
+  };
+  res.render("workspace/assignments", renderObjs);
 });
 
 export default router;

@@ -265,14 +265,18 @@ export const registerCourse = async (
   courseName,
   courseDepartmentId,
   courseCredits,
-  courseDescription
+  courseDescription,
+  courseSemester,
+  courseYear,
 ) => {
   let newCourse = validateCourse(
     courseNumber,
     courseName,
     courseDepartmentId,
     courseCredits,
-    courseDescription
+    courseDescription,
+    courseSemester,
+    courseYear,
   );
 
   const courseCollection = await courses();
@@ -290,6 +294,7 @@ export const registerCourse = async (
   if (!department) {
     throwErrorWithStatus(400, "Department not found");
   }
+  newCourse.sections = [];
   const insertInfo = await courseCollection.insertOne(newCourse);
   return insertInfo;
 };

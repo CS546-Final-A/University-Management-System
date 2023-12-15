@@ -1,26 +1,84 @@
-<h1>Modules</h1>
+<h2>Modules</h2>
+{{#if (eq userType "Professor")}}
+<button id="addModuleButton">Add new module</button>
+<form id="moduleForm" style="display: none;">
+    <input type="text" id="moduleName" placeholder="Module Name">
+    <input type="text" id="moduleDesc" placeholder="Module Description">
+    <input type="date" id="moduleDate">
+    <button type="submit">Submit</button>
+</form>
+{{/if}}
 
-<div class="modules">
-        {{#each modules}}
-        <div class="module">
-
-
-            <div class="details">
-           
-                <p>ID: {{this.moduleId}}</p>
-                <p>Name: {{this.moduleName}}</p>
-                <p>Desc: {{this.moduleDescription}}</p>
-                <p>Date: {{this.moduleDate}}</p>
-            </div>
-
-
-
-         
-            
-                <a href="/workspace/{{../sectionID}}/modules/{{this.moduleId}}/attendance">Attendance</a>
-            
+{{#each modules}}
+<div class="card my-4">
+    <div class="card-header d-flex">
+        <div class="my-auto">{{this.moduleName}}</div>
+        <div class="ms-auto"><button class="btnSubmit p-2">
+                <a href="/workspace/{{../sectionID}}/modules/{{this.moduleId}}/attendance">Attendance</a></button>
         </div>
-
-
-        {{/each}}
     </div>
+
+    <div class="card-body">
+        <div class="card-title">{{this.moduleDescription}}</div>
+        {{this.moduleDate}}
+    </div>
+
+</div>
+{{/each}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.getElementById('addModuleButton').addEventListener('click', () => {
+        document.getElementById('moduleForm').style.display = 'block';
+    });
+
+    document.getElementById('moduleForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const moduleName = document.getElementById('moduleName').value;
+        const moduleDesc = document.getElementById('moduleDesc').value;
+        const moduleDate = document.getElementById('moduleDate').value;
+        const pathSegments = window.location.pathname.split('/');
+        const sectionId = pathSegments[2];
+
+
+
+        try {
+            const response = await fetch(`/workspace/${sectionId}/modules`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    moduleName,
+                    moduleDescription: moduleDesc,
+                    moduleDate,
+                }),
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+
+                console.error('Failed to add module');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+
+
+</script>

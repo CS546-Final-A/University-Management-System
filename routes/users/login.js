@@ -5,11 +5,16 @@ import verify from "../../data_validation.js";
 
 const router = Router();
 
+export let renderObjs = {
+  userid: "",
+  name: "",
+  type: "",
+  email: "",
+};
+
 router.get("/", (req, res) => {
-  let renderObjs = {
-    name: req.session.name,
-    type: req.session.type,
-    email: req.session.email,
+  renderObjs = {
+    ...renderObjs,
     script: "login",
   };
   res.render("public/login", renderObjs);
@@ -29,6 +34,12 @@ router.post("/", async (req, res) => {
       req.session.email = result.email;
     }
 
+    renderObjs = {
+      userid: req.session.userid,
+      name: req.session.name,
+      type: req.session.type,
+      email: req.session.email,
+    };
     res.json({ loggedin: result.successful });
   } catch (e) {
     if (e.status !== 500 && e.status) {

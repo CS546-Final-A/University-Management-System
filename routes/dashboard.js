@@ -1,18 +1,18 @@
 import { Router } from "express";
 import * as courseData from "../data/courses/courses.js";
 import getUserByID from "../data/users/getUserInfoByID.js";
+import * as loginRoute from "../routes/users/login.js";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
-  const { name, type, email, userid } = req.session;
-  const renderObjs = { name, type, email };
+  let renderObjs = loginRoute.renderObjs;
 
-  if (type === "Admin") {
+  if (renderObjs.type === "Admin") {
     return res.render("admin/dashboard", renderObjs);
   }
 
-  const userInfo = await getUserByID(userid);
+  const userInfo = await getUserByID(renderObjs.userid);
   const registeredCourses = userInfo.registeredCourses || [];
 
   const requestedSections = await courseData.getSectionsByIds(
