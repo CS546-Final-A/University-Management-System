@@ -4,10 +4,7 @@ import {
   users,
   assignments,
 } from "../../config/mongoCollections.js";
-import verify, {
-  throwErrorWithStatus,
-  throwerror,
-} from "../../data_validation.js";
+import verify, { throwErrorWithStatus } from "../../data_validation.js";
 
 import { validateAssignment } from "../../data/assignments/assignmentsHelper.js";
 import { ObjectId } from "mongodb";
@@ -45,7 +42,7 @@ export async function createAssignment(
   });
 
   if (!course) {
-    throwerror(
+    throwErrorWithStatus(
       "Invalid section id given or sectionInstructor does not match with userId provided",
       400
     );
@@ -69,7 +66,7 @@ export async function createAssignment(
 
   const assignmentObj = await getAssignmentById(newId);
 
-  if (!assignmentObj) throwerror("Assignment not found", 404);
+  if (!assignmentObj) throwErrorWithStatus(400, "Assignment not found");
 
   return "success";
 }
@@ -83,7 +80,7 @@ export async function getAssignmentById(assignmentId) {
   });
 
   if (!assignment) {
-    throwerror("Assignment not found", 404);
+    throwErrorWithStatus(400, "Assignment not found");
   }
 
   assignment._id = assignment._id.toString();
@@ -121,7 +118,7 @@ export async function getAssignmentsBySectionId(sectionId) {
     .toArray();
 
   if (!assignmentList) {
-    throwerror("Assignments not found", 404);
+    throwErrorWithStatus(400, "Assignments not found");
   }
 
   for (let i = 0; i < assignmentList.length; i++) {
@@ -144,7 +141,7 @@ export async function updateAssignment(assignmentId, updatedAssignmentData) {
   );
 
   if (!updatedAssignment) {
-    throwerror("Assignment not found", 404);
+    throwErrorWithStatus(400, "Assignment not found");
   }
 
   updatedAssignment._id = updatedAssignment._id.toString();
@@ -228,7 +225,7 @@ export async function getAllAssignmentsBySectionId(sectionId) {
     .toArray();
 
   if (!assignmentList) {
-    throwerror("Assignments not found", 404);
+    throwErrorWithStatus(400, "Assignments not found");
   }
 
   for (let i = 0; i < assignmentList.length; i++) {
@@ -246,7 +243,12 @@ export async function getAllAssignmentsBySectionId(sectionId) {
 //   (assignments) => console.log(assignments)
 // );
 
-export async function submitAssignment(assignmentId, studentId, file) {
+export async function submitAssignment(
+  assignmentId,
+  studentId,
+  submissiondesc,
+  file
+) {
   assignmentId = verify.validateMongoId(assignmentId, "assignmentId");
   studentId = verify.validateMongoId(studentId, "studentId");
 
@@ -254,24 +256,21 @@ export async function submitAssignment(assignmentId, studentId, file) {
 
   const assignment = await assignmentCollection.findOne({
     _id: assignmentId,
-    submissions: {
-      $elemMatch: { studentId: studentId },
-    },
   });
 
   if (!assignment) {
-    throwerror("Assignment not found", 404);
+    throwErrorWithStatus(400, "Assignment not found");
   }
-
+  let submissionArray;
   if (assignment.submissions.length > 0) {
-    assignment.submissions = assignment.submissions.filter((submission) => {
-      submission.studentId === studentId;
+    submissionArray = assignment.submissions.filter((submission) => {
+      return submission.studentId.toString() == studentId.toString();
     });
   }
 
   if (assignment.submissionLimit) {
-    if (assignment.submissions.length >= assignment.submissionLimit) {
-      throwerror("Submission limit reached", 400);
+    if (submissionArray.length >= assignment.submissionLimit) {
+      throwErrorWithStatus(400, "Submission limit reached", 400);
     }
   }
 
@@ -302,7 +301,7 @@ export async function getAssignmentSubmissions(assignmentId) {
   });
 
   if (!assignment) {
-    throwerror("Assignment not found", 404);
+    throwErrorWithStatus(400, "Assignment not found");
   }
 
   return assignment.submissions;
@@ -324,7 +323,7 @@ export async function getAssignmentSubmissionByStudent(
   });
 
   if (!assignment) {
-    throwerror("Assignment not found", 404);
+    throwErrorWithStatus(400, "Assignment not found");
   }
 
   const submission = assignment.submissions.filter((submission) => {
@@ -347,7 +346,7 @@ export async function deleteAssignmentSubmission(assignmentId, studentId) {
   });
 
   if (!assignment) {
-    throwerror("Assignment not found", 404);
+    throwErrorWithStatus(400, "Assignment not found");
   }
 
   const submission = assignment.submissions.filter((submission) => {
@@ -379,7 +378,7 @@ export async function addScoreToSubmission(assignmentId, studentId, score) {
   });
 
   if (!assignment) {
-    throwerror("Assignment not found", 404);
+    throwErrorWithStatus(400, "Assignment not found");
   }
 
   const submission = assignment.submissions.filter((submission) => {
@@ -411,12 +410,12 @@ export async function getAssignmentScore(assignmentId, studentId) {
   });
 
   if (!assignment) {
-    throwerror("Assignment not found", 404);
+    throwErrorWithStatus(400, "Assignment not found");
   }
 
   const submission = assignment.submissions.filter((submission) => {
     submission.studentId === studentId;
   });
-  if (!submission.score) throwerror("Score not found", 404);
+  if (!submission.score) throwErrorWithStatus(400, "Score not found");
   return submission.score;
 }

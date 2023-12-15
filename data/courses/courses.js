@@ -629,3 +629,26 @@ export const getUniqueSectionYearandSemester = async () => {
 
   return [uniqueYear, uniqueSemester];
 };
+
+export const checkStudentInSection = async (sectionId, studentId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  studentId = verify.validateMongoId(studentId, "studentId");
+
+  const courseCollection = await courses();
+  const course = await courseCollection.findOne(
+    {
+      "sections.sectionId": sectionId,
+    },
+    {
+      $match: {
+        sections: { $elemMatch: { sectionId: sectionId, students: studentId } },
+      },
+    },
+    { $project: { sections: 1 } }
+  );
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+
+  return course;
+};

@@ -2,11 +2,24 @@ import { Router, query } from "express";
 import verify, { santizeInputs } from "../../data_validation.js";
 import * as assignmentDataFunctions from "../../data/assignments/assignments.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
+
 import util from "util";
 import {
   validateCourse,
   validateSection,
 } from "../../data/courses/courseHelper.js";
+import fileUpload from "express-fileupload";
+import path from "path";
+import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
+import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
+import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
+
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 import { validateAssignment } from "../../data/assignments/assignmentsHelper.js";
 const router = Router();
 
@@ -378,3 +391,114 @@ router.get(
 //     }
 //   }
 // );
+
+router.get("/:sectionId/assignments/:assignmentId/submit", async (req, res) => {
+  try {
+    let renderObjs = {
+      name: req.session.name,
+      type: req.session.type,
+      email: req.session.email,
+    };
+    let sectionId = req.params.sectionId;
+    let assignmentId = req.params.assignmentId;
+    let userId = req.session.userid;
+    userId = verify.validateMongoId(userId);
+    assignmentId = verify.validateMongoId(assignmentId);
+    let section = await courseDataFunctions.checkStudentInSection(
+      sectionId,
+      userId
+    );
+
+    if (!section) {
+      throw new Error("Section not found");
+    }
+
+    let assignment = await assignmentDataFunctions.getAssignmentById(
+      assignmentId
+    );
+
+    if (!assignment) {
+      throw new Error("Assignment not found");
+    }
+
+    renderObjs.assignment = assignment;
+    res.render("assignments/submit", renderObjs);
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      return res.json({ error: e.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+});
+
+router.post(
+  "/:sectionId/assignments/:assignmentId/submit",
+  fileUpload({ createParentPath: true }),
+  filesPayloadExists,
+  fileExtLimiter([".zip"]),
+  fileSizesLimiter,
+
+  async (req, res) => {
+    try {
+      req.body = santizeInputs(req.body);
+      let { sectionId, assignmentId } = req.params;
+      let userId = req.session.userid;
+
+      const files = req.files;
+
+      userId = verify.validateMongoId(userId);
+      assignmentId = verify.validateMongoId(assignmentId);
+      let section = await courseDataFunctions.checkStudentInSection(
+        sectionId,
+        userId
+      );
+
+      if (!section) {
+        throw new Error("Section not found");
+      }
+
+      let assignment = await assignmentDataFunctions.getAssignmentById(
+        assignmentId
+      );
+
+      if (!assignment) {
+        throw new Error("Assignment not found");
+      }
+      let fileName = "";
+      Object.keys(files).forEach((key) => {
+        const filepath = path.join(
+          "files",
+          assignmentId.toString(),
+          userId.toString(),
+          files[key].name
+        );
+        fileName = files[key].name;
+        console.log(filepath);
+        files[key].mv(filepath, (err) => {
+          if (err)
+            return res.status(500).json({ status: "error", message: err });
+        });
+      });
+
+      let submission = await assignmentDataFunctions.submitAssignment(
+        assignmentId,
+        userId,
+        Date.now().toString(),
+        fileName
+      );
+      res.send({ status: "success", message: "File is uploaded" });
+    } catch (e) {
+      if (e.status !== 500 && e.status) {
+        return res
+          .status(e.status)
+          .json({ status: "Error", message: e.message });
+      } else {
+        console.log(e);
+        res.status(500);
+        res.json({ error: "Login error" });
+      }
+    }
+  }
+);
