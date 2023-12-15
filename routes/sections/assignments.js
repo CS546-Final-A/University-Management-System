@@ -196,30 +196,7 @@ router.get("/delete/:assignmentID/", async (req, res) => {
 });
 router.get("/view/:assignmentID/submit", async (req, res) => {
   try {
-    let renderObjs = {};
-    let sectionId = res.locals.sectionID;
-    let assignmentID = res.locals.assignmentID;
-    let userId = req.session.userid;
-    userId = verify.validateMongoId(userId);
-    assignmentID = verify.validateMongoId(assignmentID);
-    let section = await courseDataFunctions.checkStudentInSection(
-      sectionId,
-      userId
-    );
-
-    if (!section) {
-      throw new Error("Section not found");
-    }
-
-    let assignment = await assignmentDataFunctions.getAssignmentById(
-      assignmentID
-    );
-
-    if (!assignment) {
-      throw new Error("Assignment not found");
-    }
-
-    res.render("assignments/submit", renderObjs);
+    res.render("assignments/submit");
   } catch (e) {
     routeError(res, e);
   }
@@ -313,22 +290,15 @@ router.get("/view/:assignmentID/submissions", async (req, res) => {
     let sectionId = res.locals.sectionID;
     let assignmentID = res.locals.assignmentID;
     assignmentID = verify.validateMongoId(assignmentID);
+    const assignment = res.locals.assignment;
     let section = await courseDataFunctions.getSectionById(sectionId);
     if (!section) {
       throw new Error("Section not found");
     }
     renderObjs.section = section;
-    let assignment = await assignmentDataFunctions.getAssignmentById(
-      assignmentID
-    );
-    if (!assignment) {
-      throw new Error("Assignment not found");
-    }
-    renderObjs.assignment = assignment;
     renderObjs.submissions = groupSubmissionsByStudentId(
       assignment.submissions
     );
-    console.log(renderObjs.submissions);
     res.render("assignments/submissions", renderObjs);
   } catch (e) {
     routeError(res, e);
@@ -351,6 +321,7 @@ router.get("/view/:assignmentID/scores", async (req, res) => {
 
     let sectionId = res.locals.sectionID;
     let assignmentID = res.locals.assignmentID;
+    const assignment = res.locals.assignment;
 
     assignmentID = verify.validateMongoId(assignmentID);
 
@@ -360,15 +331,8 @@ router.get("/view/:assignmentID/scores", async (req, res) => {
     }
 
     renderObjs.section = section;
-    renderObjs.sectionId = sectionId.toString();
-    let assignment = await assignmentDataFunctions.getAssignmentById(
-      assignmentID
-    );
-    if (!assignment) {
-      throw new Error("Assignment not found");
-    }
+
     assignment._id = assignment._id.toString();
-    renderObjs.assignment = assignment;
 
     let allStudents = await courseDataFunctions.getStudentsInSection(sectionId);
     let submissions = assignment.submissions;
@@ -386,7 +350,6 @@ router.get("/view/:assignmentID/scores", async (req, res) => {
         score: getScore(scores, student.studentId),
       };
     });
-    console.log(util.inspect(renderObjs, { depth: Infinity }));
     res.render("assignments/scores", renderObjs);
   } catch (e) {
     routeError(res, e);
@@ -421,19 +384,7 @@ router.post("/view/:assignmentID/scores", async (req, res) => {
 
 router.get("/view/:assignmentID", async (req, res) => {
   try {
-    let renderObjs = {};
-    let assignmentID = res.locals.assignmentID;
-    assignmentID = verify.validateMongoId(assignmentID);
-    let assignment = await assignmentDataFunctions.getAssignmentById(
-      assignmentID
-    );
-    if (!assignment) {
-      throw new Error("Assignment not found");
-    }
-
-    renderObjs.assignment = assignment;
-
-    res.render("assignments/view", renderObjs);
+    res.render("assignments/view");
   } catch (e) {
     routeError(res, e);
   }
