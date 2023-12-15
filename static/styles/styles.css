@@ -197,15 +197,17 @@ h1 span {
 }
 .nav-item .dropdown-menu {
   opacity: 0;
+  visibility: hidden;
   display: block;
   position: absolute;
   inset: 0px 0px auto auto;
   margin: 0px;
   transform: translate3d(0px, 62px, 0px);
-  transition: all 200ms linear;
+  transition: opacity 200ms linear;
 }
 .nav-item .dropdown-menu.show {
   opacity: 1;
+  visibility: visible;
   transform: translate3d(0px, 62px, 0px);
 }
 .dropdown-toggle::after {
