@@ -21,14 +21,11 @@ export async function addModuleToSection(
     };
 
     const result = await coursesCollection.updateOne(
-      { _id: new ObjectId(sectionId) },
+      { "sections.sectionId": new ObjectId(sectionId) },
       {
         $push: {
-          "sections.$[section].sectionModules": newModule,
+          "sections.$.sectionModules": newModule,
         },
-      },
-      {
-        arrayFilters: [{ "section.sectionId": new ObjectId(sectionId) }],
       }
     );
 
