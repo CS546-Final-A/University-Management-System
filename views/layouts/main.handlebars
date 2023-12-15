@@ -2,14 +2,14 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/styles/bootstrap.min.css" />
-    <link rel="stylesheet" href="/styles/bootstrap-select.min.css" />
-    <link rel="stylesheet" href="/styles/styles.css" />
-    <script src="/scripts/jquery.min.js"></script>
+    <link rel="stylesheet" href="/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/bootstrap-select.min.css">
+    <link rel="stylesheet" href="/styles/styles.css">
+
     <title>University Management System</title>
 </head>
 
@@ -82,11 +82,15 @@
 
 
     <!-- JS Imports -->
-    <script src="/scripts/jquery.min.js"></script>
-    <script src="/scripts/bootstrap.bundle.min.js"></script>
-    <script src="/scripts/bootstrap-select.min.js"></script>
-    <script src="/scripts/styles.js"></script>
-
+    <script language="JavaScript" type="text/javascript" src="/scripts/jquery.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/bootstrap.bundle.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/bootstrap-select.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/styles.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/verification.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/request.js"></script>
+    {{#if script}}
+    {{> (lookup . 'script') }}
+    {{/if}}
 </body>
 
 </html>

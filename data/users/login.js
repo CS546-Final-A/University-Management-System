@@ -1,7 +1,7 @@
 import { verify as checkhash } from "argon2";
 
-import { users } from "../config/mongoCollections.js";
-import verify from "../data_validation.js";
+import { users } from "../../config/mongoCollections.js";
+import verify from "../../data_validation.js";
 
 async function login(email, password) {
   email = verify.email(email);

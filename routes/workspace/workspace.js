@@ -7,7 +7,42 @@ import {
 import { addModuleToSection } from "../../data/modules/modules.js";
 import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
-import * as loginRoute from "../../routes/login.js";
+import belongsincourse from "../../data/courses/belongsincourse.js";
+import verify from "../../data_validation.js";
+import * as loginRoute from "../../routes/users/login.js";
+
+function getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+}
+
+router.use("/:sectionId", async (req, res, next) => {
+  try {
+    const sectionId = verify.validateMongoId(req.params.sectionId);
+    if (await belongsincourse(req.session.userid, sectionId)) {
+      next();
+    } else {
+      res.status(403);
+      res.render("public/error", {
+        error: "You are not enrolled in this course",
+      });
+    }
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.render("/public/error", {
+        error: e.message,
+      });
+    } else {
+      console.log(e);
+      res.status(500);
+      return res.render("/public/error", {
+        error: "Internal Server Error",
+      });
+    }
+  }
+});
 
 router.route("/:sectionId").get(async (req, res) => {
   let renderObjs = loginRoute.renderObjs;
@@ -24,10 +59,10 @@ router.route("/:sectionId").get(async (req, res) => {
   renderObjs = {
     ...renderObjs,
     layout: "sidebar",
-    sideBarTitle: course.courseName,
+    sideBarTitle: course[0].courseName,
     sectionID: section.sectionId,
     courseId: section.courseId.toString(),
-    courseName: course.courseName,
+    courseName: course[0].courseName,
     sectionName: section.sectionName,
     sectionInstructor: section.sectionInstructor,
     fN: profName.firstname,

@@ -13,6 +13,12 @@ const ratelimit = {
     standardHeaders: "draft-7", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
   }),
+  passwordresets: rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    limit: 12, // Somewhat strict to prevent a malicious user from spamming inboxes. Can be adjusted down further if an issue occurs.
+    standardHeaders: "draft-7", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+  }),
   general: rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     limit: 1000,

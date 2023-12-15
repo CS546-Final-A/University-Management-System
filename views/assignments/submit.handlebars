@@ -1,0 +1,28 @@
+<div class="container mt-5">
+    <h2>Submit Assignment</h2>
+    <div>
+        <h3>Assignment Details</h3>
+        <p>Name: {{assignment.assignmentName}}</p>
+        <p>Description: {{assignment.assignmentDescription}}</p>
+        <p>Due Date: {{assignment.assignmentDueDate}}</p>
+        <p>Weight: {{assignment.assignmentWeight}}</p>
+        <p>Submission Limit: {{assignment.submissionLimit}}</p>
+        <p>Max Score: {{assignment.assignmentMaxScore}}</p>
+        <!-- Include other assignment details as needed -->
+    </div>
+
+    <form id="uploadForm">
+        <div class="form-group">
+            <label for="myFiles">Select File (Zip Only)</label>
+            <input type="file" id="myFiles" accept=".zip" />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <div>
+        <h2>Status: <span id="status"></span></h2>
+        <h3 id="message"></h3>
+    </div>
+    <script src="/scripts/assignment-submit.js"></script>
+
+</div>

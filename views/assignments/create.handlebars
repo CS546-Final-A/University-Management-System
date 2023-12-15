@@ -1,0 +1,31 @@
+<div class="container mt-5">
+    <h2>Create Assignment</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="assignmentName">Assignment Name</label>
+            <input type="text" class="form-control" id="assignmentName" name="assignmentName" required>
+        </div>
+        <div class="form-group">
+            <label for="assignmentDescription">Assignment Description</label>
+            <textarea class="form-control" id="assignmentDescription" name="assignmentDescription" rows="4"
+                required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="assignmentWeight">Assignment Weight</label>
+            <input type="number" class="form-control" id="assignmentWeight" name="assignmentWeight" required>
+        </div>
+        <div class="form-group">
+            <label for="assignmentDueDate">Due Date</label>
+            <input type="date" class="form-control" id="assignmentDueDate" name="assignmentDueDate" required>
+        </div>
+        <div class="form-group">
+            <label for="submissionLimit">Submission Limit</label>
+            <input type="number" class="form-control" id="submissionLimit" name="submissionLimit" required>
+        </div>
+        <div class="form-group">
+            <label for="assignmentMaxScore">Max Score</label>
+            <input type="number" class="form-control" id="assignmentMaxScore" name="assignmentMaxScore" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Assignment</button>
+    </form>
+</div>

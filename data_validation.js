@@ -174,7 +174,7 @@ const verify = {
   },
   semester: (semester, semesterName) => {
     semester = verify.string(semester, semesterName);
-    const semesterHelper = ["Fall", "Spring"];
+    const semesterHelper = ["Fall", "Spring", "Summer", "Winter"];
     if (!semesterHelper.includes(semester)) {
       throwerror("Invalid semester value");
     }
@@ -199,6 +199,16 @@ const verify = {
       throwerror(`${stringName} is not an ObjectId`);
     }
     return new ObjectId(id);
+  },
+  UUID: (id) => {
+    if (typeof id !== "string") {
+      throwerror("Argument is not a string");
+    }
+    id = id.trim();
+    if (!/^[\w\d]{8}-[\w\d]{4}-[\w\d]{4}-[\w\d]{4}-[\w\d]{12}$/.test(id)) {
+      throwerror("Invalid UUID");
+    }
+    return id;
   },
   string: (string, stringName) => {
     if (typeof string !== "string") throwerror(`${stringName} is not a string`);

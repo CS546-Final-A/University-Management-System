@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import verify from "../../data_validation.js";
-import createUser from "../../data/createuser.js";
+import createUser from "../../data/administration/createuser.js";
 
 const router = Router();
 
@@ -10,6 +10,7 @@ router.get("/create", (req, res) => {
     name: req.session.name,
     type: req.session.type,
     email: req.session.email,
+    script: "users/createuser",
   };
 
   res.render("admin/createuser", renderObjs);

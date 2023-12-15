@@ -18,11 +18,13 @@ router.get("/", async (req, res) => {
     email: req.session.email,
     uniqueYear: uniqueSectionYearandSemester[0],
     uniqueSemester: uniqueSectionYearandSemester[1],
+    script: "courses/landing",
   };
   res.render("courses/landing", renderObjs);
 });
 
-router.get("/registration", async (req, res) => {
+router.get("/:year/:semester/registration", async (req, res) => {
+  const { year, semester } = req.params;
   let uniqueDepartmentNames =
     await courseDataFunctions.getUniqueDepartmentNamesandId();
   let renderObjs = {
@@ -30,6 +32,9 @@ router.get("/registration", async (req, res) => {
     type: req.session.type,
     email: req.session.email,
     uniqueDepartmentNames: uniqueDepartmentNames,
+    year: year,
+    semester: semester,
+    script: "courses/registration",
   };
   res.render("courses/registration", renderObjs);
 });
@@ -41,6 +46,8 @@ router.post("/registration", async (req, res) => {
     courseDepartmentId,
     courseCredits,
     courseDescription,
+    courseSemester,
+    courseYear,
   } = req.body;
   try {
     const course = validateCourse(
@@ -48,17 +55,22 @@ router.post("/registration", async (req, res) => {
       courseName,
       courseDepartmentId,
       courseCredits,
-      courseDescription
+      courseDescription,
+      courseSemester,
+      courseYear,
     );
     let result = await courseDataFunctions.registerCourse(
       course.courseNumber,
       course.courseName,
       course.courseDepartmentId,
       course.courseCredits,
-      course.courseDescription
+      course.courseDescription,
+      course.courseSemester,
+      course.courseYear
     );
-    if (result.acknowledged) {
-      // res.render();
+    if (result.acknowledged) { 
+      // window.location.href = "/courses/" + result.insertedId;
+      return res.json(result);
     }
   } catch (e) {
     if (e.status !== 500 && e.status) {
@@ -69,6 +81,32 @@ router.post("/registration", async (req, res) => {
     }
   }
   // res.render("courses/registration");
+});
+
+router.get("/:courseId", async (req, res) => {
+  const { courseId } = req.params;
+  try {
+    let data = await courseDataFunctions.getCourseById(courseId);
+    // res.send(data);
+    // console.log("in");
+
+    // console.log(util.inspect(data, { showHidden: false, depth: null }));
+
+    // console.log("out");
+    res.render("courses/courseDetails", { courses: data });
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      console.log(e);
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+  // res.render("courses/course", {
+  //   course: data,
+  // });
 });
 
 router.get("/:year/:semester/listings", async (req, res) => {
@@ -112,6 +150,7 @@ router.get("/:year/:semester/listings", async (req, res) => {
     type: req.session.type,
     email: req.session.email,
     courses: data,
+    script: "courses/listings",
   };
   res.render("courses/listings", renderObjs);
 });

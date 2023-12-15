@@ -6,7 +6,9 @@ export const validateCourse = (
   courseName,
   courseDepartmentId,
   courseCredits,
-  courseDescription
+  courseDescription,
+  courseSemester,
+  courseYear,
 ) => {
   if (
     !courseNumber ||
@@ -26,6 +28,8 @@ export const validateCourse = (
   );
   courseCredits = verify.numberInteger(courseCredits, "courseCredits");
   courseDescription = verify.string(courseDescription, "courseDescription");
+  courseSemester = verify.semester(courseSemester, "courseSemester");
+  courseYear = verify.year(courseYear, "courseYear");
 
   return {
     courseNumber,
@@ -33,6 +37,8 @@ export const validateCourse = (
     courseDepartmentId,
     courseCredits,
     courseDescription,
+    courseSemester,
+    courseYear,
   };
 };
 
