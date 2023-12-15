@@ -7,9 +7,9 @@ import {
 import { addModuleToSection } from "../../data/modules/modules.js";
 import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
+import { getAssignmentsBySectionId } from "../../data/assignments/assignments.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 import verify from "../../data_validation.js";
-import * as loginRoute from "../../routes/users/login.js";
 
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
@@ -45,7 +45,7 @@ router.use("/:sectionId", async (req, res, next) => {
 });
 
 router.route("/:sectionId").get(async (req, res) => {
-  let renderObjs = loginRoute.renderObjs;
+  let renderObjs = {};
 
   const section = await courseData.getSectionById(req.params.sectionId);
   const course = await courseData.getCourseById(section.courseId.toString());
@@ -83,7 +83,7 @@ router.route("/:sectionId").get(async (req, res) => {
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
-    let renderObjs = loginRoute.renderObjs;
+    let renderObjs = {};
     const section = await courseData.getSectionById(req.params.sectionId);
     const userType = req.session.type;
 
@@ -136,7 +136,7 @@ const toRadians = (degrees) => {
 router
   .route("/:sectionId/modules/:moduleId/attendance")
   .get(async (req, res) => {
-    let renderObjs = loginRoute.renderObjs;
+    let renderObjs = {};
     const { sectionId, moduleId } = req.params;
     if (req.session.type === "Professor") {
       const userType = req.session.type;
@@ -151,7 +151,6 @@ router
         if (professor) needButton = false;
 
         let studentsWithinRange = [];
-        // console.log(professor);
         if (professor) {
           const professorLocation = {
             latitude: professor.latitude,
@@ -181,7 +180,6 @@ router
               .filter((student) => student.distanceFromProfessor <= 20);
           }
         }
-        // console.log(studentsWithinRange);
         if (studentsWithinRange) {
           const name = req.session.name;
           renderObjs = {
@@ -201,26 +199,77 @@ router
         res.status(500).json({ error: "Internal server error" });
       }
     } else {
+      const attendanceData = await getAttendanceData(moduleId);
+      const professor = await attendanceData.find(
+        (entry) => entry.type === "Professor"
+      );
+      const ts = professor.timeStamp;
+      const date = new Date(ts);
+      let hours = date.getHours();
+      let minutes = date.getMinutes();
+      let amOrPm = hours >= 12 ? "PM" : "AM";
+      let H = hours;
+      let M = minutes < 10 ? "0" + minutes : minutes;
+      let k = amOrPm;
+      const userFromDb = await attendanceData.find(
+        (entry) => entry.userId === req.session.userid
+      );
+      let userThereButton = false;
+      if (userFromDb) userThereButton = true;
+      let needButton = false; //false implies prof has not started attendance
+      if (professor) needButton = true;
+      let t = new Date();
+      let timeLeft = t.getTime() - ts < 600000 ? true : false;
       const userType = req.session.type;
       const name = req.session.name;
+      let n = 0;
+      if (needButton === false) n = 1;
+      if (needButton === true && userThereButton === false && timeLeft === true)
+        n = 2;
+      if (
+        needButton === true &&
+        userThereButton === false &&
+        timeLeft === false
+      )
+        n = 3;
+      if (needButton === true && userThereButton === true) n = 4;
       renderObjs = {
         ...renderObjs,
         layout: "sidebar",
         // sideBarTitle: `${course.courseName}`,
+        sectionID: sectionId,
         userType,
         name,
+        n,
+        H,
+        M,
+        k,
       };
       res.render("workspace/attendance", renderObjs);
     }
   })
   .post(async (req, res) => {
-    console.log(req);
     const moduleId = req.params.moduleId;
     const userId = req.session.userid;
     const name = req.session.name;
     const type = req.session.type;
     const { latitude, longitude } = req.body;
+    const attendanceData = await getAttendanceData(moduleId);
+    const now = new Date();
+    const timeStamp = now.getTime();
 
+    const professor = await attendanceData.find(
+      (entry) => entry.type === "Professor"
+    );
+    if (professor) {
+      const d = calculateDistance(
+        latitude,
+        longitude,
+        professor.latitude,
+        professor.longitude
+      );
+      if (d > 0.1) alert("you'll be marked absent ");
+    }
     try {
       await addStudentToAttendance(
         name,
@@ -228,14 +277,11 @@ router
         moduleId,
         latitude,
         longitude,
-        type
-        //  timestamp
+        type,
+        timeStamp
       );
 
       res.status(200).json({ message: "Attendance marked successfully" });
-      // if(type==="Professor"){
-      //   db mein timestamp jayenge
-      // }
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal server error" });
@@ -243,17 +289,12 @@ router
   });
 
 router.route("/:sectionId/assignments").get(async (req, res) => {
-  let renderObjs = loginRoute.renderObjs;
-  const section = await courseData.getSectionById(req.params.sectionId);
+  const renderObjs = { layout: "sidebar" };
+  renderObjs.assignments = await getAssignmentsBySectionId(
+    req.params.sectionId
+  );
 
-  renderObjs = {
-    ...renderObjs,
-    layout: "sidebar",
-    // sideBarTitle: `${course.courseName}`,
-    assignments: section.Assignments,
-    sectionID: `${section.sectionId}`,
-  };
-  res.render("workspace/assignments", renderObjs);
+  res.render("assignments/list", renderObjs);
 });
 
 export default router;

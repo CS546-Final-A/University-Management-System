@@ -23,7 +23,7 @@
                             <span class="fs-5 position-relative" id="homeText">Home</span>
                         </a>
                     </li>
-                    {{#if name}}
+                    {{#if session_name}}
                     <li class="nav-item">
                         <a class="nav-link" href="/courses/">
                             <span class="fs-5 position-relative" id="coursesText">Courses</span>
@@ -37,16 +37,16 @@
                             <li>
                                 <div class="container p-0">
                                     <div class="m-2 px-2">
-                                        {{name}} <span class="text-muted fs-6"> {{type}} </span>
+                                        {{session_name}} <span class="text-muted fs-6"> {{session_type}} </span>
                                     </div>
                                     <div class="m-2 px-2">
-                                        {{email}}
+                                        {{session_email}}
                                     </div>
                                     <div id="switch" class="m-4">
                                         <div id="circle"></div>
                                     </div>
                                     <div class="my-auto d-flex justify-content-center btnNavbar">
-                                        <a class="w-100" href="/logout"><button
+                                        <a class="w-100 ps-0" href=" /logout"><button
                                                 class="mb-0 py-2 w-100 btnNavbar">Logout</button></a>
                                     </div>
 

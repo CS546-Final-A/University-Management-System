@@ -197,6 +197,7 @@ h1 span {
 }
 .nav-item .dropdown-menu {
   opacity: 0;
+  visibility: hidden;
   display: block;
   position: absolute;
   inset: 0px 0px auto auto;
@@ -206,6 +207,7 @@ h1 span {
 }
 .nav-item .dropdown-menu.show {
   opacity: 1;
+  visibility: visible;
   transform: translate3d(0px, 62px, 0px);
 }
 .dropdown-toggle::after {
