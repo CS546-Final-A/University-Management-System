@@ -6,12 +6,42 @@ import {
 } from "../../data/attendance/attendance.js";
 import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
+import belongsincourse from "../../data/courses/belongsincourse.js";
+import verify from "../../data_validation.js";
 
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 }
+
+router.use("/:sectionId", async (req, res, next) => {
+  try {
+    const sectionId = verify.validateMongoId(req.params.sectionId);
+    if (await belongsincourse(req.session.userid, sectionId)) {
+      next();
+    } else {
+      res.status(403);
+      res.render("public/error", {
+        error: "You are not enrolled in this course",
+      });
+    }
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.render("/public/error", {
+        error: e.message,
+      });
+    } else {
+      console.log(e);
+      res.status(500);
+      return res.render("/public/error", {
+        error: "Internal Server Error",
+      });
+    }
+  }
+});
+
 router.route("/:sectionId").get(async (req, res) => {
   const section = await courseData.getSectionById(req.params.sectionId);
   const course = await courseData.getCourseById(section.courseId.toString());

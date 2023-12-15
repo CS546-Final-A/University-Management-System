@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import login from "../data/login.js";
-import verify from "../data_validation.js";
+import login from "../../data/users/login.js";
+import verify from "../../data_validation.js";
 
 const router = Router();
 
@@ -10,6 +10,7 @@ router.get("/", (req, res) => {
     name: req.session.name,
     type: req.session.type,
     email: req.session.email,
+    script: "login",
   };
   res.render("public/login", renderObjs);
 });
@@ -34,7 +35,11 @@ router.post("/", async (req, res) => {
       res.status(e.status);
       return res.json({ error: e.message });
     } else {
-      console.log(e);
+      if (e.message) {
+        console.log("Error: " + e.message);
+      } else {
+        console.log("Error: " + e);
+      }
       res.status(500);
       res.json({ error: "Login error" });
     }
