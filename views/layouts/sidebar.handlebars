@@ -137,6 +137,11 @@
     <script src="/scripts/bootstrap.bundle.min.js"></script>
     <script src="/scripts/bootstrap-select.min.js"></script>
     <script src="/scripts/styles.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/verification.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/request.js"></script>
+    {{#if script}}
+    {{> (lookup . 'script') }}
+    {{/if}}
     <script>
         $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {

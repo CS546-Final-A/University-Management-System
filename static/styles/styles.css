@@ -139,6 +139,10 @@ body {
   overflow: hidden;
 }
 
+.hiddenform {
+  display: none;
+}
+
 h1 {
   font-size: 48px;
   line-height: 1.2;

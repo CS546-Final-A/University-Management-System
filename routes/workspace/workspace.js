@@ -29,13 +29,13 @@ router.use("/:sectionId", async (req, res, next) => {
   } catch (e) {
     if (e.status !== 500 && e.status) {
       res.status(e.status);
-      return res.render("/public/error", {
+      return res.render("public/error", {
         error: e.message,
       });
     } else {
       console.log(e);
       res.status(500);
-      return res.render("/public/error", {
+      return res.render("public/error", {
         error: "Internal Server Error",
       });
     }
@@ -78,9 +78,11 @@ router.route("/:sectionId/modules").get(async (req, res) => {
   const section = await courseData.getSectionById(req.params.sectionId);
   res.render("workspace/module", {
     layout: "sidebar",
-    // sideBarTitle: `${course.courseName}`,
+    sideBarTitle: `${section.courseName}`,
     modules: section.sectionModules,
     sectionID: `${section.sectionId}`,
+    userType: req.session.type,
+    script: "learningmodules/modules",
   });
 });
 
@@ -164,7 +166,7 @@ router.route("/:sectionId/assignments").get(async (req, res) => {
   const section = await courseData.getSectionById(req.params.sectionId);
   res.render("workspace/assignments", {
     layout: "sidebar",
-    // sideBarTitle: `${course.courseName}`,
+    sideBarTitle: `${section.courseName}`,
     assignments: section.Assignments,
     sectionID: `${section.sectionId}`,
   });

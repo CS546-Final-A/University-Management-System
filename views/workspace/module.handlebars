@@ -1,26 +1,31 @@
 <h1>Modules</h1>
 
 <div class="modules">
+    {{#if (eq userType "Professor")}}
+    <button id="newmodule">+Module</button>
+    <form id="newmoduleform" class="hiddenform">
+            <label for="modulename">Email:</label>
+            <input type="text" id="modulename" name="modulename" placeholder="Introduction" required>
+            <br>
+            <label for="opendate">Opens:</label>
+            <input type="date" id="opendate" name="opendate" placeholder="Introduction" required>
+            <br>
+            <input type="hidden" id="csrf" value="{{_csrf}}">
+            <button class="btnSubmit" type="submit" id="submit">Create New Module</button>
+        </label>
+    </form>
+    {{/if}}
+    <br>
+    <br>
         {{#each modules}}
         <div class="module">
-
-
             <div class="details">
-           
                 <p>ID: {{this.moduleId}}</p>
                 <p>Name: {{this.moduleName}}</p>
                 <p>Desc: {{this.moduleDescription}}</p>
                 <p>Date: {{this.moduleDate}}</p>
             </div>
-
-
-
-         
-            
                 <a href="/workspace/{{../sectionID}}/modules/{{this.moduleId}}/attendance">Attendance</a>
-            
         </div>
-
-
         {{/each}}
     </div>
