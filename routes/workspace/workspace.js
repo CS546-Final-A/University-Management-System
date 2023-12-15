@@ -18,7 +18,7 @@ router.route("/:sectionId").get(async (req, res) => {
     lastname: 1,
   });
 
-  res.render("workspace/home", {
+  res.render("workspace/section", {
     layout: "sidebar",
     sideBarTitle: `${course.courseName}`,
     sectionID: `${section.sectionId}`,
@@ -101,45 +101,48 @@ router
         const professor = await attendanceData.find(
           (entry) => entry.type === "Professor"
         );
+        let studentsWithinRange = [];
         // console.log(professor);
         if (professor) {
           const professorLocation = {
             latitude: professor.latitude,
             longitude: professor.longitude,
           };
-        }
-        let studentsWithinRange = [];
-        if (attendanceData) {
-          studentsWithinRange = attendanceData
-            .filter((entry) => entry.type === "Student")
-            .map((student) => {
-              const studentLocation = {
-                latitude: student.latitude,
-                longitude: student.longitude,
-              };
-              const distance = calculateDistance(
-                professorLocation.latitude,
-                professorLocation.longitude,
-                studentLocation.latitude,
-                studentLocation.longitude
-              );
-              return {
-                name: student.name,
-                userId: student.userId,
-                distanceFromProfessor: distance,
-              };
-            })
-            .filter((student) => student.distanceFromProfessor <= 2);
+
+          if (attendanceData) {
+            studentsWithinRange = attendanceData
+              .filter((entry) => entry.type === "Student")
+              .map((student) => {
+                const studentLocation = {
+                  latitude: student.latitude,
+                  longitude: student.longitude,
+                };
+                const distance = calculateDistance(
+                  professorLocation.latitude,
+                  professorLocation.longitude,
+                  studentLocation.latitude,
+                  studentLocation.longitude
+                );
+                return {
+                  name: student.name,
+                  userId: student.userId,
+                  distanceFromProfessor: distance,
+                };
+              })
+              .filter((student) => student.distanceFromProfessor <= 100);
+          }
         }
         // console.log(studentsWithinRange);
-        const name = req.session.name;
-        res.status(200).render("workspace/attendance", {
-          layout: "sidebar",
-          // sideBarTitle: `${course.courseName}`,
-          userType,
-          name,
-          studentsWithinRange,
-        });
+        if (studentsWithinRange) {
+          const name = req.session.name;
+          res.status(200).render("workspace/attendance", {
+            layout: "sidebar",
+            // sideBarTitle: `${course.courseName}`,
+            userType,
+            name,
+            studentsWithinRange,
+          });
+        }
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
