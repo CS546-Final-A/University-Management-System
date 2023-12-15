@@ -1,15 +1,23 @@
-<h2>section id : {{sectionID}}</h2>
-<h2>{{courseId}}</h2>
-<h1>{{courseName}}</h1>
-<h2>{{sectionName}}</h2>
-<h2>{{sectionInstructor}} {{fN}} {{lN}} </h2>
-<h2>{{sectionType}}</h2>
-<h2>{{sectionStartTime}}</h2>
-<h2>{{sectionEndTime}}</h2>
-<h2>{{sectionDay}}</h2>
-<h2>{{sectionCapacity}}</h2>
-<h2>{{sectionYear}}</h2>
-<h2>{{students}}</h2>
-<h2>{{sectionDescription}}</h2>
-<h2><a href="/workspace/{{sectionID}}/modules"> Modules</a></h2>
-<h2><a href="/workspace/{{sectionID}}/assignments"> Assignments</a></h2>
+<div class="container">
+    <h1>{{courseName}} <span class="text-muted">{{sectionName}}</span></h1>
+    <div class="my-2">
+        <h2>Description</h2>
+        <h4>{{sectionDescription}}</h4>
+    </div>
+    <div class="my-2">
+        <h2>Professor</h2>
+        <h4>{{fN}} {{lN}} </h4>
+    </div>
+    <div class="my-2">
+        <h2>Delivery</h2>
+        <h3>{{sectionType}}</h3>
+    </div>
+    <div class="my-2">
+        <h2>Timing</h2>
+        <h4>{{sectionDay}} | {{sectionStartTime}} - {{sectionEndTime}}</h4>
+    </div>
+    <div class="my-2">
+        <h2>Enrolled</h2>
+        <h4>{{students}}/{{sectionCapacity}}</h4>
+    </div>
+</div>
