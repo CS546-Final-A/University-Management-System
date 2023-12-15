@@ -495,8 +495,6 @@ export const registerSection = async (
   sectionEndTime,
   sectionDay,
   sectionCapacity,
-  sectionYear,
-  sectionSemester,
   sectionLocation,
   sectionDescription
 ) => {
@@ -510,8 +508,6 @@ export const registerSection = async (
     sectionEndTime,
     sectionDay,
     sectionCapacity,
-    sectionYear,
-    sectionSemester,
     sectionLocation,
     sectionDescription
   );
@@ -539,8 +535,6 @@ export const updateSection = async (
   sectionEndTime,
   sectionDay,
   sectionCapacity,
-  sectionYear,
-  sectionSemester,
   sectionLocation,
   sectionDescription
 ) => {
@@ -552,8 +546,6 @@ export const updateSection = async (
     sectionEndTime,
     sectionDay,
     sectionCapacity,
-    sectionYear,
-    sectionSemester,
     sectionLocation,
     sectionDescription
   );

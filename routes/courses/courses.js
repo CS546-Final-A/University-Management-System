@@ -87,13 +87,19 @@ router.get("/:courseId", async (req, res) => {
   const { courseId } = req.params;
   try {
     let data = await courseDataFunctions.getCourseById(courseId);
-    // res.send(data);
-    // console.log("in");
-
-    // console.log(util.inspect(data, { showHidden: false, depth: null }));
-
-    // console.log("out");
-    res.render("courses/courseDetails", { courses: data });
+    let renderObjs = {
+      name: req.session.name,
+      type: req.session.type,
+      email: req.session.email,
+      courseId,
+      courses: data,
+      script: "courses/detail",
+    };
+    if(renderObjs.type === "Admin") {
+      renderObjs.instructors = await courseDataFunctions.getUniqueInstructorNamesandId()
+      renderObjs.instructors.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    res.render("courses/detail", renderObjs);
   } catch (e) {
     if (e.status !== 500 && e.status) {
       res.status(e.status);
@@ -104,9 +110,31 @@ router.get("/:courseId", async (req, res) => {
       res.json({ error: "Login error" });
     }
   }
-  // res.render("courses/course", {
-  //   course: data,
-  // });
+});
+
+router.post("/:courseId/section", async (req, res) => {
+  const { courseId } = req.params;
+  console.log(req.body);
+  try {
+    let data = await courseDataFunctions.getCourseById(courseId);
+    let renderObjs = {
+      name: req.session.name,
+      type: req.session.type,
+      email: req.session.email,
+      courses: data,
+      script: "courses/detail",
+    };
+    res.render("courses/detail", renderObjs);
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      console.log(e);
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
 });
 
 router.get("/:year/:semester/listings", async (req, res) => {
