@@ -31,13 +31,13 @@ router.use("/:sectionId", async (req, res, next) => {
   } catch (e) {
     if (e.status !== 500 && e.status) {
       res.status(e.status);
-      return res.render("/public/error", {
+      return res.render("public/error", {
         error: e.message,
       });
     } else {
       console.log(e);
       res.status(500);
-      return res.render("/public/error", {
+      return res.render("public/error", {
         error: "Internal Server Error",
       });
     }
