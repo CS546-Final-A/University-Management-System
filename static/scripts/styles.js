@@ -25,9 +25,14 @@ $("#switch").on("click", function () {
   }
 });
 
-//Bootstrap Toast Notification
 $(document).ready(function () {
+  //Bootstrap Toast Notification
   $("#liveToastBtn").click(function () {
     $("#liveToast").toast("show");
+  });
+
+  //Sidebar
+  $(".hamburger").click(function () {
+    $(this).toggleClass("is-active");
   });
 });
