@@ -418,7 +418,7 @@ export async function getSubmissionById(submissionId) {
 export async function updateSubmissionScore(assignmentId, studentId, score) {
   assignmentId = verify.validateMongoId(assignmentId, "assignmentId");
   studentId = verify.validateMongoId(studentId, "studentId");
-  score = verify.number(score, "score");
+  score = verify.rationalNumber(score, "score");
 
   const assignmentCollection = await assignments();
   const assignment = await assignmentCollection.findOne({

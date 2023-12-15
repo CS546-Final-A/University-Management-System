@@ -672,7 +672,7 @@ router.post(
       // Validate the score
       // Ensure that you have a function to validate the score in your data functions
       score = parseFloat(score);
-      score = verify.number(score);
+      score = verify.rationalNumber(score);
       studentId = verify.validateMongoId(studentId);
       assignmentId = verify.validateMongoId(assignmentId);
       // Validate and update the score in the database

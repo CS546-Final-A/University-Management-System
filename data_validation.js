@@ -220,6 +220,12 @@ const verify = {
       throwerror(`${numberName} is not a valid number`);
     return number;
   },
+  rationalNumber: (number, numberName) => {
+    if (typeof number !== "number" || isNaN(number)) {
+      throwerror(`${numberName} is not a valid number`);
+    }
+    return number;
+  },
   numberInteger: (number, numberName) => {
     number = parseInt(number, 10);
     verify.number(number, numberName);
