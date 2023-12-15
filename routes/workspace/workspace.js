@@ -19,6 +19,7 @@ function getCurrentPosition() {
 
 router.use("/:sectionID*", async (req, res, next) => {
   res.locals.sectionID = req.params.sectionID;
+  res.locals.layout = "sidebar";
   try {
     const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
     if (await belongsincourse(req.session.userid, sectionID)) {
