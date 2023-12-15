@@ -76,13 +76,15 @@ router.post("/create", async (req, res) => {
 
 router.use("/:action/:assignmentID*", async (req, res, next) => {
   try {
-    res.locals.assignmentID = verify.validateMongoId(req.params.assignmentID);
-    res.locals.assignment = await assignmentDataFunctions.getAssignmentById(
-      res.locals.assignmentID
-    );
+    if (req.params.assignmentID) {
+      res.locals.assignmentID = verify.validateMongoId(req.params.assignmentID);
+      res.locals.assignment = await assignmentDataFunctions.getAssignmentById(
+        res.locals.assignmentID
+      );
 
-    if (!res.locals.assignment) {
-      throw { status: 404, message: "Assignment not found" };
+      if (!res.locals.assignment) {
+        throw { status: 404, message: "Assignment not found" };
+      }
     }
     next();
   } catch (e) {
@@ -158,7 +160,7 @@ router.post("/edit/:assignmentID/", async (req, res) => {
     );
 
     res.redirect(
-      "/sections/" + sectionId + "/assignments/" + assignmentID + "/"
+      "/sections/" + sectionId + "/assignments/view/" + assignmentID
     );
   } catch (e) {
     routeError(res, e);
