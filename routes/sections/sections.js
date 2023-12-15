@@ -40,6 +40,15 @@ router.use("/:sectionID*", async (req, res, next) => {
   }
 });
 
+router.use("/:sectionID/grades", async (req, res) => {
+  if (req.sesssion.type !== "student") {
+    res.status(403);
+    return res.render("public/error", {
+      error: "You are not a student",
+    });
+  }
+});
+
 router.use("/:sectionID/assignments", assignmentRoutes);
 
 export default router;
