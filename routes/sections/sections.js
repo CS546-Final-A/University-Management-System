@@ -2,7 +2,10 @@ import { Router, query } from "express";
 import verify, { santizeInputs } from "../../data_validation.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 import assignmentRoutes from "./assignments.js";
-import { computeGradeByUserID } from "../../data/submissions/computeGrades.js";
+import {
+  computeGradeByUserID,
+  computeClassGrades,
+} from "../../data/submissions/computeGrades.js";
 import { getAssignmentsBySectionId } from "../../data/assignments/assignments.js";
 
 import { fileURLToPath } from "url";
@@ -43,43 +46,65 @@ router.use("/:sectionID*", async (req, res, next) => {
   }
 });
 
+async function renderStudentView(res, StudentID) {
+  const assignments = await getAssignmentsBySectionId(res.locals.sectionID);
+  const finalgrades = await computeGradeByUserID(
+    res.locals.sectionID,
+    StudentID
+  );
+
+  if (!assignments) {
+    throw (
+      "Assignments returned " +
+      assignments +
+      " which is not an expected return type"
+    );
+  }
+
+  for (let assignment of assignments) {
+    assignment.scores = assignment.scores.find((markObj) => {
+      return markObj.studentId.toString() === StudentID;
+    });
+    if (!assignment.scores) {
+      assignment.scores = "N/A";
+    } else {
+      assignment.scores = assignment.scores.score.toString();
+    }
+  }
+
+  res.render("assignments/students/grades", {
+    assignments: assignments,
+    grades: finalgrades,
+  });
+}
+
+router.use("/:sectionID/grades/:studentID", async (req, res) => {
+  try {
+    if (
+      req.session.type === "Professor" ||
+      req.session.userid === req.params.studentID
+    ) {
+      return await renderStudentView(res, req.params.studentID);
+    } else {
+      throw {
+        status: 403,
+        message: "You are not authorized to view that grade",
+      };
+    }
+  } catch (e) {
+    routeError(res, e);
+  }
+});
+
 router.use("/:sectionID/grades", async (req, res) => {
   try {
-    if (req.session.type !== "Student") {
-      res.status(403);
-      return res.render("public/error", {
-        error: "You are not a student",
-      });
+    if (req.session.type === "Student") {
+      return await renderStudentView(res, req.session.userid);
+    } else {
+      // Professor view
+      const students = await computeClassGrades(res.locals.sectionID);
+      res.render("assignments/professors/grades", { students: students });
     }
-    const assignments = await getAssignmentsBySectionId(res.locals.sectionID);
-    const finalgrades = await computeGradeByUserID(
-      res.locals.sectionID,
-      req.session.userid
-    );
-
-    if (!assignments) {
-      throw (
-        "Assignments returned " +
-        assignments +
-        " which is not an expected return type"
-      );
-    }
-
-    for (let assignment of assignments) {
-      assignment.scores = assignment.scores.find((markObj) => {
-        return markObj.studentId.toString() === req.session.userid;
-      });
-      if (!assignment.scores) {
-        assignment.scores = "N/A";
-      } else {
-        assignment.scores = assignment.scores.score.toString();
-      }
-    }
-
-    res.render("assignments/students/grades", {
-      assignments: assignments,
-      grades: finalgrades,
-    });
   } catch (e) {
     routeError(res, e);
   }
