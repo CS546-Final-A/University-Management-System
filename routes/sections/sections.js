@@ -23,6 +23,54 @@ const __dirname = dirname(__filename);
 import { validateAssignment } from "../../data/assignments/assignmentsHelper.js";
 const router = Router();
 
+
+router.get("/:sectionId", async (req, res) => {
+  let sectionId = req.params.sectionId;
+  try {
+    const section = await courseDataFunctions.getSectionById(sectionId);
+    return res.json(section);
+  } catch (error) {
+    if (e.status !== 500 && e.status) {
+      return res.json({ error: e.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+});
+
+router.put("/:sectionId", async (req, res) => {
+  const sectionId = req.params.sectionId;
+  const updatedSectionData = req.body;
+
+  try {
+    const updatedSection = await courseDataFunctions.updateSection(sectionId, updatedSectionData);
+    return res.json(updatedSection);
+  } catch (error) {
+    if (error.status !== 500 && error.status) {
+      return res.status(error.status).json({ error: error.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Internal Server Error" });
+    }
+  }
+});
+
+router.delete("/:sectionId", async (req, res) => {
+  let sectionId = req.params.sectionId;
+  try {
+    const deleteInfo = await courseDataFunctions.deleteSection(sectionId);
+    return res.json(deleteInfo);
+  } catch (error) {
+    if (error.status !== 500 && error.status) {
+      return res.json({ error: error.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+});
+
 router.get("/:sectionId/assignments/create", async (req, res) => {
   try {
     let renderObjs = {

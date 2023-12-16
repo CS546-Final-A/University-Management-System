@@ -85,8 +85,6 @@ export const validateSection = (
     sectionEndTime,
     sectionDay,
     sectionCapacity,
-    sectionYear,
-    sectionSemester,
     sectionLocation,
     sectionDescription,
   };

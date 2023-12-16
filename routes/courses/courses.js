@@ -1,5 +1,5 @@
 import { Router, query } from "express";
-import { santizeInputs } from "../../data_validation.js";
+import verify, { santizeInputs } from "../../data_validation.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
 import util from "util";
 import {
@@ -57,7 +57,7 @@ router.post("/registration", async (req, res) => {
       courseCredits,
       courseDescription,
       courseSemester,
-      courseYear,
+      courseYear
     );
     let result = await courseDataFunctions.registerCourse(
       course.courseNumber,
@@ -68,7 +68,7 @@ router.post("/registration", async (req, res) => {
       course.courseSemester,
       course.courseYear
     );
-    if (result.acknowledged) { 
+    if (result.acknowledged) {
       // window.location.href = "/courses/" + result.insertedId;
       return res.json(result);
     }
@@ -95,8 +95,9 @@ router.get("/:courseId", async (req, res) => {
       courses: data,
       script: "courses/detail",
     };
-    if(renderObjs.type === "Admin") {
-      renderObjs.instructors = await courseDataFunctions.getUniqueInstructorNamesandId()
+    if (renderObjs.type === "Admin") {
+      renderObjs.instructors =
+        await courseDataFunctions.getUniqueInstructorNamesandId();
       renderObjs.instructors.sort((a, b) => a.name.localeCompare(b.name));
     }
     res.render("courses/detail", renderObjs);
@@ -113,24 +114,52 @@ router.get("/:courseId", async (req, res) => {
 });
 
 router.post("/:courseId/section", async (req, res) => {
-  const { courseId } = req.params;
-  console.log(req.body);
+  let { courseId } = req.params;
+  const {
+    sectionName,
+    sectionInstructor,
+    sectionType,
+    sectionStartTime,
+    sectionEndTime,
+    sectionDay,
+    sectionCapacity,
+    sectionLocation,
+    sectionDescription,
+  } = req.body;
   try {
-    let data = await courseDataFunctions.getCourseById(courseId);
-    let renderObjs = {
-      name: req.session.name,
-      type: req.session.type,
-      email: req.session.email,
-      courses: data,
-      script: "courses/detail",
-    };
-    res.render("courses/detail", renderObjs);
+    verify.validateMongoId(courseId, "courseId");
+    const section = validateSection(
+      sectionName,
+      sectionInstructor,
+      sectionType,
+      sectionStartTime,
+      sectionEndTime,
+      sectionDay,
+      sectionCapacity,
+      sectionLocation,
+      sectionDescription
+    );
+    const result = await courseDataFunctions.registerSection(
+      courseId,
+      section.sectionName,
+      section.sectionInstructor,
+      section.sectionType,
+      section.sectionStartTime,
+      section.sectionEndTime,
+      section.sectionDay,
+      section.sectionCapacity,
+      section.sectionLocation,
+      section.sectionDescription
+    );
+
+    if (result.acknowledged) {
+      return res.json(result);
+    }
   } catch (e) {
     if (e.status !== 500 && e.status) {
       res.status(e.status);
       return res.json({ error: e.message });
     } else {
-      console.log(e);
       res.status(500);
       res.json({ error: "Login error" });
     }

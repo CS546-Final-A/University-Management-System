@@ -267,7 +267,7 @@ export const registerCourse = async (
   courseCredits,
   courseDescription,
   courseSemester,
-  courseYear,
+  courseYear
 ) => {
   let newCourse = validateCourse(
     courseNumber,
@@ -276,7 +276,7 @@ export const registerCourse = async (
     courseCredits,
     courseDescription,
     courseSemester,
-    courseYear,
+    courseYear
   );
 
   const courseCollection = await courses();
@@ -513,8 +513,18 @@ export const registerSection = async (
   );
 
   const courseCollection = await courses();
+  const existingSection = await courseCollection.findOne({
+    _id: courseId,
+    "sections.sectionName": newSection.sectionName,
+  });
+
+  if (existingSection)
+    throwErrorWithStatus(400, "Section with the same name already exists");
+
   newSection.sectionId = new ObjectId();
-  const updateInfo = await courseCollection.update(
+  newSection.enrolledStudents = [];
+
+  const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
     { $push: { sections: newSection } }
   );
@@ -578,18 +588,18 @@ export const updateSection = async (
   return updateInfo;
 };
 
-export const deletesection = async (sectionId) => {
+export const deleteSection = async (sectionId) => {
   sectionId = verify.validateMongoId(sectionId, "sectionId");
 
   const courseCollection = await courses();
-  const section = await courseCollection.findOne({
+  const course = await courseCollection.findOne({
     "sections.sectionId": sectionId,
   });
 
-  if (!section) {
+  if (!course) {
     throwErrorWithStatus(400, `Section was not found!`);
   }
-  const deletionInfo = db.courseCollection.updateOne(
+  const deletionInfo = await courseCollection.updateOne(
     { "sections.sectionId": sectionId },
     { $pull: { sections: { sectionId: sectionId } } }
   );
@@ -597,6 +607,8 @@ export const deletesection = async (sectionId) => {
   if (!deletionInfo) {
     throwerror("Section was not deleted successfully!");
   }
+  deletionInfo.courseId = course._id;
+  return deletionInfo;
 };
 
 export const getUniqueSectionYearandSemester = async () => {

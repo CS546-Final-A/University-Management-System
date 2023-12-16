@@ -50,10 +50,19 @@
                                     <td>{{this.sectionDescription}}</td>
                                     <td>{{this.sectionCapacity}}</td>
                                     <td>{{this.enrolledStudents.length}}</td>
+
+                                    {{#if (eq ../../type 'Admin')}}
+                                    <td>
+                                        <button class="btn btn-warning edit-btn" onclick="editSection('{{this.sectionId}}')">Edit</button>
+                                        <button class="btn btn-danger delete-btn" onclick="deleteSection('{{this.sectionId}}')">Delete</button>
+                                    </td>
+                                    {{/if}}
+                                    {{#if (eq ../../type 'Student')}}
                                     {{#if (gt this.sectionCapacity this.enrolledStudents.length)}}
                                     <td><button class="btn btn-primary">Enroll</button></td>
                                     {{else}}
                                     <td>Capacity Full</td>
+                                    {{/if}}
                                     {{/if}}
                                 </tr>
                                 {{/each}}
@@ -80,7 +89,8 @@
                     <form id="addSectionForm">
                         <div class="form-group" hidden>
                             <label for="courseId">Course ID:</label>
-                            <input type="text" class="form-control" id="courseId" name="courseId" required value="{{courseId}}">
+                            <input type="text" class="form-control" id="courseId" name="courseId" required
+                                value="{{courseId}}">
                         </div>
 
                         <div class="form-group">
@@ -129,8 +139,8 @@
 
                         <div class="form-group">
                             <label for="sectionCapacity">Section Capacity:</label>
-                            <input type="number" class="form-control" id="sectionCapacity" name="sectionCapacity" min="10" max="100"
-                                required>
+                            <input type="number" class="form-control" id="sectionCapacity" name="sectionCapacity"
+                                min="10" max="100" required>
                         </div>
 
                         <div class="form-group">
@@ -145,7 +155,8 @@
                                 required></textarea>
                         </div>
                         <input type="hidden" id="csrf" value="{{_csrf}}">
-                        <button type="submit" class="btn btn-primary" onclick="sectionSubmit()">Submit</button>
+                        <div id="error" style="color: red;"></div>
+                        <button type="submit" class="btn btn-primary" onclick="sectionSubmit(event)">Submit</button>
                     </form>
                 </div>
             </div>
