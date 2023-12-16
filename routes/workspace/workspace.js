@@ -95,8 +95,10 @@ router.route("/:sectionId").get(async (req, res) => {
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
+    let sectionId = verify.validateMongoId(req.params.sectionId);
+
     let renderObjs = {};
-    const section = await courseData.getSectionById(req.params.sectionId);
+    const section = await courseData.getSectionById(sectionId);
     const userType = req.session.type;
 
     renderObjs = {
@@ -110,7 +112,9 @@ router
     res.render("workspace/module", renderObjs);
   })
   .post(async (req, res) => {
+    req.body = santizeInputs(req.body);
     const { sectionId } = req.params;
+    sectionId = verify.validateMongoId(req.params.sectionId);
     const { moduleName, moduleDescription, moduleDate } = req.body;
     try {
       await addModuleToSection(
@@ -151,6 +155,17 @@ router
   .get(async (req, res) => {
     let renderObjs = {};
     const { sectionId, moduleId } = req.params;
+    let userId = req.session.userid;
+    userId = verify.validateMongoId(userId);
+    moduleId = verify.validateMongoId(moduleId);
+    let section = await courseDataFunctions.checkStudentInSection(
+      sectionId,
+      userId
+    );
+
+    if (!section) {
+      throw new Error("Section not found");
+    }
     if (req.session.type === "Professor") {
       const userType = req.session.type;
       try {
@@ -280,6 +295,7 @@ router
     }
   })
   .post(async (req, res) => {
+    req.body = santizeInputs(req.body);
     const moduleId = req.params.moduleId;
     const userId = req.session.userid;
     const name = req.session.name;
@@ -343,11 +359,9 @@ router.post(
   async (req, res) => {
     try {
       req.body = santizeInputs(req.body);
+      const files = req.files;
       let { sectionId, moduleId } = req.params;
       let userId = req.session.userid;
-
-      const files = req.files;
-
       userId = verify.validateMongoId(userId);
       moduleId = verify.validateMongoId(moduleId);
       let section = await courseDataFunctions.checkStudentInSection(
