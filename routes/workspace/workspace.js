@@ -4,13 +4,26 @@ import {
   addStudentToAttendance,
   getAttendanceData,
 } from "../../data/attendance/attendance.js";
-import { addModuleToSection } from "../../data/modules/modules.js";
+import {
+  addModuleToSection,
+  getModuleById,
+  uploadMaterial,
+} from "../../data/modules/modules.js";
 import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
-import verify from "../../data_validation.js";
 import assignmentRoutes from "./assignments.js";
+import verify, { santizeInputs } from "../../data_validation.js";
+import fileUpload from "express-fileupload";
+import path from "path";
+import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
+import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
+import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
 
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -84,8 +97,10 @@ router.route("/:sectionId").get(async (req, res) => {
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
+    let sectionId = verify.validateMongoId(req.params.sectionId);
+
     let renderObjs = {};
-    const section = await courseData.getSectionById(res.locals.sectionId);
+    const section = await courseData.getSectionById(sectionId);
     const userType = req.session.type;
 
     renderObjs = {
@@ -98,7 +113,9 @@ router
     res.render("workspace/module", renderObjs);
   })
   .post(async (req, res) => {
+    req.body = santizeInputs(req.body);
     const { sectionId } = req.params;
+    sectionId = verify.validateMongoId(req.params.sectionId);
     const { moduleName, moduleDescription, moduleDate } = req.body;
     try {
       await addModuleToSection(
@@ -133,11 +150,23 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 const toRadians = (degrees) => {
   return degrees * (Math.PI / 180);
 };
+
 router
   .route("/:sectionId/modules/:moduleId/attendance")
   .get(async (req, res) => {
     let renderObjs = {};
     const { sectionId, moduleId } = req.params;
+    let userId = req.session.userid;
+    userId = verify.validateMongoId(userId);
+    moduleId = verify.validateMongoId(moduleId);
+    let section = await courseDataFunctions.checkStudentInSection(
+      sectionId,
+      userId
+    );
+
+    if (!section) {
+      throw new Error("Section not found");
+    }
     if (req.session.type === "Professor") {
       const userType = req.session.type;
       try {
@@ -202,51 +231,71 @@ router
       const professor = await attendanceData.find(
         (entry) => entry.type === "Professor"
       );
-      const ts = professor.timeStamp;
-      const date = new Date(ts);
-      let hours = date.getHours();
-      let minutes = date.getMinutes();
-      let amOrPm = hours >= 12 ? "PM" : "AM";
-      let H = hours;
-      let M = minutes < 10 ? "0" + minutes : minutes;
-      let k = amOrPm;
-      const userFromDb = await attendanceData.find(
-        (entry) => entry.userId === req.session.userid
-      );
-      let userThereButton = false;
-      if (userFromDb) userThereButton = true;
-      let needButton = false; //false implies prof has not started attendance
-      if (professor) needButton = true;
-      let t = new Date();
-      let timeLeft = t.getTime() - ts < 600000 ? true : false;
+      let needButton = false;
+      let n = 0;
       const userType = req.session.type;
       const name = req.session.name;
-      let n = 0;
-      if (needButton === false) n = 1;
-      if (needButton === true && userThereButton === false && timeLeft === true)
-        n = 2;
-      if (
-        needButton === true &&
-        userThereButton === false &&
-        timeLeft === false
-      )
-        n = 3;
-      if (needButton === true && userThereButton === true) n = 4;
-      renderObjs = {
-        ...renderObjs,
-        layout: "sidebar",
-        // sideBarTitle: `${course.courseName}`,
-        userType,
-        name,
-        n,
-        H,
-        M,
-        k,
-      };
-      res.render("workspace/attendance", renderObjs);
+      if (!professor) {
+        n = 1;
+        renderObjs = {
+          ...renderObjs,
+          layout: "sidebar",
+          // sideBarTitle: `${course.courseName}`,
+          sectionID: sectionId,
+          userType,
+          name,
+          n,
+        };
+        res.render("workspace/attendance", renderObjs);
+      } else {
+        const ts = professor.timeStamp;
+        const date = new Date(ts);
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let amOrPm = hours >= 12 ? "PM" : "AM";
+        let H = hours;
+        let M = minutes < 10 ? "0" + minutes : minutes;
+        let k = amOrPm;
+        const userFromDb = await attendanceData.find(
+          (entry) => entry.userId === req.session.userid
+        );
+        let userThereButton = false;
+        if (userFromDb) userThereButton = true;
+        if (professor) needButton = true;
+        let t = new Date();
+        let timeLeft = t.getTime() - ts < 600000 ? true : false;
+        if (needButton === false) n = 1;
+        if (
+          needButton === true &&
+          userThereButton === false &&
+          timeLeft === true
+        )
+          n = 2;
+        if (
+          needButton === true &&
+          userThereButton === false &&
+          timeLeft === false
+        )
+          n = 3;
+        if (needButton === true && userThereButton === true) n = 4;
+        renderObjs = {
+          ...renderObjs,
+          layout: "sidebar",
+          // sideBarTitle: `${course.courseName}`,
+          sectionID: sectionId,
+          userType,
+          name,
+          n,
+          H,
+          M,
+          k,
+        };
+        res.render("workspace/attendance", renderObjs);
+      }
     }
   })
   .post(async (req, res) => {
+    req.body = santizeInputs(req.body);
     const moduleId = req.params.moduleId;
     const userId = req.session.userid;
     const name = req.session.name;
@@ -287,5 +336,70 @@ router
   });
 
 router.use("/:sectionId/assignments", assignmentRoutes);
+
+router.post(
+  "/:sectionId/modules/:moduleId/upload",
+  fileUpload({ createParentPath: true }),
+  filesPayloadExists,
+  fileExtLimiter([".zip"]),
+  fileSizesLimiter,
+
+  async (req, res) => {
+    try {
+      req.body = santizeInputs(req.body);
+      const files = req.files;
+      let { sectionId, moduleId } = req.params;
+      let userId = req.session.userid;
+      userId = verify.validateMongoId(userId);
+      moduleId = verify.validateMongoId(moduleId);
+      let section = await courseDataFunctions.checkStudentInSection(
+        sectionId,
+        userId
+      );
+
+      if (!section) {
+        throw new Error("Section not found");
+      }
+
+      let module = await getModuleById(moduleId);
+
+      if (!module) {
+        throw new Error("Assignment not found");
+      }
+      let fileName = "";
+      Object.keys(files).forEach((key) => {
+        const filepath = path.join(
+          "files",
+          moduleId.toString(),
+          userId.toString(),
+          files[key].name
+        );
+        fileName = files[key].name;
+        console.log(filepath);
+        files[key].mv(filepath, (err) => {
+          if (err)
+            return res.status(500).json({ status: "error", message: err });
+        });
+      });
+
+      let material = await uploadMaterial(
+        moduleId,
+        Date.now().toString(),
+        fileName
+      );
+      res.send({ status: "success", message: "File is uploaded" });
+    } catch (e) {
+      if (e.status !== 500 && e.status) {
+        return res
+          .status(e.status)
+          .json({ status: "Error", message: e.message });
+      } else {
+        console.log(e);
+        res.status(500);
+        res.json({ error: "Login error" });
+      }
+    }
+  }
+);
 
 export default router;
