@@ -99,9 +99,7 @@ router.use("/:action/:assignmentID*", async (req, res, next) => {
       }
       res.locals.assignment.assignmentDueDate = new Date(
         res.locals.assignment.assignmentDueDate
-      )
-        .toISOString()
-        .substring(0, 10);
+      );
     }
     next();
   } catch (e) {
