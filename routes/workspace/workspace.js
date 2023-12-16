@@ -13,6 +13,16 @@ import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 import verify, { santizeInputs } from "../../data_validation.js";
+import fileUpload from "express-fileupload";
+import path from "path";
+import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
+import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
+import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
+
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -206,49 +216,67 @@ router
       const professor = await attendanceData.find(
         (entry) => entry.type === "Professor"
       );
-      const ts = professor.timeStamp;
-      const date = new Date(ts);
-      let hours = date.getHours();
-      let minutes = date.getMinutes();
-      let amOrPm = hours >= 12 ? "PM" : "AM";
-      let H = hours;
-      let M = minutes < 10 ? "0" + minutes : minutes;
-      let k = amOrPm;
-      const userFromDb = await attendanceData.find(
-        (entry) => entry.userId === req.session.userid
-      );
-      let userThereButton = false;
-      if (userFromDb) userThereButton = true;
-      let needButton = false; //false implies prof has not started attendance
-      if (professor) needButton = true;
-      let t = new Date();
-      let timeLeft = t.getTime() - ts < 600000 ? true : false;
+      let needButton = false;
+      let n = 0;
       const userType = req.session.type;
       const name = req.session.name;
-      let n = 0;
-      if (needButton === false) n = 1;
-      if (needButton === true && userThereButton === false && timeLeft === true)
-        n = 2;
-      if (
-        needButton === true &&
-        userThereButton === false &&
-        timeLeft === false
-      )
-        n = 3;
-      if (needButton === true && userThereButton === true) n = 4;
-      renderObjs = {
-        ...renderObjs,
-        layout: "sidebar",
-        // sideBarTitle: `${course.courseName}`,
-        sectionID: sectionId,
-        userType,
-        name,
-        n,
-        H,
-        M,
-        k,
-      };
-      res.render("workspace/attendance", renderObjs);
+      if (!professor) {
+        n = 1;
+        renderObjs = {
+          ...renderObjs,
+          layout: "sidebar",
+          // sideBarTitle: `${course.courseName}`,
+          sectionID: sectionId,
+          userType,
+          name,
+          n,
+        };
+        res.render("workspace/attendance", renderObjs);
+      } else {
+        const ts = professor.timeStamp;
+        const date = new Date(ts);
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let amOrPm = hours >= 12 ? "PM" : "AM";
+        let H = hours;
+        let M = minutes < 10 ? "0" + minutes : minutes;
+        let k = amOrPm;
+        const userFromDb = await attendanceData.find(
+          (entry) => entry.userId === req.session.userid
+        );
+        let userThereButton = false;
+        if (userFromDb) userThereButton = true;
+        if (professor) needButton = true;
+        let t = new Date();
+        let timeLeft = t.getTime() - ts < 600000 ? true : false;
+        if (needButton === false) n = 1;
+        if (
+          needButton === true &&
+          userThereButton === false &&
+          timeLeft === true
+        )
+          n = 2;
+        if (
+          needButton === true &&
+          userThereButton === false &&
+          timeLeft === false
+        )
+          n = 3;
+        if (needButton === true && userThereButton === true) n = 4;
+        renderObjs = {
+          ...renderObjs,
+          layout: "sidebar",
+          // sideBarTitle: `${course.courseName}`,
+          sectionID: sectionId,
+          userType,
+          name,
+          n,
+          H,
+          M,
+          k,
+        };
+        res.render("workspace/attendance", renderObjs);
+      }
     }
   })
   .post(async (req, res) => {
@@ -304,8 +332,6 @@ router.route("/:sectionId/assignments").get(async (req, res) => {
   };
   res.render("workspace/assignments", renderObjs);
 });
-
-export default router;
 
 router.post(
   "/:sectionId/modules/:moduleId/upload",
@@ -373,3 +399,5 @@ router.post(
     }
   }
 );
+
+export default router;
