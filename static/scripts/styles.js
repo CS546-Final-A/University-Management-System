@@ -26,6 +26,29 @@ $("#switch").on("click", function () {
 });
 
 $(document).ready(function () {
+  var currentPageUrl = window.location.pathname;
+
+  // Iterate through all anchor tags with class "hover"
+  $(".hover").each(function () {
+    var linkUrl = $(this).attr("href");
+
+    // Check if the link URL matches the current page URL
+    if (currentPageUrl === linkUrl) {
+      $(this).addClass("active");
+      $(this).parent("li").addClass("active");
+    }
+  });
+
+  $(".nav-link").each(function () {
+    var linkUrl = $(this).attr("href");
+
+    // Check if the link URL matches the current page URL
+    if (currentPageUrl === linkUrl) {
+      $(this).addClass("active");
+      $(this).parent("li").addClass("active");
+    }
+  });
+
   //Bootstrap Toast Notification
   $("#liveToastBtn").click(function () {
     $("#liveToast").toast("show");
@@ -38,27 +61,28 @@ $(document).ready(function () {
 
   //Ripple Effect
   const ANIMATEDCLASSNAME = "animated";
-  const ELEMENTS = document.querySelectorAll(".hover");
-  const ELEMENTS_SPAN = [];
 
-  ELEMENTS.forEach((element, index) => {
+  $(".hover").each(function (index) {
     let addAnimation = false;
+    const $element = $(this);
+    const $elementSpan = $element.find("span");
 
-    // If The span element for this element does not exist in the array, add it.
-    if (!ELEMENTS_SPAN[index])
-      ELEMENTS_SPAN[index] = element.querySelector("span");
+    $element.on("mouseover", function (e) {
+      $elementSpan.css({
+        left: e.pageX - $element.offset().left + "px",
+        top: e.pageY - $element.offset().top + "px",
+      });
 
-    element.addEventListener("mouseover", (e) => {
-      ELEMENTS_SPAN[index].style.left = e.pageX - element.offsetLeft + "px";
-      ELEMENTS_SPAN[index].style.top = e.pageY - element.offsetTop + "px";
-
-      // Add an animation-class to animate via CSS.
-      if (addAnimation) element.classList.add(ANIMATEDCLASSNAME);
+      if (addAnimation) {
+        $element.addClass(ANIMATEDCLASSNAME);
+      }
     });
 
-    element.addEventListener("mouseout", (e) => {
-      ELEMENTS_SPAN[index].style.left = e.pageX - element.offsetLeft + "px";
-      ELEMENTS_SPAN[index].style.top = e.pageY - element.offsetTop + "px";
+    $element.on("mouseout", function (e) {
+      $elementSpan.css({
+        left: e.pageX - $element.offset().left + "px",
+        top: e.pageY - $element.offset().top + "px",
+      });
     });
   });
 });

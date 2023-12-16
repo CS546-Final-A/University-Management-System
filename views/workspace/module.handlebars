@@ -1,43 +1,32 @@
-<h2>Modules</h2>
-{{#if (eq userType "Professor")}}
-<button id="addModuleButton">Add new module</button>
-<form id="moduleForm" style="display: none;">
-    <input type="text" id="moduleName" placeholder="Module Name">
-    <input type="text" id="moduleDesc" placeholder="Module Description">
-    <input type="date" id="moduleDate">
-    <button type="submit">Submit</button>
-</form>
-{{/if}}
+<div class="container-fluid">
+    <h2>Modules</h2>
+    {{#if (eq userType "Professor")}}
+    <button id="addModuleButton">Add new module</button>
+    <form id="moduleForm" style="display: none;">
+        <input type="text" id="moduleName" placeholder="Module Name">
+        <input type="text" id="moduleDesc" placeholder="Module Description">
+        <input type="date" id="moduleDate">
+        <button type="submit">Submit</button>
+    </form>
+    {{/if}}
 
-{{#each modules}}
-<div class="card my-4 glassEffect">
-    <div class="card-header d-flex">
-        <div class="my-auto">{{this.moduleName}}</div>
-        <div class="ms-auto"><button class="btnSubmit p-2">
-                <a href="/workspace/{{../sectionID}}/modules/{{this.moduleId}}/attendance">Attendance</a></button>
+    {{#each modules}}
+    <div class="card my-4 glassEffect">
+        <div class="card-header d-flex">
+            <div class="my-auto">{{this.moduleName}}</div>
+            <div class="ms-auto"><button class="btnSubmit p-2">
+                    <a href="/workspace/{{../sectionID}}/modules/{{this.moduleId}}/attendance">Attendance</a></button>
+            </div>
         </div>
-    </div>
 
-    <div class="card-body">
-        <div class="card-title">{{this.moduleDescription}}</div>
-        {{this.moduleDate}}
-    </div>
+        <div class="card-body">
+            <div class="card-title">{{this.moduleDescription}}</div>
+            {{this.moduleDate}}
+        </div>
 
+    </div>
+    {{/each}}
 </div>
-{{/each}}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <script>
     document.getElementById('addModuleButton').addEventListener('click', () => {
@@ -78,7 +67,5 @@
             console.error('Error:', error);
         }
     });
-
-
 
 </script>
