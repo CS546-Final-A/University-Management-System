@@ -29,8 +29,8 @@
   min-width: 250px;
   max-width: 250px;
   height: 100vh;
-  background: #252525;
-  color: #fff;
+  background: #fff0;
+  color: var(--activeTextColor);
   transition: all 0.3s;
 }
 
@@ -40,7 +40,7 @@
 
 #sidebar .sidebar-header {
   padding: 20px;
-  background: #252525;
+  background: #fff0;
 }
 
 #sidebar ul.components {
@@ -61,8 +61,8 @@
 }
 
 #sidebar ul li.active > a {
-  color: #fff;
-  background: #000000;
+  color: var(--activeBgColor);
+  background: var(--activeTextColor);
 }
 
 a[data-toggle="collapse"] {
@@ -88,17 +88,19 @@ ul.CTAs a {
 
 a.download {
   background: #fff;
-  color: #252525;
+  color: #fff0;
 }
 
 a.article,
 a.article:hover {
-  background: #252525 !important;
+  background: #fff0 !important;
   color: #fff !important;
 }
 
 .components li a {
-  border-radius: 30px;
+  /* border-top-right-radius: 90px;
+  border-bottom-right-radius: 90px; */
+  border-radius: 90px;
 }
 
 /* ---------------------------------------------------
@@ -133,7 +135,7 @@ a.article:hover {
 }
 
 .hamIcon::after {
-  background-color: transparent;
+  background-color: #fff0;
 }
 
 .hamburger .line {
@@ -192,7 +194,7 @@ a.article:hover {
   box-sizing: border-box;
   width: 55px;
   height: 55px;
-  border: 3px solid transparent;
+  border: 3px solid #fff0;
   top: -11px;
   left: -11px;
   border-radius: 100%;
@@ -235,8 +237,8 @@ a.article:hover {
   --time: 0.5s;
   position: relative;
 
-  color: #ffffff;
-  background: #222;
+  color: var(--activeTextColor);
+  background: var(--activeBgColor);
   overflow: hidden;
   border-bottom-left-radius: var(--border-radius);
   border-bottom-right-radius: var(--border-radius);
@@ -251,7 +253,7 @@ a.article:hover {
 }
 
 .hover:hover text {
-  color: #000000;
+  color: var(--activeBgColor);
 }
 
 .hover span {
@@ -263,7 +265,7 @@ a.article:hover {
   height: 0;
 
   border-radius: 100%;
-  background: #ffffff;
+  background: var(--activeTextColor);
 
   transform: translate(-50%, -50%);
   transition: width var(--time), padding-top var(--time);

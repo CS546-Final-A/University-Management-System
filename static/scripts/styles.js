@@ -7,6 +7,8 @@ $("#switch").on("click", function () {
   var getColor2 = $("html").css("--whiteColor");
   var glassColor1 = $("html").css("--glassColor1");
   var glassColor2 = $("html").css("--glassColor2");
+  var shadowColor1 = $("html").css("--shadowColor1");
+  var shadowColor2 = $("html").css("--shadowColor2");
 
   if ($("body").hasClass("dark")) {
     $("body").removeClass("dark");
@@ -15,6 +17,7 @@ $("#switch").on("click", function () {
     $("html").css("--activeTextColor", getColor1);
     $("html").css("--activeBgColor", getColor2);
     $("html").css("--activeGlassColor", glassColor1);
+    $("html").css("--activeShadowColor", shadowColor1);
   } else {
     $("body").addClass("dark");
     $("#switch").addClass("switched");
@@ -22,6 +25,7 @@ $("#switch").on("click", function () {
     $("html").css("--activeTextColor", getColor2);
     $("html").css("--activeBgColor", getColor1);
     $("html").css("--activeGlassColor", glassColor2);
+    $("html").css("--activeShadowColor", shadowColor2);
   }
 });
 
