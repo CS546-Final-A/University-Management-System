@@ -1,5 +1,7 @@
 <div class="container mt-5">
+    <input type="hidden" id="csrf" value="{{_csrf}}">
     {{#each courses}}
+    <input type="text" class="form-control" id="courseId" name="courseId" hidden value="{{courseId}}">
     <div class="card mb-4 w-100" style="display: flex; flex-direction: column;">
         <div class="card-header">
             <h2>{{this.courseNumber}} : {{this.courseName}}</h2>
@@ -53,15 +55,25 @@
 
                                     {{#if (eq ../../type 'Admin')}}
                                     <td>
-                                        <button class="btn btn-warning edit-btn" onclick="editSection('{{this.sectionId}}')">Edit</button>
-                                        <button class="btn btn-danger delete-btn" onclick="deleteSection('{{this.sectionId}}')">Delete</button>
+                                        <button class="btn btn-warning edit-btn"
+                                            onclick="editSection('{{this.sectionId}}')">Edit</button>
+                                        <button class="btn btn-danger delete-btn"
+                                            onclick="deleteSection('{{this.sectionId}}')">Delete</button>
                                     </td>
                                     {{/if}}
+
                                     {{#if (eq ../../type 'Student')}}
+
+                                    {{#if this.isEnrolled}}
+
+                                    <td>Enrolled</td>
+                                    {{else}}
                                     {{#if (gt this.sectionCapacity this.enrolledStudents.length)}}
-                                    <td><button class="btn btn-primary">Enroll</button></td>
+                                    <td><button class="btn btn-primary"
+                                            onclick="enrollSection('{{this.sectionId}}')">Enroll</button></td>
                                     {{else}}
                                     <td>Capacity Full</td>
+                                    {{/if}}
                                     {{/if}}
                                     {{/if}}
                                 </tr>
@@ -88,9 +100,9 @@
                 <div class="modal-body">
                     <form id="addSectionForm">
                         <div class="form-group" hidden>
-                            <label for="courseId">Course ID:</label>
-                            <input type="text" class="form-control" id="courseId" name="courseId" required
-                                value="{{courseId}}">
+                            <label for="sectionId">Section ID:</label>
+                            <input type="text" class="form-control" id="sectionId" name="sectionId" required
+                                value="{{sectionId}}">
                         </div>
 
                         <div class="form-group">
@@ -155,6 +167,7 @@
                                 required></textarea>
                         </div>
                         <input type="hidden" id="csrf" value="{{_csrf}}">
+                        <input type="hidden" id="editMode" name="editMode" value="false">
                         <div id="error" style="color: red;"></div>
                         <button type="submit" class="btn btn-primary" onclick="sectionSubmit(event)">Submit</button>
                     </form>

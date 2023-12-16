@@ -87,7 +87,15 @@ router.get("/:courseId", async (req, res) => {
   const { courseId } = req.params;
   try {
     let data = await courseDataFunctions.getCourseById(courseId);
+    data.forEach((course) => {
+      course.sections.forEach((section) => {
+        if (section.enrolledStudents?.includes(req.session.userid)) {
+          section.isEnrolled = true;
+        }
+      });
+    });
     let renderObjs = {
+      userId: req.session.userid,
       name: req.session.name,
       type: req.session.type,
       email: req.session.email,
@@ -107,59 +115,6 @@ router.get("/:courseId", async (req, res) => {
       return res.json({ error: e.message });
     } else {
       console.log(e);
-      res.status(500);
-      res.json({ error: "Login error" });
-    }
-  }
-});
-
-router.post("/:courseId/section", async (req, res) => {
-  let { courseId } = req.params;
-  const {
-    sectionName,
-    sectionInstructor,
-    sectionType,
-    sectionStartTime,
-    sectionEndTime,
-    sectionDay,
-    sectionCapacity,
-    sectionLocation,
-    sectionDescription,
-  } = req.body;
-  try {
-    verify.validateMongoId(courseId, "courseId");
-    const section = validateSection(
-      sectionName,
-      sectionInstructor,
-      sectionType,
-      sectionStartTime,
-      sectionEndTime,
-      sectionDay,
-      sectionCapacity,
-      sectionLocation,
-      sectionDescription
-    );
-    const result = await courseDataFunctions.registerSection(
-      courseId,
-      section.sectionName,
-      section.sectionInstructor,
-      section.sectionType,
-      section.sectionStartTime,
-      section.sectionEndTime,
-      section.sectionDay,
-      section.sectionCapacity,
-      section.sectionLocation,
-      section.sectionDescription
-    );
-
-    if (result.acknowledged) {
-      return res.json(result);
-    }
-  } catch (e) {
-    if (e.status !== 500 && e.status) {
-      res.status(e.status);
-      return res.json({ error: e.message });
-    } else {
       res.status(500);
       res.json({ error: "Login error" });
     }
@@ -210,6 +165,16 @@ router.get("/:year/:semester/listings", async (req, res) => {
     script: "courses/listings",
   };
   res.render("courses/listings", renderObjs);
+});
+
+router.get("/:sectionId/enroll", async (req, res) => {
+  const { sectionId } = req.params;
+  try {
+    await courseDataFunctions.enrollSection(sectionId, req.session.userid);
+    res.json({ acknowledged: true });
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
 });
 
 export default router;

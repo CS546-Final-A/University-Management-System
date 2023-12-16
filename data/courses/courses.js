@@ -540,6 +540,7 @@ export const registerSection = async (
 export const updateSection = async (
   sectionId,
   sectionName,
+  sectionInstructor,
   sectionType,
   sectionStartTime,
   sectionEndTime,
@@ -551,6 +552,7 @@ export const updateSection = async (
   sectionId = verify.validateMongoId(sectionId, "sectionId");
   let updatedSection = validateSection(
     sectionName,
+    sectionInstructor,
     sectionType,
     sectionStartTime,
     sectionEndTime,
@@ -574,7 +576,15 @@ export const updateSection = async (
     { "sections.sectionId": sectionId },
     {
       $set: {
-        "sections.$": updatedSection,
+        "sections.$.sectionName": updatedSection.sectionName,
+        "sections.$.sectionInstructor": updatedSection.sectionInstructor,
+        "sections.$.sectionType": updatedSection.sectionType,
+        "sections.$.sectionStartTime": updatedSection.sectionStartTime,
+        "sections.$.sectionEndTime": updatedSection.sectionEndTime,
+        "sections.$.sectionDay": updatedSection.sectionDay,
+        "sections.$.sectionCapacity": updatedSection.sectionCapacity,
+        "sections.$.sectionLocation": updatedSection.sectionLocation,
+        "sections.$.sectionDescription": updatedSection.sectionDescription,
       },
     },
     { returnDocument: "after" }
@@ -609,6 +619,45 @@ export const deleteSection = async (sectionId) => {
   }
   deletionInfo.courseId = course._id;
   return deletionInfo;
+};
+
+export const enrollSection = async (sectionId, userId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+
+  const courseCollection = await courses();
+  const course = await courseCollection.findOne({
+    "sections.sectionId": sectionId,
+  });
+
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+
+  const section = course.sections.find(
+    (section) => section.sectionId.toString() === sectionId.toString()
+  );
+  if (section?.enrolledStudents?.length >= section.sectionCapacity) {
+    throwErrorWithStatus(400, `Section is at maximum capacity. Cannot enroll.`);
+  }
+
+  if (section.enrolledStudents.includes(userId)) {
+    throwErrorWithStatus(400, `User is already enrolled in this section.`);
+  }
+
+  section.enrolledStudents.push(userId);
+
+  const updateResult = await courseCollection.updateOne(
+    { "sections.sectionId": sectionId },
+    {
+      $set: {
+        "sections.$": section,
+      },
+    }
+  );
+
+  if (updateResult.modifiedCount !== 1) {
+    throwErrorWithStatus(400, `Failed to enroll user.`);
+  }
 };
 
 export const getUniqueSectionYearandSemester = async () => {
@@ -660,4 +709,21 @@ export const checkStudentInSection = async (sectionId, studentId) => {
   }
 
   return course;
+};
+
+export const checkEnrollment = async (sectionId, studentId) => {
+  try {
+    sectionId = verify.validateMongoId(sectionId.toString(), "sectionId");
+    studentId = verify.validateMongoId(studentId, "studentId");
+
+    const courseCollection = await courses();
+    const enrollmentData = await courseCollection.findOne({
+      "sections.sectionId": sectionId,
+      "sections.enrolledStudents": studentId,
+    });
+
+    return !!enrollmentData;
+  } catch (error) {
+    return false;
+  }
 };

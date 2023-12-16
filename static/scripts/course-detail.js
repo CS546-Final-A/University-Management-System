@@ -1,8 +1,9 @@
-function openAddSectionModal()  {
+function openAddSectionModal() {
   document.getElementById("addSectionForm").reset();
+  document.getElementById("editMode").value = "false";
   document.getElementById("addSectionModalLabel").textContent = "Add Section";
   $("#addSectionModal").modal("toggle");
-};
+}
 // Handle form submission
 const sectionSubmit = async (event) => {
   event.preventDefault();
@@ -17,7 +18,8 @@ const sectionSubmit = async (event) => {
   const sectionDay = document.getElementById("sectionDay").value;
   const sectionCapacity = document.getElementById("sectionCapacity").value;
   const sectionLocation = document.getElementById("sectionLocation").value;
-  const sectionDescription = document.getElementById("sectionDescription").value;
+  const sectionDescription =
+    document.getElementById("sectionDescription").value;
   try {
     if (sectionStartTime >= sectionEndTime) {
       setError("Start time must be before end time.");
@@ -36,7 +38,14 @@ const sectionSubmit = async (event) => {
       sectionDescription,
     };
 
-    const sectionRegistrationRoute = editMode === "true" ? `/sections/${courseId}` : `/courses/${courseId}/section`;
+    if (editMode === "true") {
+      requestData.sectionId = document.getElementById("sectionId").value;
+    }
+
+    const sectionRegistrationRoute =
+      editMode === "true"
+        ? `/sections/${requestData.sectionId}`
+        : `/sections/${courseId}/section`;
 
     const result = await request(
       editMode === "true" ? "PUT" : "POST",
@@ -62,7 +71,9 @@ const sectionSubmit = async (event) => {
 };
 
 const editSection = async (sectionId) => {
-  document.getElementById("addSectionModalLabel").textContent = "Update Section";
+  document.getElementById("editMode").value = "true";
+  document.getElementById("addSectionModalLabel").textContent =
+    "Update Section";
   const csrf = document.getElementById("csrf").value;
   let section;
   try {
@@ -70,22 +81,24 @@ const editSection = async (sectionId) => {
     section = await request("GET", getSection, csrf);
 
     document.getElementById("addSectionForm").reset();
+    document.getElementById("courseId").value = section.courseId;
+    document.getElementById("sectionId").value = sectionId;
+    document.getElementById("sectionName").value = section.sectionName;
+    document.getElementById("sectionInstructor").value =
+      section.sectionInstructor;
+    document.getElementById("sectionType").value = section.sectionType;
+    document.getElementById("sectionStartTime").value =
+      section.sectionStartTime;
+    document.getElementById("sectionEndTime").value = section.sectionEndTime;
+    document.getElementById("sectionDay").value = section.sectionDay;
+    document.getElementById("sectionCapacity").value = section.sectionCapacity;
+    document.getElementById("sectionLocation").value = section.sectionLocation;
+    document.getElementById("sectionDescription").value =
+      section.sectionDescription;
     $("#addSectionModal").modal("toggle");
   } catch (error) {
     console.log(error.message);
   }
-  document.getElementById("courseId").value = section.courseId;
-  document.getElementById("sectionName").value = section.sectionName;
-  document.getElementById("sectionInstructor").value = section.sectionInstructor;
-  document.getElementById("sectionType").value = section.sectionType;
-  document.getElementById("sectionStartTime").value = section.sectionStartTime;
-  document.getElementById("sectionEndTime").value = section.sectionEndTime;
-  document.getElementById("sectionDay").value = section.sectionDay;
-  document.getElementById("sectionCapacity").value = section.sectionCapacity;
-  document.getElementById("sectionLocation").value = section.sectionLocation;
-  document.getElementById("sectionDescription").value = section.sectionDescription;
-
-  
 };
 
 const deleteSection = async (sectionId) => {
@@ -98,6 +111,24 @@ const deleteSection = async (sectionId) => {
       document.getElementById("error").innerText = result.error;
     } else if (deleteInfo?.acknowledged) {
       window.location.href = "/courses/" + deleteInfo.courseId;
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const enrollSection = async (sectionId) => {
+  const csrf = document.getElementById("csrf").value;
+  let enrollInfo;
+  try {
+    const enrollSection = `/courses/${sectionId}/enroll`;
+    enrollInfo = await request("GET", enrollSection, csrf);
+    const courseId = document.getElementById("courseId").value;
+    // if (enrollInfo?.error) {
+    //   document.getElementById("error").innerText = result.error;
+    // } else 
+    if (enrollInfo?.acknowledged) {
+      window.location.href = "/courses/" + courseId;
     }
   } catch (error) {
     console.log(error.message);
