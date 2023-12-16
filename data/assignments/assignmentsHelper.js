@@ -48,7 +48,7 @@ export const validateAssignment = (
   if (!assignmentWeight) {
     throwErrorWithStatus(400, "Invalid assignment weight");
   }
-  assignmentWeight = parseInt(assignmentWeight);
+  assignmentWeight = parseFloat(assignmentWeight);
 
   assignmentSectionId = verify.validateMongoId(assignmentSectionId);
 

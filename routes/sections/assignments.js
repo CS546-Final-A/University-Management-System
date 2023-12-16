@@ -16,6 +16,7 @@ import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
 router.get("/create", async (req, res) => {
   try {
     let renderObjs = {};
+    renderObjs.script = "assignments/create";
     //TODO: get all the assignments for this section and pass it to the renderObjs
     let section = await courseDataFunctions.getSectionById(
       res.locals.sectionID
@@ -100,31 +101,11 @@ router.get("/edit/:assignmentID", async (req, res) => {
         message: "You do not have edit rights for this assignment",
       };
     }
+    let renderObjs = {};
+    renderObjs.script = "assignments/edit";
 
     res.locals.assignment.assignmentDueDate =
       res.locals.assignment.assignmentDueDate.toISOString().substring(0, 10);
-    res.render("assignments/edit");
-  } catch (e) {
-    routeError(res, e);
-  }
-});
-router.get("/edit/:assignmentID/", async (req, res) => {
-  try {
-    let renderObjs = {};
-    let sectionId = res.locals.sectionID;
-    let assignmentID = res.locals.assignmentID;
-    assignmentID = verify.validateMongoId(assignmentID);
-    let section = await courseDataFunctions.getSectionById(sectionId);
-    if (!section) {
-      throw new Error("Section not found");
-    }
-    renderObjs.section = section;
-    let assignment = await assignmentDataFunctions.getAssignmentById(
-      assignmentID
-    );
-    if (!assignment) {
-      throw new Error("Assignment not found");
-    }
     res.render("assignments/edit", renderObjs);
   } catch (e) {
     routeError(res, e);
@@ -386,7 +367,10 @@ router.post("/view/:assignmentID/scores", async (req, res) => {
 
 router.get("/view/:assignmentID", async (req, res) => {
   try {
-    res.render("assignments/view");
+    let renderObjs = {};
+    renderObjs.script = "assignments/view";
+
+    res.render("assignments/view", renderObjs);
   } catch (e) {
     routeError(res, e);
   }

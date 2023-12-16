@@ -123,6 +123,9 @@
             });
         });
     </script>
+    {{#if script}}
+    {{> (lookup . 'script') }}
+    {{/if}}
 </body>
 
 </html>
