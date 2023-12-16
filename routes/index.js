@@ -13,7 +13,6 @@ import logout from "./users/logout.js";
 import dashboard from "./dashboard.js";
 import user_management from "./administration/users.js";
 import courses from "./courses/courses.js";
-import workspace from "./workspace/workspace.js";
 import sections from "./sections/sections.js";
 
 function route(app) {
@@ -40,7 +39,6 @@ function route(app) {
   app.use("/download", downloads);
   app.use("/courses", courses);
   app.use("/sections", sections);
-  app.use("/workspace", workspace);
 }
 
 export default route;
