@@ -72,10 +72,16 @@ const gtHelper = function (a, b) {
   return a > b;
 };
 
+const gtD = function (a, b) {
+  const x = new Date(a);
+  const y = new Date(b);
+  return x > y;
+};
+
 const handlebars = exphbs.create({
   defaultLayout: "main",
   partialsDir: ["views/partials/"],
-  helpers: { eq: eqHelper, gt: gtHelper },
+  helpers: { eq: eqHelper, gt: gtHelper, gtD: gtD },
 });
 
 app.engine("handlebars", handlebars.engine);

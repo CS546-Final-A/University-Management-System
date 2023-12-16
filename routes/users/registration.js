@@ -85,7 +85,7 @@ router.patch("/setpassword", async (req, res) => {
 
 router.get("/:registrationcode", async (req, res) => {
   if (req.session.registrationuserid) {
-    return res.redirect("/register/setpassword");
+    return res.redirect("/register/setpassword/");
   }
   try {
     const registrationcode = verify.UUID(req.params.registrationcode);
@@ -104,7 +104,7 @@ router.get("/:registrationcode", async (req, res) => {
 
 router.post("/:registrationcode", async (req, res) => {
   if (req.session.registrationuserid) {
-    return res.redirect("/register/setpassword");
+    return res.redirect("/register/setpassword/");
   }
   let user;
   try {
@@ -120,7 +120,7 @@ router.post("/:registrationcode", async (req, res) => {
     user.identification.number === idnum
   ) {
     req.session.registrationuserid = user._id;
-    return res.redirect("/register/setpassword");
+    return res.redirect("/register/setpassword/");
   } else {
     res.render("public/registration", {
       identification: identification.type,

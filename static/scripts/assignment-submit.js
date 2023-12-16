@@ -5,6 +5,13 @@ $(document).ready(function () {
       e.preventDefault();
 
       const myFiles = document.getElementById("myFiles").files;
+
+      if (myFiles.length === 0) {
+        return alert("Please select a file");
+      }
+      if (myFiles.length > 1) {
+        return alert("Please select only one file");
+      }
       const formData = new FormData();
 
       Object.keys(myFiles).forEach((key) => {

@@ -7,6 +7,7 @@ import routeError from "../routeerror.js";
 import verify, { santizeInputs } from "../../data_validation.js";
 import { validateAssignment } from "../../data/assignments/assignmentsHelper.js";
 
+import belongsincourse from "../../data/courses/belongsincourse.js";
 import fileUpload from "express-fileupload";
 import path from "path";
 import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
@@ -68,13 +69,23 @@ router.post("/create", async (req, res) => {
       assignment.assignmentMaxScore
     );
     if (result == "success") {
-      res.redirect("/sections/" + sectionId + "/assignments");
+      res.redirect("/sections/" + sectionId + "/assignments/");
     }
   } catch (e) {
     routeError(res, e);
   }
 });
 
+router.use("/:action/:assignmentID", async (req, res, next) => {
+  if (await belongsincourse(req.session.userid, res.locals.sectionID)) {
+    next();
+  } else {
+    res.status(403);
+    res.render("public/error", {
+      error: "You are not enrolled in this course",
+    });
+  }
+});
 router.use("/:action/:assignmentID*", async (req, res, next) => {
   try {
     if (req.params.assignmentID) {
@@ -86,6 +97,11 @@ router.use("/:action/:assignmentID*", async (req, res, next) => {
       if (!res.locals.assignment) {
         throw { status: 404, message: "Assignment not found" };
       }
+      res.locals.assignment.assignmentDueDate = new Date(
+        res.locals.assignment.assignmentDueDate
+      )
+        .toISOString()
+        .substring(0, 10);
     }
     next();
   } catch (e) {
@@ -144,7 +160,7 @@ router.post("/edit/:assignmentID/", async (req, res) => {
     );
 
     res.redirect(
-      "/sections/" + sectionId + "/assignments/view/" + assignmentID
+      "/sections/" + sectionId + "/assignments/view/" + assignmentID + "/"
     );
   } catch (e) {
     routeError(res, e);
@@ -170,14 +186,17 @@ router.get("/delete/:assignmentID/", async (req, res) => {
       assignmentID
     );
 
-    res.redirect("/sections/" + sectionId + "/assignments");
+    res.redirect("/sections/" + sectionId + "/assignments/");
   } catch (e) {
     routeError(res, e);
   }
 });
 router.get("/view/:assignmentID/submit", async (req, res) => {
   try {
-    res.render("assignments/submit");
+    let renderObjs = {};
+    renderObjs.currentDate = new Date();
+
+    res.render("assignments/submit", renderObjs);
   } catch (e) {
     routeError(res, e);
   }
@@ -358,7 +377,7 @@ router.post("/view/:assignmentID/scores", async (req, res) => {
     );
 
     res.redirect(
-      `/sections/${sectionId}/assignments/view/${assignmentID}/scores`
+      `/sections/${sectionId}/assignments/view/${assignmentID}/scores/`
     );
   } catch (e) {
     routeError(res, e);
@@ -369,6 +388,8 @@ router.get("/view/:assignmentID", async (req, res) => {
   try {
     let renderObjs = {};
     renderObjs.script = "assignments/view";
+
+    renderObjs.currentDate = new Date().toString();
 
     res.render("assignments/view", renderObjs);
   } catch (e) {
