@@ -12,9 +12,12 @@
   --fadeGrey: #a1a1a147;
   --transparentColor: #00000000;
   --glassColor1: #ffffff40;
-  --glassColor2: #3b3b3b40;
+  --glassColor2: #29292936;
   --activeGlassColor: var(--glassColor1);
   --toastRed1: #e84848;
+  --shadowCol1: #5959594f;
+  --shadowCol2: #2c2c2c4f;
+  --activeShadowcolor: var(--shadowCol1);
 }
 
 body {
@@ -28,7 +31,7 @@ body {
   background-repeat: repeat;
   background-size: 10%;
   background-color: var(--activeBgColor);
-  transition: all 300ms linear;
+  transition: all 0.2s linear;
 }
 
 .start-header {
@@ -84,7 +87,7 @@ body {
 .nav-link {
   color: var(--activeTextColor) !important;
   font-weight: 500;
-  transition: all 200ms linear;
+  transition: all 0.2s linear;
 }
 .nav-item:hover .nav-link {
   color: #8167a9 !important;
@@ -106,7 +109,7 @@ body {
   content: "";
   background-color: #8167a9;
   opacity: 0;
-  transition: all 200ms linear;
+  transition: all 0.2s linear;
 }
 .nav-item:hover:after {
   bottom: 0;
@@ -118,14 +121,14 @@ body {
 }
 .nav-item {
   position: relative;
-  transition: all 200ms linear;
+  transition: all 0.2s linear;
   margin-top: auto !important;
   margin-bottom: auto !important;
 }
 
 .bg-light {
   background-color: var(--activeBgColor) !important;
-  transition: all 200ms linear;
+  transition: all 0.2s linear;
 }
 .section {
   position: relative;
@@ -157,15 +160,15 @@ p {
 
 h1 span {
   display: inline-block;
-  transition: all 300ms linear;
+  transition: all 0.2s linear;
   opacity: 1;
 }
 
 #switch,
 #circle {
   cursor: pointer;
-  -webkit-transition: all 300ms linear;
-  transition: all 300ms linear;
+  -webkit-transition: all 0.2s linear;
+  transition: all 0.2s linear;
 }
 #switch {
   width: 40px;
@@ -178,7 +181,7 @@ h1 span {
   text-align: center;
   opacity: 1;
   transform: translate(0);
-  transition: all 300ms linear;
+  transition: all 0.2s linear;
 }
 
 #circle {
@@ -202,14 +205,18 @@ h1 span {
   position: absolute;
   inset: 0px 0px auto auto;
   margin: 0px;
+  color: var(--activeTextcolor);
+  background-color: var(--activeBgColor);
   transform: translate3d(0px, 62px, 0px);
-  transition: all 200ms linear;
+  transition: background-color 0.2s linear, opacity 0.2s linear;
 }
+
 .nav-item .dropdown-menu.show {
   opacity: 1;
   visibility: visible;
   transform: translate3d(0px, 62px, 0px);
 }
+
 .dropdown-toggle::after {
   display: none;
 }
@@ -342,9 +349,9 @@ input.autofill:active::after {
 
 .glassEffect {
   background-color: var(--activeGlassColor) !important;
-  box-shadow: 0 0px 15px #0000004d !important;
-  backdrop-filter: blur(1.5px);
-  -webkit-backdrop-filter: blur(1.5px);
+  box-shadow: 0 2px 10px var(--activeShadowcolor) !important;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   border: 1px solid #ffffff73;
 }
 
@@ -364,4 +371,42 @@ a:hover,
 a:focus {
   color: inherit;
   text-decoration: none;
+}
+
+.searchData {
+  border-bottom: 1px solid var(--activeTextColor);
+  transition: all 0.2s linear;
+}
+
+.searchData:hover {
+  background-color: #95959555;
+}
+
+.btn-success {
+  background-color: #aff69d !important;
+  color: black !important;
+  opacity: 1 !important;
+}
+
+.btn-danger {
+  background-color: #ff7676 !important;
+  color: black !important;
+  opacity: 1 !important;
+}
+
+.btn-warning {
+  background-color: #f9de92 !important;
+  color: black !important;
+  opacity: 1 !important;
+}
+
+.btn-info {
+  background-color: #6cc8ec !important;
+  color: black !important;
+  opacity: 1 !important;
+}
+
+.modal-backdrop.show {
+  background-color: var(--activeBgColor) !important;
+  opacity: 0.6 !important;
 }
