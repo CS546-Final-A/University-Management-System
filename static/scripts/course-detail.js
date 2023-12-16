@@ -22,7 +22,7 @@ const sectionSubmit = async (event) => {
     document.getElementById("sectionDescription").value;
   try {
     if (sectionStartTime >= sectionEndTime) {
-      setError("Start time must be before end time.");
+      setError("Start time must be before end time.", "error");
       return;
     }
     let requestData = {
@@ -63,9 +63,9 @@ const sectionSubmit = async (event) => {
   } catch (e) {
     document.getElementById("error").innerText = "";
     if (e.error) {
-      setError(e.error);
+      setError(e.error, "error");
     } else {
-      setError(e.message);
+      setError(e.message, "error");
     }
   }
 };
@@ -96,8 +96,13 @@ const editSection = async (sectionId) => {
     document.getElementById("sectionDescription").value =
       section.sectionDescription;
     $("#addSectionModal").modal("toggle");
-  } catch (error) {
-    console.log(error.message);
+  } catch (e) {
+    document.getElementById("tableError").innerText = "";
+    if (e.error) {
+      setError(e.error, "tableError");
+    } else {
+      setError(e.message, "tableError");
+    }
   }
 };
 
@@ -110,10 +115,17 @@ const deleteSection = async (sectionId) => {
     if (deleteInfo?.error) {
       document.getElementById("error").innerText = result.error;
     } else if (deleteInfo?.acknowledged) {
+      const errdiv = document.getElementById("tableError");
+      errdiv.innerText = "";
       window.location.href = "/courses/" + deleteInfo.courseId;
     }
-  } catch (error) {
-    console.log(error.message);
+  } catch (e) {
+    document.getElementById("tableError").innerText = "";
+    if (e.error) {
+      setError(e.error, "tableError");
+    } else {
+      setError(e.message, "tableError");
+    }
   }
 };
 
@@ -124,20 +136,54 @@ const enrollSection = async (sectionId) => {
     const enrollSection = `/courses/${sectionId}/enroll`;
     enrollInfo = await request("GET", enrollSection, csrf);
     const courseId = document.getElementById("courseId").value;
-    // if (enrollInfo?.error) {
-    //   document.getElementById("error").innerText = result.error;
-    // } else 
+    if (enrollInfo?.error) {
+      document.getElementById("tableError").innerText = result.error;
+      // setError(result.error, "tableError");
+    } else 
     if (enrollInfo?.acknowledged) {
+      const errdiv = document.getElementById("tableError");
+      errdiv.innerText = "";
       window.location.href = "/courses/" + courseId;
     }
-  } catch (error) {
-    console.log(error.message);
+  } catch (e) {
+    document.getElementById("tableError").innerText = "";
+    if (e.error) {
+      setError(e.error, "tableError");
+    } else {
+      setError(e.message, "tableError");
+    }
   }
 };
 
-function setError(error) {
+const discardSection = async (sectionId) => {
+  const csrf = document.getElementById("csrf").value;
+  let discardInfo;
+  try {
+    const discardSection = `/courses/${sectionId}/discard`;
+    discardInfo = await request("GET", discardSection, csrf);
+    const courseId = document.getElementById("courseId").value;
+    if (discardInfo?.error) {
+      document.getElementById("tableError").innerText = result.error;
+      // setError(result.error, "tableError");
+    } else 
+    if (discardInfo?.acknowledged) {
+      const errdiv = document.getElementById("tableError");
+      errdiv.innerText = "";
+      window.location.href = "/courses/" + courseId;
+    }
+  } catch (e) {
+    document.getElementById("tableError").innerText = "";
+    if (e.error) {
+      setError(e.error, "tableError");
+    } else {
+      setError(e.message, "tableError");
+    }
+  }
+};
+
+function setError(error, id) {
   // Reset the fadout animation and overwrite text
-  const errdiv = document.getElementById("error");
+  const errdiv = document.getElementById(id);
   errdiv.innerText = error;
   errdiv.style.animationName = "";
   errdiv.offsetHeight;

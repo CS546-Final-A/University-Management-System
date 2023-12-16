@@ -1,7 +1,8 @@
+<link rel="stylesheet" href="/styles/error.css">
 <div class="container mt-5">
     <input type="hidden" id="csrf" value="{{_csrf}}">
     {{#each courses}}
-    <input type="text" class="form-control" id="courseId" name="courseId" hidden value="{{courseId}}">
+    <input type="text" class="form-control" id="courseId" name="courseId" hidden value="{{this.courseId}}">
     <div class="card mb-4 w-100" style="display: flex; flex-direction: column;">
         <div class="card-header">
             <h2>{{this.courseNumber}} : {{this.courseName}}</h2>
@@ -42,7 +43,7 @@
                             </thead>
                             <tbody>
                                 {{#each this.sections}}
-                                <tr>
+                                <tr style="{{#if this.isEnrolled}}background-color: #abcdef;{{/if}}">
                                     <td>{{this.sectionName}}</td>
                                     <td>{{this.sectionInstructor.name}}</td>
                                     <td>{{this.sectionType}}</td>
@@ -66,7 +67,9 @@
 
                                     {{#if this.isEnrolled}}
 
-                                    <td>Enrolled</td>
+                                    <td>
+                                        <button class="btn btn-danger" onclick="discardSection('{{this.sectionId}}')">Discard</button>
+                                    </td>
                                     {{else}}
                                     {{#if (gt this.sectionCapacity this.enrolledStudents.length)}}
                                     <td><button class="btn btn-primary"
@@ -81,6 +84,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <div id="tableError" style="color: red;"></div>
                 </div>
             </div>
         </div>

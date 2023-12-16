@@ -86,10 +86,12 @@ router.post("/registration", async (req, res) => {
 router.get("/:courseId", async (req, res) => {
   const { courseId } = req.params;
   try {
+    let userId = verify.validateMongoId(req.session.userid)
     let data = await courseDataFunctions.getCourseById(courseId);
     data.forEach((course) => {
+      course.courseId = course._id.toString();
       course.sections.forEach((section) => {
-        if (section.enrolledStudents?.includes(req.session.userid)) {
+        if (section.enrolledStudents?.some(studentId => studentId.equals(userId))) {
           section.isEnrolled = true;
         }
       });
@@ -171,6 +173,16 @@ router.get("/:sectionId/enroll", async (req, res) => {
   const { sectionId } = req.params;
   try {
     await courseDataFunctions.enrollSection(sectionId, req.session.userid);
+    res.json({ acknowledged: true });
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
+});
+
+router.get("/:sectionId/discard", async (req, res) => {
+  const { sectionId } = req.params;
+  try {
+    await courseDataFunctions.discardSection(sectionId, req.session.userid);
     res.json({ acknowledged: true });
   } catch (error) {
     res.status(error.status || 500).json({ error: error.message });

@@ -623,6 +623,7 @@ export const deleteSection = async (sectionId) => {
 
 export const enrollSection = async (sectionId, userId) => {
   sectionId = verify.validateMongoId(sectionId, "sectionId");
+  userId = verify.validateMongoId(userId, "userId");
 
   const courseCollection = await courses();
   const course = await courseCollection.findOne({
@@ -636,16 +637,81 @@ export const enrollSection = async (sectionId, userId) => {
   const section = course.sections.find(
     (section) => section.sectionId.toString() === sectionId.toString()
   );
+
+  // Capacity Check
   if (section?.enrolledStudents?.length >= section.sectionCapacity) {
     throwErrorWithStatus(400, `Section is at maximum capacity. Cannot enroll.`);
   }
-
+  // Enrollment Check
   if (section.enrolledStudents.includes(userId)) {
     throwErrorWithStatus(400, `User is already enrolled in this section.`);
+  }
+  const userCollection = await users();
+  const user = await userCollection.findOne({
+    _id: userId,
+    type: "Student",
+  });
+  if (!user) {
+    throwErrorWithStatus(400, `User is not a student. Cannot enroll.`);
+  }
+
+  // Section Enrollment Check
+  const enrolledInSection = course.sections.find((s) =>
+    user.registeredCourses.includes(s.sectionId.toString())
+  );
+
+  if (enrolledInSection) {
+    throwErrorWithStatus(
+      400,
+      `User is already enrolled in a section within this course. Cannot enroll.`
+    );
+  }
+
+  // Time check
+  const conflictingSections = await userCollection
+    .find({
+      _id: userId,
+      registeredCourses: { $in: course.sections.map((s) => s.sectionId) },
+    })
+    .toArray();
+
+  for (const enrolledSection of conflictingSections) {
+    for (const enrolledSectionId of enrolledSection.registeredCourses) {
+      const enrolledCourse = await courseCollection.findOne({
+        "sections.sectionId": enrolledSectionId,
+      });
+
+      const enrolledSectionInCourse = enrolledCourse?.sections?.find(
+        (s) => s.sectionId.toString() === enrolledSectionId.toString()
+      );
+      if (
+        enrolledSectionInCourse &&
+        enrolledSectionInCourse.sectionDay === section.sectionDay &&
+        isTimeSlotOverlap(
+          section.sectionStartTime,
+          section.sectionEndTime,
+          enrolledSectionInCourse.sectionStartTime,
+          enrolledSectionInCourse.sectionEndTime
+        )
+      ) {
+        throwErrorWithStatus(
+          400,
+          `User is already enrolled in a conflicting time slot. Cannot enroll.`
+        );
+      }
+    }
   }
 
   section.enrolledStudents.push(userId);
 
+  await userCollection.updateOne(
+    { _id: userId },
+    {
+      $push: {
+        registeredCourses: sectionId.toString(),
+      },
+    }
+  );
   const updateResult = await courseCollection.updateOne(
     { "sections.sectionId": sectionId },
     {
@@ -658,6 +724,64 @@ export const enrollSection = async (sectionId, userId) => {
   if (updateResult.modifiedCount !== 1) {
     throwErrorWithStatus(400, `Failed to enroll user.`);
   }
+};
+
+export const discardSection = async (sectionId, userId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  userId = verify.validateMongoId(userId, "userId");
+
+  const courseCollection = await courses();
+  const userCollection = await users();
+
+  const course = await courseCollection.findOne({
+    "sections.sectionId": sectionId,
+  });
+
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+
+  const section = course.sections.find(
+    (section) => section.sectionId.toString() === sectionId.toString()
+  );
+
+  if (
+    !section.enrolledStudents.some(
+      (enrolledUserId) => enrolledUserId.toString() === userId.toString()
+    )
+  ) {
+    throwErrorWithStatus(400, `User is not enrolled in this section.`);
+  }
+
+  await userCollection.updateOne(
+    { _id: userId },
+    {
+      $pull: {
+        registeredCourses: sectionId.toString(),
+      },
+    }
+  );
+
+  section.enrolledStudents = section.enrolledStudents.filter(
+    (enrolledUserId) => enrolledUserId.toString() !== userId.toString()
+  );
+
+  const updateResult = await courseCollection.updateOne(
+    { "sections.sectionId": sectionId },
+    {
+      $set: {
+        "sections.$": section,
+      },
+    }
+  );
+
+  if (updateResult.modifiedCount !== 1) {
+    throwErrorWithStatus(400, `Failed to discard user from the section.`);
+  }
+};
+
+const isTimeSlotOverlap = (start1, end1, start2, end2) => {
+  return !(end1 < start2 || start1 > end2);
 };
 
 export const getUniqueSectionYearandSemester = async () => {
