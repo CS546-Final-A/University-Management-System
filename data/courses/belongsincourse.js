@@ -7,6 +7,10 @@ async function belongsincourse(userid, sectionid) {
   sectionid = verify.validateMongoId(sectionid);
   const section = await getSectionById(sectionid);
 
+  if (!section) {
+    throw { status: 404, message: "Invalid section" };
+  }
+
   if (section.sectionInstructor.toString() === userid.toString()) {
     return true;
   }

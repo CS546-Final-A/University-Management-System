@@ -2,9 +2,12 @@ import { Router, query } from "express";
 import verify, { santizeInputs } from "../../data_validation.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 import assignmentRoutes from "./assignments.js";
+import { computeGradeByUserID } from "../../data/submissions/computeGrades.js";
+import { getAssignmentsBySectionId } from "../../data/assignments/assignments.js";
 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import routeError from "../routeerror.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -41,11 +44,44 @@ router.use("/:sectionID*", async (req, res, next) => {
 });
 
 router.use("/:sectionID/grades", async (req, res) => {
-  if (req.sesssion.type !== "student") {
-    res.status(403);
-    return res.render("public/error", {
-      error: "You are not a student",
+  try {
+    if (req.session.type !== "Student") {
+      res.status(403);
+      return res.render("public/error", {
+        error: "You are not a student",
+      });
+    }
+    const assignments = await getAssignmentsBySectionId(res.locals.sectionID);
+    const finalgrades = await computeGradeByUserID(
+      res.locals.sectionID,
+      req.session.userid
+    );
+
+    if (!assignments) {
+      throw (
+        "Assignments returned " +
+        assignments +
+        " which is not an expected return type"
+      );
+    }
+
+    for (let assignment of assignments) {
+      assignment.scores = assignment.scores.find((markObj) => {
+        return markObj.studentId.toString() === req.session.userid;
+      });
+      if (!assignment.scores) {
+        assignment.scores = "N/A";
+      } else {
+        assignment.scores = assignment.scores.score.toString();
+      }
+    }
+
+    res.render("assignments/students/grades", {
+      assignments: assignments,
+      grades: finalgrades,
     });
+  } catch (e) {
+    routeError(res, e);
   }
 });
 

@@ -1,21 +1,21 @@
 import { users, assignments } from "../../config/mongoCollections.js";
-import { verify } from "../../data_validation.js";
+import verify from "../../data_validation.js";
 
 function gradeForStudent(studentid, assignmentdata) {
-  let marks = 0;
-  let maxmarks = 0;
+  let score = 0;
+  let maxscore = 0;
 
   for (let assignment of assignmentdata) {
-    const score = assignment.marks.find((markObj) => {
+    const mark = assignment.scores.find((markObj) => {
       return markObj.studentId === studentid;
     });
-    if (score) {
-      marks = marks + assignment.assignmentWeight * score.score;
+    if (mark) {
+      score = score + assignment.assignmentWeight * mark.score;
+      maxscore =
+        maxscore + assignment.assignmentWeight * assignment.assignmentMaxScore;
     }
-    maxmarks =
-      maxmarks + assignment.assignmentWeight * assignment.assignmentMaxScore;
   }
-  return (marks / maxmarks) * 100;
+  return (score / maxscore) * 100;
 }
 
 async function computeGradeByUserID(sectiondID, studentid) {
@@ -24,17 +24,19 @@ async function computeGradeByUserID(sectiondID, studentid) {
 
   const assignmentcol = await assignments();
 
-  const assignmentdata = await assignmentcol.findMany(
-    {},
-    {
-      projection: {
-        _id: 0,
-        marks: 1,
-        assignmentWeight: 1,
-        assignmentMaxScore: 1,
-      },
-    }
-  );
+  const assignmentdata = await assignmentcol
+    .find(
+      {},
+      {
+        projection: {
+          _id: 0,
+          scores: 1,
+          assignmentWeight: 1,
+          assignmentMaxScore: 1,
+        },
+      }
+    )
+    .toArray();
 
   return gradeForStudent(studentid, assignmentdata);
 }
@@ -45,24 +47,28 @@ async function computeClassGrades(sectiondID) {
   const usercol = await users();
   const assignmentcol = await assignments();
 
-  const students = await usercol.findMany(
-    {
-      registeredCourses: sectiondID.toString(),
-    },
-    { projection: { _id: 1 } }
-  );
-
-  const assignmentdata = await assignmentcol.findMany(
-    {},
-    {
-      projection: {
-        _id: 0,
-        marks: 1,
-        assignmentWeight: 1,
-        assignmentMaxScore: 1,
+  const students = await usercol
+    .find(
+      {
+        registeredCourses: sectiondID.toString(),
       },
-    }
-  );
+      { projection: { _id: 1 } }
+    )
+    .toArray();
+
+  const assignmentdata = await assignmentcol
+    .find(
+      {},
+      {
+        projection: {
+          _id: 0,
+          scores: 1,
+          assignmentWeight: 1,
+          assignmentMaxScore: 1,
+        },
+      }
+    )
+    .toArray();
 
   const classgrades = {};
 

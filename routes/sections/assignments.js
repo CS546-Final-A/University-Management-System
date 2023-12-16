@@ -401,12 +401,6 @@ router.get("/", async (req, res) => {
   try {
     let renderObjs = {};
     let sectionId = res.locals.sectionID;
-    sectionId = verify.validateMongoId(sectionId);
-    let section = await courseDataFunctions.getSectionById(sectionId);
-    if (!section) {
-      throw new Error("Section not found");
-    }
-    renderObjs.section = section;
     let assignments = await assignmentDataFunctions.getAssignmentsBySectionId(
       sectionId
     );
