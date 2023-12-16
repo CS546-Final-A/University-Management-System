@@ -1,59 +1,41 @@
-<div class="container-fluid">
-    <h2>Modules</h2>
-    {{#if (eq userType "Professor")}}
-    <button class="btn btn-info" id="addModuleButton" data-bs-toggle="modal" data-bs-target="#exampleModal">New
-        Module</button>
+<h2>Modules</h2>
+{{#if (eq userType "Professor")}}
+<button id="addModuleButton">Add new module</button>
+<form id="moduleForm" style="display: none;">
+    <input type="text" id="moduleName" placeholder="Module Name">
+    <input type="text" id="moduleDesc" placeholder="Module Description">
+    <input type="date" id="moduleDate">
+    <button type="submit">Submit</button>
+</form>
+{{/if}}
 
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glassEffect">
-                <div class="modal-header glassEffect">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">New Module</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="moduleForm" style="display: none;">
-                        <div class="form-floating mb-3">
-                            <input class="form-control" type="text" id="moduleName" placeholder="" />
-                            <label for="#moduleName">Name</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input class="form-control" type="text" id="moduleDesc" placeholder="">
-                            <label for="moduleDesc">Description</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input class="form-control" type="date" id="moduleDate">
-                            <label for="#moduleDate">Date</label>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="moduleFormBtn" type="submit" class="btn btn-info">Submit</button>
-                </div>
-            </div>
+{{#each modules}}
+<div class="card my-4 glassEffect">
+    <div class="card-header d-flex">
+        <div class="my-auto">{{this.moduleName}}</div>
+        <div class="ms-auto"><button class="btnSubmit p-2">
+                <a href="/workspace/{{../sectionID}}/modules/{{this.moduleId}}/attendance">Attendance</a></button>
         </div>
     </div>
-    {{/if}}
 
-    {{#each modules}}
-    <div class="card my-4 glassEffect">
-        <div class="card-header glassEffect d-flex">
-            <div class="my-auto">{{this.moduleName}}</div>
-            <div class="my-auto fs-6 ms-3">({{this.moduleDate}})</div>
-            <div class="ms-auto"><button class="btnSubmit p-2">
-                    <a href="/workspace/{{../sectionID}}/modules/{{this.moduleId}}/attendance">Attendance</a></button>
-            </div>
-        </div>
-
-        <div class="card-body">
-            <div class="card-title">{{this.moduleDescription}}</div>
-        </div>
-
+    <div class="card-body">
+        <div class="card-title">{{this.moduleDescription}}</div>
+        {{this.moduleDate}}
     </div>
-    {{/each}}
+
 </div>
+{{/each}}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -62,7 +44,7 @@
         document.getElementById('moduleForm').style.display = 'block';
     });
 
-    document.getElementById('moduleFormBtn').addEventListener('click', async (e) => {
+    document.getElementById('moduleForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const moduleName = document.getElementById('moduleName').value;
@@ -96,5 +78,7 @@
             console.error('Error:', error);
         }
     });
+
+
 
 </script>

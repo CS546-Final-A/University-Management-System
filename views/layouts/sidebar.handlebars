@@ -30,17 +30,12 @@
                         </button>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/dashboard">
-                            <span class="fs-5 position-relative" id="homeText">Dashboard</span>
+                        <a class="nav-link" href="/">
+                            <span class="fs-5 position-relative" id="homeText">Home</span>
                         </a>
                     </li>
 
                     {{#if session_name}}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/courses/">
-                            <span class="fs-5 position-relative" id="coursesText">Courses</span>
-                        </a>
-                    </li>
                     <li class="nav-item ms-auto dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             data-bs-auto-close="outside" aria-expanded="false"><img src="/icons/user-circle.svg"
@@ -74,9 +69,13 @@
 
     <div class="wrapper">
         <!-- Sidebar  -->
-        <nav id="sidebar" class="glassEffect">
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>{{sideBarTitle}}</h3>
+            </div>
+
             <ul class="list-unstyled components">
-                <li class="py-1">
+                <li class="active py-1">
                     <a class="hover" href="/workspace/{{sectionID}}"><span></span><text>Home</text></a>
                 </li>
                 <li class="py-1">
@@ -111,6 +110,7 @@
             </div>
         </div>
     </div>
+
 
 
     <!-- JS Imports -->

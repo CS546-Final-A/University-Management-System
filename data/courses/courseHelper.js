@@ -50,6 +50,8 @@ export const validateSection = (
   sectionEndTime,
   sectionDay,
   sectionCapacity,
+  sectionYear,
+  sectionSemester,
   sectionLocation,
   sectionDescription
 ) => {
@@ -61,6 +63,8 @@ export const validateSection = (
     !sectionEndTime |
     !sectionDay |
     !sectionCapacity |
+    !sectionYear |
+    !sectionSemester |
     !sectionLocation |
     !sectionDescription
   ) {
@@ -74,6 +78,8 @@ export const validateSection = (
   sectionEndTime = verify.time(sectionEndTime, "sectionEndTime");
   sectionDay = verify.day(sectionDay, "sectionDay");
   sectionCapacity = verify.numberInteger(sectionCapacity, "sectionCapacity");
+  sectionYear = verify.year(sectionYear);
+  sectionSemester = verify.semester(sectionSemester, "sectionSemester");
   sectionLocation = verify.string(sectionLocation, "sectionLocation");
   sectionDescription = verify.string(sectionDescription, "sectionDescription");
 
@@ -85,6 +91,8 @@ export const validateSection = (
     sectionEndTime,
     sectionDay,
     sectionCapacity,
+    sectionYear,
+    sectionSemester,
     sectionLocation,
     sectionDescription,
   };

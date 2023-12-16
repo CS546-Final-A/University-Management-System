@@ -141,17 +141,26 @@ const verify = {
     }
 
     const hr = timeSplit[0];
-    const min = timeSplit[1];
+    const min = timeSplit[1].substring(0, 2);
+    const period = timeSplit[1].substring(2);
+
+    if (period.length !== 3 || period[0] !== " ")
+      throwerror(`Invalid period in ${timeName}`);
 
     if (isNaN(parseInt(hr))) throwerror(`Invalid hour in ${timeName}`);
 
     if (
-      (parseInt(hr) < 0 || parseInt(hr) > 23)
+      (parseInt(hr) < 10 && hr.length > 1) ||
+      parseInt(hr) < 1 ||
+      parseInt(hr) > 12
     )
       throwerror(`Invalid hour in ${timeName}`);
 
     if (isNaN(min) || min < 0 || min > 59)
       throwerror(`Invalid minutes in ${timeName}`);
+
+    if (period.trim() !== "PM" && period.trim() !== "AM")
+      throwerror(`Invalid period in ${timeName}`);
 
     return time;
   },
@@ -226,7 +235,7 @@ const verify = {
   },
   isAlphaString: (string, stringName) => {
     string = verify.string(string, stringName);
-    if (!/^[A-Za-z]+$/.test(string)) {
+    if (!/^[a-zA-Z ]*$/.test(string)) {
       throwerror(`${stringName} should only have alphabets`);
     }
     return string;
