@@ -1,5 +1,5 @@
 import { Router, query } from "express";
-import { santizeInputs } from "../../data_validation.js";
+import verify, { santizeInputs } from "../../data_validation.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
 import util from "util";
 import {
@@ -57,7 +57,7 @@ router.post("/registration", async (req, res) => {
       courseCredits,
       courseDescription,
       courseSemester,
-      courseYear,
+      courseYear
     );
     let result = await courseDataFunctions.registerCourse(
       course.courseNumber,
@@ -68,7 +68,7 @@ router.post("/registration", async (req, res) => {
       course.courseSemester,
       course.courseYear
     );
-    if (result.acknowledged) { 
+    if (result.acknowledged) {
       // window.location.href = "/courses/" + result.insertedId;
       return res.json(result);
     }
@@ -86,14 +86,31 @@ router.post("/registration", async (req, res) => {
 router.get("/:courseId", async (req, res) => {
   const { courseId } = req.params;
   try {
+    let userId = verify.validateMongoId(req.session.userid)
     let data = await courseDataFunctions.getCourseById(courseId);
-    // res.send(data);
-    // console.log("in");
-
-    // console.log(util.inspect(data, { showHidden: false, depth: null }));
-
-    // console.log("out");
-    res.render("courses/courseDetails", { courses: data });
+    data.forEach((course) => {
+      course.courseId = course._id.toString();
+      course.sections.forEach((section) => {
+        if (section.enrolledStudents?.some(studentId => studentId.equals(userId))) {
+          section.isEnrolled = true;
+        }
+      });
+    });
+    let renderObjs = {
+      userId: req.session.userid,
+      name: req.session.name,
+      type: req.session.type,
+      email: req.session.email,
+      courseId,
+      courses: data,
+      script: "courses/detail",
+    };
+    if (renderObjs.type === "Admin") {
+      renderObjs.instructors =
+        await courseDataFunctions.getUniqueInstructorNamesandId();
+      renderObjs.instructors.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    res.render("courses/detail", renderObjs);
   } catch (e) {
     if (e.status !== 500 && e.status) {
       res.status(e.status);
@@ -104,9 +121,6 @@ router.get("/:courseId", async (req, res) => {
       res.json({ error: "Login error" });
     }
   }
-  // res.render("courses/course", {
-  //   course: data,
-  // });
 });
 
 router.get("/:year/:semester/listings", async (req, res) => {
@@ -153,6 +167,26 @@ router.get("/:year/:semester/listings", async (req, res) => {
     script: "courses/listings",
   };
   res.render("courses/listings", renderObjs);
+});
+
+router.get("/:sectionId/enroll", async (req, res) => {
+  const { sectionId } = req.params;
+  try {
+    await courseDataFunctions.enrollSection(sectionId, req.session.userid);
+    res.json({ acknowledged: true });
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
+});
+
+router.get("/:sectionId/discard", async (req, res) => {
+  const { sectionId } = req.params;
+  try {
+    await courseDataFunctions.discardSection(sectionId, req.session.userid);
+    res.json({ acknowledged: true });
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
 });
 
 export default router;
