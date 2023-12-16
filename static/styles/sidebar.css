@@ -29,8 +29,8 @@
   min-width: 250px;
   max-width: 250px;
   height: 100vh;
-  background: #fff0;
-  color: var(--activeTextColor);
+  background: #252525;
+  color: #fff;
   transition: all 0.3s;
 }
 
@@ -40,7 +40,7 @@
 
 #sidebar .sidebar-header {
   padding: 20px;
-  background: #fff0;
+  background: #252525;
 }
 
 #sidebar ul.components {
@@ -61,13 +61,21 @@
 }
 
 #sidebar ul li.active > a {
-  color: var(--activeBgColor);
-  background: var(--activeTextColor);
+  color: #fff;
+  background: #8f425a;
 }
 
 a[data-toggle="collapse"] {
   position: relative;
 }
+
+/* .dropdown-toggle::after {
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+} */
 
 ul ul a {
   font-size: 0.9em !important;
@@ -88,19 +96,17 @@ ul.CTAs a {
 
 a.download {
   background: #fff;
-  color: #fff0;
+  color: #252525;
 }
 
 a.article,
 a.article:hover {
-  background: #fff0 !important;
+  background: #252525 !important;
   color: #fff !important;
 }
 
 .components li a {
-  /* border-top-right-radius: 90px;
-  border-bottom-right-radius: 90px; */
-  border-radius: 90px;
+  border-radius: 30px;
 }
 
 /* ---------------------------------------------------
@@ -135,7 +141,7 @@ a.article:hover {
 }
 
 .hamIcon::after {
-  background-color: #fff0;
+  background-color: transparent;
 }
 
 .hamburger .line {
@@ -194,7 +200,7 @@ a.article:hover {
   box-sizing: border-box;
   width: 55px;
   height: 55px;
-  border: 3px solid #fff0;
+  border: 3px solid transparent;
   top: -11px;
   left: -11px;
   border-radius: 100%;
@@ -237,8 +243,8 @@ a.article:hover {
   --time: 0.5s;
   position: relative;
 
-  color: var(--activeTextColor);
-  background: var(--activeBgColor);
+  color: #ffffff;
+  background: #222;
   overflow: hidden;
   border-bottom-left-radius: var(--border-radius);
   border-bottom-right-radius: var(--border-radius);
@@ -253,7 +259,7 @@ a.article:hover {
 }
 
 .hover:hover text {
-  color: var(--activeBgColor);
+  color: #000000;
 }
 
 .hover span {
@@ -265,7 +271,7 @@ a.article:hover {
   height: 0;
 
   border-radius: 100%;
-  background: var(--activeTextColor);
+  background: #ffffff;
 
   transform: translate(-50%, -50%);
   transition: width var(--time), padding-top var(--time);

@@ -3,7 +3,8 @@ async function request(method, target, csrf, data) {
   if (
     typeof method != "string" ||
     typeof target != "string" ||
-    typeof csrf != "string"
+    typeof csrf != "string" ||
+    (typeof data != "object" && typeof data != "undefined")
   ) {
     throw "Invalid arguments";
   }
@@ -13,26 +14,18 @@ async function request(method, target, csrf, data) {
   if (target.trim().length < 1) {
     throw "Invalid target";
   }
-  if(method !== "GET") {
-    if (typeof data != "object" && typeof data != "undefined") {
-      throw "Invalid arguments";
-    }
-  }
   method = method.trim().toUpperCase();
   target = target.trim();
 
   try {
-    const requestOptions = {
+    const response = await fetch(target, {
       method: method,
       headers: {
         "Content-type": "application/json; charset=utf-8",
         "X-CSRF-Token": csrf,
       },
-    };
-    if (methods.includes(method) && method !== "GET") {
-      requestOptions.body = JSON.stringify(data);
-    }
-    const response = await fetch(target, requestOptions);
+      body: JSON.stringify(data),
+    });
 
     if (response.ok) {
       let result = await response.text();

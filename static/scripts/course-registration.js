@@ -22,13 +22,14 @@ const courseSubmit = async () => {
     };
     
     const result = await request("POST", "/courses/registration", csrf, requestData);
+    console.log(result);
     if(result?.error) {
-      document.getElementById("error").innerText = result.error;
+      document.getElementById("status").innerText = result.error;
     } else if (result?.acknowledged) {
       window.location.href = "/courses/" + result.insertedId;
     }
   } catch (e) {
-    document.getElementById("error").innerText = "";
+    document.getElementById("status").innerText = "";
     if (e.error) {
       setError(e.error);
     } else {
