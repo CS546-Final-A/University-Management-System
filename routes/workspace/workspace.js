@@ -4,12 +4,15 @@ import {
   addStudentToAttendance,
   getAttendanceData,
 } from "../../data/attendance/attendance.js";
-import { addModuleToSection } from "../../data/modules/modules.js";
+import {
+  addModuleToSection,
+  getModuleById,
+  uploadMaterial,
+} from "../../data/modules/modules.js";
 import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
-import verify from "../../data_validation.js";
-
+import verify, { santizeInputs } from "../../data_validation.js";
 function getCurrentPosition() {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -132,6 +135,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 const toRadians = (degrees) => {
   return degrees * (Math.PI / 180);
 };
+
 router
   .route("/:sectionId/modules/:moduleId/attendance")
   .get(async (req, res) => {
@@ -302,3 +306,70 @@ router.route("/:sectionId/assignments").get(async (req, res) => {
 });
 
 export default router;
+
+router.post(
+  "/:sectionId/modules/:moduleId/upload",
+  fileUpload({ createParentPath: true }),
+  filesPayloadExists,
+  fileExtLimiter([".zip"]),
+  fileSizesLimiter,
+
+  async (req, res) => {
+    try {
+      req.body = santizeInputs(req.body);
+      let { sectionId, moduleId } = req.params;
+      let userId = req.session.userid;
+
+      const files = req.files;
+
+      userId = verify.validateMongoId(userId);
+      moduleId = verify.validateMongoId(moduleId);
+      let section = await courseDataFunctions.checkStudentInSection(
+        sectionId,
+        userId
+      );
+
+      if (!section) {
+        throw new Error("Section not found");
+      }
+
+      let module = await getModuleById(moduleId);
+
+      if (!module) {
+        throw new Error("Assignment not found");
+      }
+      let fileName = "";
+      Object.keys(files).forEach((key) => {
+        const filepath = path.join(
+          "files",
+          moduleId.toString(),
+          userId.toString(),
+          files[key].name
+        );
+        fileName = files[key].name;
+        console.log(filepath);
+        files[key].mv(filepath, (err) => {
+          if (err)
+            return res.status(500).json({ status: "error", message: err });
+        });
+      });
+
+      let material = await uploadMaterial(
+        moduleId,
+        Date.now().toString(),
+        fileName
+      );
+      res.send({ status: "success", message: "File is uploaded" });
+    } catch (e) {
+      if (e.status !== 500 && e.status) {
+        return res
+          .status(e.status)
+          .json({ status: "Error", message: e.message });
+      } else {
+        console.log(e);
+        res.status(500);
+        res.json({ error: "Login error" });
+      }
+    }
+  }
+);
