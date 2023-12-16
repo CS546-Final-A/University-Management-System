@@ -48,6 +48,7 @@ export async function createAssignment(
     );
   }
   assignmentValidated.submissions = [];
+  assignmentValidated.scores = [];
   const assignmentCollection = await assignments();
 
   const insertInfo = await assignmentCollection.insertOne(assignmentValidated);
@@ -92,36 +93,14 @@ export async function getAssignmentById(assignmentId) {
 export async function getAssignmentsBySectionId(sectionId) {
   sectionId = verify.validateMongoId(sectionId, "sectionId");
 
-  const courseCollection = await courses();
-  const section = await courseCollection.findOne(
-    {
-      sections: {
-        $elemMatch: { sectionId: sectionId },
-      },
-    },
-    {
-      $match: { "sections.sectionId": sectionId },
-      $sort: { assignmentDueDate: 1 },
-    }
-  );
-
-  if (!section) {
-    throwErrorWithStatus(400, "Invalid section id");
-  }
-
-  const assignmentIds = section.sections[0].assignments;
-
-  if (!assignmentIds) {
-    return [];
-  }
-
   const assignmentCollection = await assignments();
   const assignmentList = await assignmentCollection
-    .find({ _id: { $in: assignmentIds } })
+    .find({
+      assignmentSectionId: sectionId,
+    })
     .toArray();
-
   if (!assignmentList) {
-    throwErrorWithStatus(400, "Assignments not found");
+    throwErrorWithStatus(404, "Assignments not found");
   }
 
   for (let i = 0; i < assignmentList.length; i++) {

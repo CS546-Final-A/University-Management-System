@@ -1,0 +1,27 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Assignment Name</th>
+            <th scope="col">Due Date</th>
+            <th scope="col">Weight</th>
+            <th scope="col">Max Score</th>
+            <th scope="col">Your Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each assignments}}
+        <tr>
+            <td>{{this.assignmentName}}</td>
+            <td>{{this.assignmentDueDate}}</td>
+            <td>{{this.assignmentWeight}}</td>
+            <td>{{this.assignmentMaxScore}}</td>
+            <td>{{this.scores}}</td>
+            <td>
+                <a href="view/{{this._id}}/" class="btn btn-primary">View</a>
+
+        </tr>
+        {{/each}}
+
+    </tbody>
+
+</table>
