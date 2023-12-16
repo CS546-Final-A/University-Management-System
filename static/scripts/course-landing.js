@@ -32,7 +32,6 @@ $("#selectSemester").click(async function (e) {
   e.preventDefault();
   const year = $("#year").val();
   const semester = $("#semester").val();
-  // console.log(year, semester);
 
   window.location.href = `/courses/${year}/${semester}/listings/`;
 });

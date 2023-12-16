@@ -5,6 +5,13 @@
     opacity: 0%;
 }
 
+#tableError {
+    animation-duration: 4s;
+    animation-timing-function: linear;
+    color: red;
+    opacity: 0%;
+}
+
 @keyframes fadeout {
     0% {
         opacity: 100%;
