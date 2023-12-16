@@ -19,7 +19,7 @@ import path from "path";
 import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
 import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
 import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
-
+import * as courseDataFunctions from "../../data/courses/courses.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -62,7 +62,7 @@ router.use("/:sectionID*", async (req, res, next) => {
 router.route("/:sectionId").get(async (req, res) => {
   let renderObjs = {};
 
-  const section = await courseData.getSectionById(res.locals.sectionId);
+  const section = await courseData.getSectionById(res.locals.sectionID);
   const course = await courseData.getCourseById(section.courseId.toString());
 
   const profName = await getUserByID(section.sectionInstructor, {
@@ -155,7 +155,7 @@ router
   .route("/:sectionId/modules/:moduleId/attendance")
   .get(async (req, res) => {
     let renderObjs = {};
-    const { sectionId, moduleId } = req.params;
+    let { sectionId, moduleId } = req.params;
     let userId = req.session.userid;
     userId = verify.validateMongoId(userId);
     moduleId = verify.validateMongoId(moduleId);
