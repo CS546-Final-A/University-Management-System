@@ -68,7 +68,11 @@ async function computeGradeByUserID(sectiondID, studentid) {
     )
     .toArray();
 
-  return gradeForStudent(studentid, assignmentdata);
+  const grade = { grade: gradeForStudent(studentid, assignmentdata) };
+
+  grade.letterGrade = letterGrade(grade.grade);
+
+  return grade;
 }
 
 async function computeClassGrades(sectiondID) {
