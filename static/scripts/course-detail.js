@@ -189,8 +189,10 @@ function setError(error, id) {
 
   // $(".toast-body").css("background-color", toastRed2);
   $(".toast-body").css("color", "#000000");
-  $("#toastHeadMsg").html("Error");
+  $("#toastHeadMsg").html(id);
   $(".toast-body").html(error);
+  toastStartTime = new Date();
+  intervalId = setInterval(updateTimestamp, 1000);
   $("#liveToast").toast("show");
 }
 

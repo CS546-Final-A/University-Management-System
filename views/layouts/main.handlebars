@@ -36,7 +36,7 @@
                     {{#ifUserType session_type allowedRoles=['Admin', 'Student']}}
                     <li class="nav-item">
                         <a class="nav-link" href="/courses/">
-                            <span class="fs-5 position-relative" id="coursesText">Courses</span>
+                            <span class="fs-5 position-relative" id="coursesText">Course</span>
                         </a>
                     </li>
                     {{/ifUserType}}
@@ -92,7 +92,7 @@
                 <div class="toast-header">
                     <img src="/icons/error.svg" alt="errorIcon">
                     <strong class="me-auto ms-2" id="toastHeadMsg">Bootstrap</strong>
-                    <small>Just Now</small>
+                    <small class="toast-timestamp">Just Now</small>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
