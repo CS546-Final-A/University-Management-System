@@ -83,7 +83,7 @@
             </tbody>
         </table>
     </div>
-
+    <div id="tableError" style="color: red;"></div>
     {{/each}}
     {{#if (eq type 'Admin')}}
     <div class="modal fade" id="addSectionModal" tabindex="-1" role="dialog" aria-labelledby="addSectionModalLabel"
@@ -170,6 +170,7 @@
                         </div>
                         <input type="hidden" id="csrf" value="{{_csrf}}">
                         <input type="hidden" id="editMode" name="editMode" value="false">
+                        <div id="error" style="color: red;"></div>
                         <button type="submit" class="btn btn-info" onclick="sectionSubmit(event)">Submit</button>
                     </form>
                 </div>
