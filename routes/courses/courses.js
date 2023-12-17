@@ -85,6 +85,7 @@ router.post("/registration", async (req, res) => {
     }
   } catch (e) {
     if (e.status !== 500 && e.status) {
+      res.status(e.status);
       return res.json({ error: e.message });
     } else {
       res.status(500);
