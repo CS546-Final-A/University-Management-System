@@ -11,46 +11,54 @@ import routeError from "../routeerror.js";
 const router = Router();
 
 router.get("/", async (req, res) => {
-  let uniqueSectionYearandSemester =
-    await courseDataFunctions.getUniqueSectionYearandSemester();
-  let renderObjs = {
-    session_name: req.session.name,
-    session_type: req.session.type,
-    session_email: req.session.email,
-    uniqueYear: uniqueSectionYearandSemester[0],
-    uniqueSemester: uniqueSectionYearandSemester[1],
-    script: "courses/landing",
-  };
-  res.render("courses/landing", renderObjs);
+  try {
+    let uniqueSectionYearandSemester =
+      await courseDataFunctions.getUniqueSectionYearandSemester();
+    let renderObjs = {
+      session_name: req.session.name,
+      session_type: req.session.type,
+      session_email: req.session.email,
+      uniqueYear: uniqueSectionYearandSemester[0],
+      uniqueSemester: uniqueSectionYearandSemester[1],
+      script: "courses/landing",
+    };
+    res.render("courses/landing", renderObjs);
+  } catch (e) {
+    routeError(res, e);
+  }
 });
 
 router.get("/:year/:semester/registration", async (req, res) => {
-  const { year, semester } = req.params;
-  let uniqueDepartmentNames =
-    await courseDataFunctions.getUniqueDepartmentNamesandId();
-  let renderObjs = {
-    session_name: req.session.name,
-    session_type: req.session.type,
-    session_email: req.session.email,
-    uniqueDepartmentNames: uniqueDepartmentNames,
-    year: year,
-    semester: semester,
-    script: "courses/registration",
-  };
-  res.render("courses/registration", renderObjs);
+  try {
+    const { year, semester } = req.params;
+    let uniqueDepartmentNames =
+      await courseDataFunctions.getUniqueDepartmentNamesandId();
+    let renderObjs = {
+      session_name: req.session.name,
+      session_type: req.session.type,
+      session_email: req.session.email,
+      uniqueDepartmentNames: uniqueDepartmentNames,
+      year: year,
+      semester: semester,
+      script: "courses/registration",
+    };
+    res.render("courses/registration", renderObjs);
+  } catch (e) {
+    routeError(res, e);
+  }
 });
 
 router.post("/registration", async (req, res) => {
-  const {
-    courseNumber,
-    courseName,
-    courseDepartmentId,
-    courseCredits,
-    courseDescription,
-    courseSemester,
-    courseYear,
-  } = req.body;
   try {
+    const {
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription,
+      courseSemester,
+      courseYear,
+    } = req.body;
     const course = validateCourse(
       courseNumber,
       courseName,
@@ -72,21 +80,23 @@ router.post("/registration", async (req, res) => {
     if (result.acknowledged) {
       // window.location.href = "/courses/" + result.insertedId;
       return res.json(result);
+    } else {
+      throw "Unexpected result";
     }
   } catch (e) {
     if (e.status !== 500 && e.status) {
       return res.json({ error: e.message });
     } else {
       res.status(500);
-      res.json({ error: "Login error" });
+      res.json({ error: "Internal Server Error" });
     }
   }
   // res.render("courses/registration");
 });
 
 router.get("/:courseId", async (req, res) => {
-  const { courseId } = req.params;
   try {
+    const { courseId } = req.params;
     let userId = verify.validateMongoId(req.session.userid);
     let data = await courseDataFunctions.getCourseById(courseId);
     data.forEach((course) => {
@@ -118,54 +128,58 @@ router.get("/:courseId", async (req, res) => {
 });
 
 router.get("/:year/:semester/listings", async (req, res) => {
-  const { year, semester } = req.params;
+  try {
+    const { year, semester } = req.params;
 
-  let {
-    searchTerm,
-    departmentFilter,
-    instructorFilter,
-    meetingDaysFilter,
-    deliveryModeFilter,
-  } = req.query;
-  let data = await courseDataFunctions.getAllCourses(
-    year,
-    semester,
-    searchTerm,
-    departmentFilter,
-    instructorFilter,
-    meetingDaysFilter,
-    deliveryModeFilter
-  );
-  data.year = year;
-  data.semester = semester;
+    let {
+      searchTerm,
+      departmentFilter,
+      instructorFilter,
+      meetingDaysFilter,
+      deliveryModeFilter,
+    } = req.query;
+    let data = await courseDataFunctions.getAllCourses(
+      year,
+      semester,
+      searchTerm,
+      departmentFilter,
+      instructorFilter,
+      meetingDaysFilter,
+      deliveryModeFilter
+    );
+    data.year = year;
+    data.semester = semester;
 
-  let uniqueDepartmentNames =
-    await courseDataFunctions.getUniqueDepartmentNamesandId();
-  let uniqueInstructors =
-    await courseDataFunctions.getUniqueInstructorNamesandId();
-  uniqueDepartmentNames.sort((a, b) => a.name.localeCompare(b.name));
-  uniqueInstructors.sort((a, b) => a.name.localeCompare(b.name));
-  data.uniqueDepartmentNames = uniqueDepartmentNames;
-  data.uniqueInstructors = uniqueInstructors;
+    let uniqueDepartmentNames =
+      await courseDataFunctions.getUniqueDepartmentNamesandId();
+    let uniqueInstructors =
+      await courseDataFunctions.getUniqueInstructorNamesandId();
+    uniqueDepartmentNames.sort((a, b) => a.name.localeCompare(b.name));
+    uniqueInstructors.sort((a, b) => a.name.localeCompare(b.name));
+    data.uniqueDepartmentNames = uniqueDepartmentNames;
+    data.uniqueInstructors = uniqueInstructors;
 
-  let uniqueSectionTypes = ["Online", "In-Person"];
-  data.uniqueSectionTypes = uniqueSectionTypes;
-  data.map((course) => {
-    course.departmentName = course.departmentName[0];
-  });
-  let renderObjs = {
-    session_name: req.session.name,
-    session_type: req.session.type,
-    session_email: req.session.email,
-    courses: data,
-    script: "courses/listings",
-  };
-  res.render("courses/listings", renderObjs);
+    let uniqueSectionTypes = ["Online", "In-Person"];
+    data.uniqueSectionTypes = uniqueSectionTypes;
+    data.map((course) => {
+      course.departmentName = course.departmentName[0];
+    });
+    let renderObjs = {
+      session_name: req.session.name,
+      session_type: req.session.type,
+      session_email: req.session.email,
+      courses: data,
+      script: "courses/listings",
+    };
+    res.render("courses/listings", renderObjs);
+  } catch (e) {
+    routeError(res, e);
+  }
 });
 
 router.get("/:sectionId/enroll", async (req, res) => {
-  const { sectionId } = req.params;
   try {
+    const { sectionId } = req.params;
     await courseDataFunctions.enrollSection(sectionId, req.session.userid);
     res.json({ acknowledged: true });
   } catch (error) {
@@ -174,8 +188,8 @@ router.get("/:sectionId/enroll", async (req, res) => {
 });
 
 router.get("/:sectionId/discard", async (req, res) => {
-  const { sectionId } = req.params;
   try {
+    const { sectionId } = req.params;
     await courseDataFunctions.discardSection(sectionId, req.session.userid);
     res.json({ acknowledged: true });
   } catch (error) {
@@ -184,19 +198,19 @@ router.get("/:sectionId/discard", async (req, res) => {
 });
 
 router.post("/addSection/:courseId", async (req, res) => {
-  let { courseId } = req.params;
-  const {
-    sectionName,
-    sectionInstructor,
-    sectionType,
-    sectionStartTime,
-    sectionEndTime,
-    sectionDay,
-    sectionCapacity,
-    sectionLocation,
-    sectionDescription,
-  } = req.body;
   try {
+    let { courseId } = req.params;
+    const {
+      sectionName,
+      sectionInstructor,
+      sectionType,
+      sectionStartTime,
+      sectionEndTime,
+      sectionDay,
+      sectionCapacity,
+      sectionLocation,
+      sectionDescription,
+    } = req.body;
     verify.validateMongoId(courseId, "courseId");
     const section = validateSection(
       sectionName,
@@ -231,26 +245,26 @@ router.post("/addSection/:courseId", async (req, res) => {
       return res.json({ error: e.message });
     } else {
       res.status(500);
-      res.json({ error: "Login error" });
+      res.json({ error: "Internal Server Error" });
     }
   }
 });
 
 router.put("/editSection/:sectionId", async (req, res) => {
-  const {
-    sectionId,
-    sectionName,
-    sectionInstructor,
-    sectionType,
-    sectionStartTime,
-    sectionEndTime,
-    sectionDay,
-    sectionCapacity,
-    sectionLocation,
-    sectionDescription,
-  } = req.body;
-
   try {
+    const {
+      sectionId,
+      sectionName,
+      sectionInstructor,
+      sectionType,
+      sectionStartTime,
+      sectionEndTime,
+      sectionDay,
+      sectionCapacity,
+      sectionLocation,
+      sectionDescription,
+    } = req.body;
+
     verify.validateMongoId(sectionId, "sectionId");
     let updateSection = validateSection(
       sectionName,
@@ -287,8 +301,8 @@ router.put("/editSection/:sectionId", async (req, res) => {
 });
 
 router.delete("/deleteSection/:sectionId", async (req, res) => {
-  let sectionId = req.params.sectionId;
   try {
+    let sectionId = req.params.sectionId;
     const deleteInfo = await courseDataFunctions.deleteSection(sectionId);
     return res.json(deleteInfo);
   } catch (error) {
@@ -296,14 +310,14 @@ router.delete("/deleteSection/:sectionId", async (req, res) => {
       return res.json({ error: error.message });
     } else {
       res.status(500);
-      res.json({ error: "Login error" });
+      res.json({ error: "Internal Server Error" });
     }
   }
 });
 
 router.get("/getSectionById/:sectionId", async (req, res) => {
-  let sectionId = req.params.sectionId;
   try {
+    let sectionId = req.params.sectionId;
     const section = await courseDataFunctions.getSectionById(sectionId);
     return res.json(section);
   } catch (error) {
@@ -311,7 +325,7 @@ router.get("/getSectionById/:sectionId", async (req, res) => {
       return res.json({ error: error.message });
     } else {
       res.status(500);
-      res.json({ error: "Login error" });
+      res.json({ error: "Internal Server Error" });
     }
   }
 });
