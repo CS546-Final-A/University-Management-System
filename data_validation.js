@@ -229,6 +229,13 @@ const verify = {
     }
     return string;
   },
+  isAlphaStringwithSpaces: (string, stringName) => {
+    string = verify.string(string, stringName);
+    if (!/^[A-Za-z ]+$/.test(string)) {
+      throwerror(`${stringName} should only have alphabets or spaces`);
+    }
+    return string;
+  },
   letterGrade: (grade) => {
     grade = verify.string(grade, "Letter grade");
 
