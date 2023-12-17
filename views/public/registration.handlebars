@@ -1,8 +1,12 @@
 <form id="registration" method="POST">
-    {{> (lookup. 'identificationverification') }}
+
+    <div class="mb-3 col-md-4">
+        {{> (lookup. 'identificationverification') }}
+    </div>
+
     <input type="hidden" name="idtype" value="{{identification}}">
     <input type="hidden" id="_csrf" name="_csrf" value="{{_csrf}}">
-    <br><input type="submit" id="submit" value="Register"></input>
+    <button class="btn btn-info" type="submit" id="submit" value="Register">Register</button>
 </form>
 {{#if error}}
 <div id="error">{{error}}</div>
