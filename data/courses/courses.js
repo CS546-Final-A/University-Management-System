@@ -553,12 +553,12 @@ export const registerSection = async (
     {
       _id: newSection.sectionInstructor,
     },
-    { $push: { registeredCourses: newSection.sectionId } }
+    { $push: { registeredCourses: newSection.sectionId.toString() } }
   );
 
   const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
-    { $push: { sections: newSection.toString() } }
+    { $push: { sections: newSection } }
   );
   if (!updateInfo) {
     throwErrorWithStatus(
