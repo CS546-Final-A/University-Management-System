@@ -16,16 +16,15 @@ import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
 
 router.get("/create", async (req, res) => {
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to create assignments for this secion",
+      };
+    }
     let renderObjs = {};
     renderObjs.script = "assignments/create";
     //TODO: get all the assignments for this section and pass it to the renderObjs
-    let section = await courseDataFunctions.getSectionById(
-      res.locals.sectionID
-    );
-
-    if (!section) {
-      throw new Error("Section not found");
-    }
 
     res.render("assignments/create", renderObjs);
   } catch (e) {
@@ -34,20 +33,26 @@ router.get("/create", async (req, res) => {
 });
 
 router.post("/create", async (req, res) => {
-  req.body = santizeInputs(req.body);
-  const sectionId = res.locals.sectionID;
-  let userId = req.session.userid;
-  const {
-    assignmentName,
-    assignmentDescription,
-    assignmentWeight,
-    assignmentDueDate,
-
-    submissionLimit,
-
-    assignmentMaxScore,
-  } = req.body;
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to create assignments for this secion",
+      };
+    }
+    req.body = santizeInputs(req.body);
+    const sectionId = res.locals.sectionID;
+    let userId = req.session.userid;
+    const {
+      assignmentName,
+      assignmentDescription,
+      assignmentWeight,
+      assignmentDueDate,
+
+      submissionLimit,
+
+      assignmentMaxScore,
+    } = req.body;
     const assignment = validateAssignment(
       userId,
       assignmentName,
