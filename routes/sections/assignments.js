@@ -108,6 +108,12 @@ router.use("/:action/:assignmentID*", async (req, res, next) => {
 });
 
 router.get("/edit/:assignmentID", async (req, res) => {
+  if (req.session.type !== "Professor") {
+    throw {
+      status: 403,
+      message: "You are not permitted to change assignments for this secion",
+    };
+  }
   try {
     if (req.session.type !== "Professor") {
       throw {
@@ -127,6 +133,12 @@ router.get("/edit/:assignmentID", async (req, res) => {
 });
 
 router.post("/edit/:assignmentID/", async (req, res) => {
+  if (req.session.type !== "Professor") {
+    throw {
+      status: 403,
+      message: "You are not permitted to change assignments for this secion",
+    };
+  }
   req.body = santizeInputs(req.body);
   const sectionId = res.locals.sectionID;
   const assignmentID = res.locals.assignmentID;
@@ -167,6 +179,12 @@ router.post("/edit/:assignmentID/", async (req, res) => {
 
 router.get("/delete/:assignmentID/", async (req, res) => {
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to delete assignments for this secion",
+      };
+    }
     let sectionId = res.locals.sectionID;
     let assignmentID = res.locals.assignmentID;
     assignmentID = verify.validateMongoId(assignmentID);
@@ -191,6 +209,12 @@ router.get("/delete/:assignmentID/", async (req, res) => {
 });
 router.get("/view/:assignmentID/submit", async (req, res) => {
   try {
+    if (req.session.type !== "Student") {
+      throw {
+        status: 403,
+        message: "You are not permitted to submit assignments in this secion",
+      };
+    }
     let renderObjs = {};
     renderObjs.currentDate = new Date();
 
@@ -210,6 +234,12 @@ router.post(
 
   async (req, res) => {
     try {
+      if (req.session.type !== "Student") {
+        throw {
+          status: 403,
+          message: "You are not permitted to submit assignments in this secion",
+        };
+      }
       req.body = santizeInputs(req.body);
       const sectionId = res.locals.sectionID;
       const assignmentID = res.locals.assignmentID;
