@@ -323,13 +323,6 @@ router.get("/view/:assignmentID/scores", async (req, res) => {
 
     assignmentID = verify.validateMongoId(assignmentID);
 
-    let section = await courseDataFunctions.getSectionById(sectionId);
-    if (!section) {
-      throw new Error("Section not found");
-    }
-
-    renderObjs.section = section;
-
     assignment._id = assignment._id.toString();
 
     let allStudents = await courseDataFunctions.getStudentsInSection(sectionId);
@@ -348,6 +341,13 @@ router.get("/view/:assignmentID/scores", async (req, res) => {
         score: getScore(scores, student.studentId),
       };
     });
+
+    if (req.session.type !== "Professor") {
+      renderObjs.students = renderObjs.students.find((student) => {
+        return student._id === req.session.userid;
+      });
+      renderObjs.students = [renderObjs.students];
+    }
     res.render("assignments/scores", renderObjs);
   } catch (e) {
     routeError(res, e);
@@ -355,11 +355,18 @@ router.get("/view/:assignmentID/scores", async (req, res) => {
 });
 
 router.post("/view/:assignmentID/scores", async (req, res) => {
-  let sectionId = res.locals.sectionID;
-  let assignmentID = res.locals.assignmentID;
-  let { studentId, score } = req.body;
-
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to change grades for this secion",
+      };
+    }
+
+    let sectionId = res.locals.sectionID;
+    let assignmentID = res.locals.assignmentID;
+    let { studentId, score } = req.body;
+
     // Validate the score
     // Ensure that you have a function to validate the score in your data functions
     score = parseFloat(score);
