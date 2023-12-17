@@ -433,15 +433,6 @@ a:focus {
   padding-right: 0px !important;
 }
 
-.form-floating > .form-control,
-.form-floating > .form-control-plaintext,
-.form-floating > .form-select {
-  height: calc(3.5rem + -15px) !important;
-}
-.form-floating > label {
-  transform: scale(1) translateY(-0.5rem) translateX(0rem) !important;
-}
-
 .form-floating > .form-control-plaintext ~ label,
 .form-floating > .form-control:focus ~ label,
 .form-floating > .form-control:not(:placeholder-shown) ~ label,
@@ -465,11 +456,6 @@ a:focus {
   width: 100%;
   left: 0;
 } */
-
-.form-floating > .form-control,
-.form-floating > label {
-  padding-left: 0.25rem !important;
-}
 
 .iconSwitch {
   color: #000000 !important;
