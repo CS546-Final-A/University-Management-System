@@ -23,12 +23,20 @@
                             <span class="fs-5 position-relative" id="homeText">Dashboard</span>
                         </a>
                     </li>
-                    {{#if session_name}}
+                    {{#ifUserType session_type allowedRoles=['Admin', 'Student']}}
                     <li class="nav-item">
                         <a class="nav-link" href="/courses/">
                             <span class="fs-5 position-relative" id="coursesText">Courses</span>
                         </a>
                     </li>
+                    {{/ifUserType}}
+                    {{#ifUserType session_type allowedRoles=['Admin']}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/configuration/">
+                            <span class="fs-5 position-relative" id="configurationText">Configuration</span>
+                        </a>
+                    </li>
+                    {{/ifUserType}}
                     <li class="nav-item ms-auto dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             data-bs-auto-close="outside" aria-expanded="false"><img src="/icons/user-circle.svg"
@@ -54,7 +62,6 @@
                             </li>
                         </ul>
                     </li>
-                    {{/if}}
                 </ul>
             </header>
         </div>

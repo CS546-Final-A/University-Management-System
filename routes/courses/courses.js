@@ -13,9 +13,9 @@ router.get("/", async (req, res) => {
   let uniqueSectionYearandSemester =
     await courseDataFunctions.getUniqueSectionYearandSemester();
   let renderObjs = {
-    name: req.session.name,
-    type: req.session.type,
-    email: req.session.email,
+    session_name: req.session.name,
+    session_type: req.session.type,
+    session_email: req.session.email,
     uniqueYear: uniqueSectionYearandSemester[0],
     uniqueSemester: uniqueSectionYearandSemester[1],
     script: "courses/landing",
@@ -28,9 +28,9 @@ router.get("/:year/:semester/registration", async (req, res) => {
   let uniqueDepartmentNames =
     await courseDataFunctions.getUniqueDepartmentNamesandId();
   let renderObjs = {
-    name: req.session.name,
-    type: req.session.type,
-    email: req.session.email,
+    session_name: req.session.name,
+    session_type: req.session.type,
+    session_email: req.session.email,
     uniqueDepartmentNames: uniqueDepartmentNames,
     year: year,
     semester: semester,
@@ -98,9 +98,9 @@ router.get("/:courseId", async (req, res) => {
     });
     let renderObjs = {
       userId: req.session.userid,
-      name: req.session.name,
-      type: req.session.type,
-      email: req.session.email,
+      session_name: req.session.name,
+      session_type: req.session.type,
+      session_email: req.session.email,
       courseId,
       courses: data,
       script: "courses/detail",
@@ -160,9 +160,9 @@ router.get("/:year/:semester/listings", async (req, res) => {
     course.departmentName = course.departmentName[0];
   });
   let renderObjs = {
-    name: req.session.name,
-    type: req.session.type,
-    email: req.session.email,
+    session_name: req.session.name,
+    session_type: req.session.type,
+    session_email: req.session.email,
     courses: data,
     script: "courses/listings",
   };

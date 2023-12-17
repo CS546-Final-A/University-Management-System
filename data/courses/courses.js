@@ -171,37 +171,22 @@ export const getAllCourses = async (
       },
       {
         $match: {
-          sections: {
-            $elemMatch: {
-              sectionYear: year,
-              sectionSemester: semester,
-            },
-          },
+          courseSemester: semester,
+          courseYear: year,
         },
       },
       {
         $project: {
           _id: 1,
-          // Include all other fields from the "courses" collection
           courseName: 1,
           courseNumber: 1,
           courseDepartmentId: 1,
           courseCredits: 1,
-          sections: {
-            $filter: {
-              input: "$sections",
-              as: "section",
-              cond: {
-                $and: [
-                  { $eq: ["$$section.sectionYear", year] },
-                  { $eq: ["$$section.sectionSemester", semester] },
-                ],
-              },
-            },
-          },
+          courseSemester: 1,
+          courseYear: 1,
+          sections: 1,
           departmentName: "$department.departmentName",
           courseDescription: 1,
-          // Include all fields from the "sections" collection
           instructors: "$instructor",
         },
       },

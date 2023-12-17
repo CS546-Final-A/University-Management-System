@@ -12,6 +12,7 @@ import register from "./users/registration.js";
 import logout from "./users/logout.js";
 import dashboard from "./dashboard.js";
 import user_management from "./administration/users.js";
+import configuration from "./administration/configuration.js";
 import courses from "./courses/courses.js";
 import sections from "./sections/sections.js";
 
@@ -39,6 +40,9 @@ function route(app) {
   app.use("/download", downloads);
   app.use("/courses", courses);
   app.use("/sections", sections);
+  
+  app.use("/configuration", adminsOnly);
+  app.use("/configuration", configuration);
 }
 
 export default route;

@@ -17,7 +17,7 @@
                     <div class="mb-3">
                         <strong>Credits:</strong> {{this.courseCredits}}
                     </div>
-                    {{#if (eq ../type 'Admin')}}
+                    {{#if (eq ../session_type 'Admin')}}
                     <div class="mb-3">
                         <button type="button" class="btn btn-primary" onclick="openAddSectionModal()">Add
                             Section</button>
@@ -54,7 +54,7 @@
                                     <td>{{this.sectionCapacity}}</td>
                                     <td>{{this.enrolledStudents.length}}</td>
 
-                                    {{#if (eq ../../type 'Admin')}}
+                                    {{#if (eq ../../session_type 'Admin')}}
                                     <td>
                                         <button class="btn btn-warning edit-btn"
                                             onclick="editSection('{{this.sectionId}}')">Edit</button>
@@ -63,7 +63,7 @@
                                     </td>
                                     {{/if}}
 
-                                    {{#if (eq ../../type 'Student')}}
+                                    {{#if (eq ../../session_type 'Student')}}
 
                                     {{#if this.isEnrolled}}
 

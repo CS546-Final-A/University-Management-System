@@ -6,8 +6,13 @@ import * as loginRoute from "../routes/users/login.js";
 const router = Router();
 
 router.get("/", async (req, res) => {
+  let renderObjs = {
+    session_name: req.session.name,
+    session_type: req.session.type,
+    session_email: req.session.email,
+  };
   if (req.session.type === "Admin") {
-    return res.render("admin/dashboard");
+    return res.render("admin/dashboard", renderObjs);
   }
 
   const userInfo = await getUserByID(req.session.userid);
@@ -17,7 +22,6 @@ router.get("/", async (req, res) => {
     registeredCourses.map((course) => course)
   );
 
-  let renderObjs = {};
   const workspace = requestedSections.map((section) => {
     return {
       courseName: section.courseName,
