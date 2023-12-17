@@ -28,7 +28,7 @@ router.get(
         submission.file
       );
 
-      res.download(submissionPath, submission.filename, (err) => {
+      res.download(submissionPath, submission.file, (err) => {
         if (err) {
           console.log(err);
         }

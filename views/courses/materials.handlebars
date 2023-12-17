@@ -1,53 +1,53 @@
 <h2>Course Learning Materials</h2>
 <div>
-  Course Name: {{courseName}} <br>
-  Course Description: {{courseDescription}}
+    Course Name: {{courseName}} <br>
+    Course Description: {{courseDescription}}
 
-  {{#if (eq type "Professor")}}
-<div id="uploadHeadingDiv">
-    <label for="headingInput">Upload Heading</label>
-    <input type="text" id="headingInput" />
-    <button id="headingUploadButton">Upload Heading</button>
-</div>
-<form id="fileUploadForm" enctype="multipart/form-data">
-    <select id="headingDropdown">
-        {{#each headings}}
+    {{#if (eq type "Professor")}}
+    <div id="uploadHeadingDiv">
+        <label for="headingInput">Upload Heading</label>
+        <input type="text" id="headingInput" />
+        <button id="headingUploadButton">Upload Heading</button>
+    </div>
+    <form id="fileUploadForm">
+        <select id="headingDropdown">
+            {{#each headings}}
             <option value="{{this}}">{{this}}</option>
-        {{/each}}
-    </select>
-    <label for="fileInput">Select File</label>
-    <input type="file" id="fileInput" />
-    <button type="submit">Submit</button>
-</form>
+            {{/each}}
+        </select>
+        <label for="fileInput">Select File</label>
+        <input type="file" id="fileInput" accept=".pdf" />
+        <button type="submit">Submit</button>
+    </form>
 </div>
- {{/if}}
+{{/if}}
 <script>
- document.getElementById("headingUploadButton").addEventListener("click", async () => {
-    const uploadedHeading = document.getElementById("headingInput").value.trim();
+    document.getElementById("headingUploadButton").addEventListener("click", async () => {
+        const uploadedHeading = document.getElementById("headingInput").value.trim();
 
-    if (!uploadedHeading) {
-        alert("Please enter a valid heading");
-        return;
-    }
-
-    const newHeading = new FormData();
-    newHeading.append("heading", uploadedHeading);
-
-    try {
-        const response = await fetch(window.location.href + 'heading', {
-            method: "POST",
-            body: newHeading,
-        });
-
-        if (response.ok) {
-            window.location.reload();
-        } else {
-            console.error("Error:", response.status);
+        if (!uploadedHeading) {
+            alert("Please enter a valid heading");
+            return;
         }
-    } catch (error) {
-        console.error("Error:", error);
-    }
-});
+
+        const newHeading = new FormData();
+        newHeading.append("heading", uploadedHeading);
+
+        try {
+            const response = await fetch(window.location.href + 'heading', {
+                method: "POST",
+                body: newHeading,
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error("Error:", response.status);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    });
 
 
     document.getElementById("fileUploadForm").addEventListener("submit", async (e) => {
@@ -55,25 +55,28 @@
 
         const selectedHeading = document.getElementById("headingDropdown").value.trim();
         const uploadedFiles = document.getElementById("fileInput").files;
-      if (uploadedFiles.length === 0) {
-        return alert("Please select a file");
-      }
-      if (uploadedFiles.length > 1) {
-        return alert("Please select only one file");
-      }
+        if (uploadedFiles.length === 0) {
+            return alert("Please select a file");
+        }
+        if (uploadedFiles.length > 1) {
+            return alert("Please select only one file");
+        }
         if (!selectedHeading || !uploadedFiles) {
             alert("Please select a heading and upload a file");
             return;
         }
-        const fileFormData = new FormData();
-        fileFormData.append("heading", selectedHeading);
-        fileFormData.append("file", uploadedFiles);
-console.log(fileFormData)
+        const formData = new FormData();
+        Object.keys(uploadedFiles).forEach((key) => {
+            formData.append(uploadedFiles.item(key).name, uploadedFiles.item(key));
+        });
+        formData.append("heading", selectedHeading);
+
         try {
-            const response = await fetch(window.location.href+ 'file', {
+            const response = await fetch(window.location.href + 'file', {
                 method: "POST",
-                body: fileFormData,
+                body: formData,
             });
+            console.log(response);
 
         } catch (error) {
             console.error("Error:", error);

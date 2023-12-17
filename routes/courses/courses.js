@@ -249,33 +249,29 @@ router.route("/:courseId/materials").get(async (req, res) => {
   }
 });
 
-router
-  .route("/:courseId/materials/heading")
-  .post(upload.none(), async (req, res) => {
-    try {
-      req.body = santizeInputs(req.body);
-      let { courseId } = req.params;
-      let userId = req.session.userid;
-      userId = verify.validateMongoId(userId);
-      courseId = verify.validateMongoId(courseId);
-      await courseDataFunctions.addHeading(
-        req.params.courseId,
-        req.body.heading
-      );
-      res.status(200).json({ message: "Heading added successfully" });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
+router.route("/:courseId/materials/heading").post(async (req, res) => {
+  try {
+    req.body = santizeInputs(req.body);
+    let { courseId } = req.params;
+    let userId = req.session.userid;
+    userId = verify.validateMongoId(userId);
+    courseId = verify.validateMongoId(courseId);
+    await courseDataFunctions.addHeading(req.params.courseId, req.body.heading);
+    res.status(200).json({ message: "Heading added successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // Handling file uploads
 router
   .route("/:courseId/materials/file")
   .post(
-    upload.fields([{ name: "file" }, { name: "heading" }]),
     fileUpload({ createParentPath: true }),
     filesPayloadExists,
+    fileExtLimiter([".pdf"]),
+    fileSizesLimiter,
     async (req, res) => {
       console.log("in route");
       console.log(req.files);
@@ -309,8 +305,9 @@ router
         Object.keys(files).forEach((key) => {
           const filepath = path.join(
             "files",
-            moduleId.toString(),
-            userId.toString(),
+            "materials",
+            courseId.toString(),
+            heading,
             files[key].name
           );
           fileName = files[key].name;
