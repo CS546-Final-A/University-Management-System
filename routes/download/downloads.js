@@ -10,7 +10,6 @@ const router = Router();
 router.get(
   "/assignments/:assignmentId/submissions/:submissionId",
   async (req, res) => {
-    console.log(req);
     try {
       let submissionId = req.params.submissionId;
       let assignmentId = req.params.assignmentId;
