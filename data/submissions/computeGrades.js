@@ -57,7 +57,7 @@ async function computeGradeByUserID(sectiondID, studentid) {
 
   const assignmentdata = await assignmentcol
     .find(
-      {},
+      { assignmentSectionId: sectiondID },
       {
         projection: {
           _id: 0,
@@ -94,7 +94,7 @@ async function computeClassGrades(sectiondID) {
 
   const assignmentdata = await assignmentcol
     .find(
-      {},
+      { assignmentSectionId: sectiondID },
       {
         projection: {
           _id: 0,
