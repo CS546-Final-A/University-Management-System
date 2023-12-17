@@ -1,150 +1,148 @@
 <link rel="stylesheet" href="/styles/error.css">
-<div class="container mt-5">
+<div class="container-fluid">
     <input type="hidden" id="csrf" value="{{_csrf}}">
     {{#each courses}}
     <input type="text" class="form-control" id="courseId" name="courseId" hidden value="{{this.courseId}}">
-    <div class="card mb-4 w-100" style="display: flex; flex-direction: column;">
-        <div class="card-header">
-            <h2>{{this.courseNumber}} : {{this.courseName}}</h2>
-        </div>
-        <div class="card-body" style="flex: 1;">
-            <p>{{this.courseDescription}}</p>
-            <div style="display: flex;">
-                <div style="flex: 1 0 200px;">
-                    <div class="mb-3">
-                        <strong>Department:</strong> {{this.courseDepartmentId.name}}
-                    </div>
-                    <div class="mb-3">
-                        <strong>Credits:</strong> {{this.courseCredits}}
-                    </div>
-                    {{#if (eq ../session_type 'Admin')}}
-                    <div class="mb-3">
-                        <button type="button" class="btn btn-primary" onclick="openAddSectionModal()">Add
-                            Section</button>
-                    </div>
-                    {{/if}}
-                </div>
-                <div style="flex: 1;">
-                    <div class="table-responsive">
-                        <table class="table table-striped h-100">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Instructor</th>
-                                    <th>Type</th>
-                                    <th>Time</th>
-                                    <th>Day</th>
-                                    <th>Location</th>
-                                    <th>Description</th>
-                                    <th>Capacity</th>
-                                    <th>Enrollments</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{#each this.sections}}
-                                <tr style="{{#if this.isEnrolled}}background-color: #abcdef;{{/if}}">
-                                    <td>{{this.sectionName}}</td>
-                                    <td>{{this.sectionInstructor.name}}</td>
-                                    <td>{{this.sectionType}}</td>
-                                    <td>{{this.sectionStartTime}} - {{this.sectionEndTime}}</td>
-                                    <td>{{this.sectionDay}}</td>
-                                    <td>{{this.sectionLocation}}</td>
-                                    <td>{{this.sectionDescription}}</td>
-                                    <td>{{this.sectionCapacity}}</td>
-                                    <td>{{this.enrolledStudents.length}}</td>
-
-                                    {{#if (eq ../../session_type 'Admin')}}
-                                    <td>
-                                        <button class="btn btn-warning edit-btn"
-                                            onclick="editSection('{{this.sectionId}}')">Edit</button>
-                                        <button class="btn btn-danger delete-btn"
-                                            onclick="deleteSection('{{this.sectionId}}')">Delete</button>
-                                    </td>
-                                    {{/if}}
-
-                                    {{#if (eq ../../session_type 'Student')}}
-
-                                    {{#if this.isEnrolled}}
-
-                                    <td>
-                                        <button class="btn btn-danger" onclick="discardSection('{{this.sectionId}}')">Discard</button>
-                                    </td>
-                                    {{else}}
-                                    {{#if (gt this.sectionCapacity this.enrolledStudents.length)}}
-                                    <td><button class="btn btn-primary"
-                                            onclick="enrollSection('{{this.sectionId}}')">Enroll</button></td>
-                                    {{else}}
-                                    <td>Capacity Full</td>
-                                    {{/if}}
-                                    {{/if}}
-                                    {{/if}}
-                                </tr>
-                                {{/each}}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="tableError" style="color: red;"></div>
-                </div>
+    <h2>
+        <div class="d-flex">
+            <div class="my-auto">{{this.courseNumber}} : {{this.courseName}}</div>
+            <div class="mx-4 my-auto text-muted fs-5">
+                {{this.courseDepartmentId.name}}
             </div>
         </div>
+    </h2>
+    <div class="my-3"><strong>Credits:</strong> {{this.courseCredits}}</div>
+
+    <div class="my-3">{{this.courseDescription}}</div>
+
+    {{#if (eq ../type 'Admin')}}
+    <div class="my-4">
+        <button type="button" class="btn btn-info" onclick="openAddSectionModal()">Add
+            Section</button>
     </div>
+    {{/if}}
+
+
+    <div class="table-responsive glassEffect">
+        <table class="table table-striped h-100 mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Instructor</th>
+                    <th>Type</th>
+                    <th>Time</th>
+                    <th>Day</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                    <th>Capacity</th>
+                    <th>Enrollments</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each this.sections}}
+                <tr style="{{#if this.isEnrolled}}background-color: #abcdef;{{/if}}">
+                    <td>{{this.sectionName}}</td>
+                    <td>{{this.sectionInstructor.name}}</td>
+                    <td>{{this.sectionType}}</td>
+                    <td>{{this.sectionStartTime}} - {{this.sectionEndTime}}</td>
+                    <td>{{this.sectionDay}}</td>
+                    <td>{{this.sectionLocation}}</td>
+                    <td>{{this.sectionDescription}}</td>
+                    <td>{{this.sectionCapacity}}</td>
+                    <td>{{this.students.length}}</td>
+                    <td>
+                        {{#if (eq ../../type 'Admin')}}
+
+                        <button class="btn btn-warning edit-btn"
+                            onclick="editSection('{{this.sectionId}}')">Edit</button>
+                        <button class="btn btn-danger delete-btn"
+                            onclick="deleteSection('{{this.sectionId}}')">Delete</button>
+
+                        {{/if}}
+
+                        {{#if (eq ../../type 'Student')}}
+
+                        {{#if this.isEnrolled}}
+
+
+                        <button class="btn btn-danger" onclick="discardSection('{{this.sectionId}}')">Discard</button>
+
+                        {{else}}
+                        {{#if (gt this.sectionCapacity this.students.length)}}
+                        <button class="btn btn-info" onclick="enrollSection('{{this.sectionId}}')">Enroll</button>
+
+                        {{else}}
+                        Capacity Full
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
     {{/each}}
     {{#if (eq type 'Admin')}}
     <div class="modal fade" id="addSectionModal" tabindex="-1" role="dialog" aria-labelledby="addSectionModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addSectionModalLabel">Add Section</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content glassEffect">
+                <div class="modal-header glassEffect">
+                    <h5 class="modal-title fs-5" id="addSectionModalLabel">Add Section</h5>
+                    <button type="button" class="btn-close btn-info" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
                 <div class="modal-body">
                     <form id="addSectionForm">
-                        <div class="form-group" hidden>
-                            <label for="sectionId">Section ID:</label>
+                        <div class="form-floating my-4" hidden>
                             <input type="text" class="form-control" id="sectionId" name="sectionId" required
-                                value="{{sectionId}}">
+                                value="{{sectionId}}" placeholder="">
+                            <label for="sectionId">Section ID:</label>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-floating my-4">
+                            <input type="text" class="form-control" id="sectionName" name="sectionName" placeholder=""
+                                required>
                             <label for="sectionName">Section Name:</label>
-                            <input type="text" class="form-control" id="sectionName" name="sectionName" required>
                         </div>
 
-                        <div class="form-group">
+                        <div class="my-4">
                             <label for="sectionInstructor">Section Instructor:</label>
-                            <select id="sectionInstructor" name="sectionInstructor">
+                            <select id="sectionInstructor" name="sectionInstructor" class="selectpicker form-control"
+                                data-live-search="true">
                                 {{#each instructors}}
                                 <option value="{{this.id}}">{{this.name}}</option>
                                 {{/each}}
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="my-4">
                             <label for="sectionType">Section Type:</label>
-                            <select id="sectionType" name="sectionType">
+                            <select id="sectionType" name="sectionType" class="selectpicker form-control"
+                                data-live-search="true">
                                 <option value="In Person">In Person</option>
                                 <option value="Online">Online</option>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="sectionStartTime">Section Start Time:</label>
+                        <div class="form-floating my-4">
                             <input type="time" class="form-control" id="sectionStartTime" name="sectionStartTime"
-                                required>
+                                placeholder="" required>
+                            <label for="sectionStartTime">Section Start Time:</label>
                         </div>
 
-                        <div class="form-group">
+                        <div class="my-4">
+                            <input type="time" class="form-control" id="sectionEndTime" name="sectionEndTime"
+                                placeholder="" required>
                             <label for="sectionEndTime">Section End Time:</label>
-                            <input type="time" class="form-control" id="sectionEndTime" name="sectionEndTime" required>
                         </div>
 
-                        <div class="form-group">
+                        <div class="my-4">
                             <label for="sectionDay">Section Day:</label>
-                            <select id="sectionDay">
+                            <select id="sectionDay" class="selectpicker form-control" data-live-search="true">
                                 <option value="Monday">Monday</option>
                                 <option value="Tuesday">Tuesday</option>
                                 <option value="Wednesday">Wednesday</option>
@@ -153,27 +151,26 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="sectionCapacity">Section Capacity:</label>
+                        <div class="form-floating my-4">
                             <input type="number" class="form-control" id="sectionCapacity" name="sectionCapacity"
-                                min="10" max="100" required>
+                                min="10" max="100" placeholder="" required>
+                            <label for="sectionCapacity">Section Capacity:</label>
                         </div>
 
-                        <div class="form-group">
-                            <label for="sectionLocation">Section Location:</label>
+                        <div class="form-floating my-4">
                             <input type="text" class="form-control" id="sectionLocation" name="sectionLocation"
-                                required>
+                                placeholder="" required>
+                            <label for="sectionLocation">Section Location:</label>
                         </div>
 
-                        <div class="form-group">
+                        <div class="my-4">
                             <label for="sectionDescription">Section Description:</label>
                             <textarea class="form-control" id="sectionDescription" name="sectionDescription" rows="3"
-                                required></textarea>
+                                placeholder="" required></textarea>
                         </div>
                         <input type="hidden" id="csrf" value="{{_csrf}}">
                         <input type="hidden" id="editMode" name="editMode" value="false">
-                        <div id="error" style="color: red;"></div>
-                        <button type="submit" class="btn btn-primary" onclick="sectionSubmit(event)">Submit</button>
+                        <button type="submit" class="btn btn-info" onclick="sectionSubmit(event)">Submit</button>
                     </form>
                 </div>
             </div>

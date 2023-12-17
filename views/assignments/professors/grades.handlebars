@@ -1,0 +1,36 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Student Name</th>
+            <th scope="col">Grade</th>
+            <th scope="col">Letter Grade</th>
+            <th scope="col">Finalize</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each students}}
+        <tr>
+            <td><a href="{{this._id}}">{{this.firstname}} {{this.lastname}}</a></td>
+            <td>{{this.grade}}</td>
+            <td>{{this.lettergrade}}</td>
+            <td>{{this.scores}}</td>
+            <td>
+                <form class="submitform">
+                    <input type="hidden" name="studentid" value="{{this._id}}">
+                    <input type="hidden" name="grade" value="{{this.lettergrade}}">
+                    <input type="hidden" name="csrf" value="{{_csrf}}">
+                    {{#if this.finalgrade}}
+                    <button disabled type="submit" class="btn btn-info">Finalize Grade</button>
+            </td>
+            {{else}}
+            <button type="submit" class="btn btn-info">Finalize Grade</button></td>
+            {{/if}}
+            </form>
+            </td>
+        </tr>
+        {{/each}}
+
+    </tbody>
+
+</table>

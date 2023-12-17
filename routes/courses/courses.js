@@ -86,12 +86,12 @@ router.post("/registration", async (req, res) => {
 router.get("/:courseId", async (req, res) => {
   const { courseId } = req.params;
   try {
-    let userId = verify.validateMongoId(req.session.userid)
+    let userId = verify.validateMongoId(req.session.userid);
     let data = await courseDataFunctions.getCourseById(courseId);
     data.forEach((course) => {
       course.courseId = course._id.toString();
       course.sections.forEach((section) => {
-        if (section.enrolledStudents?.some(studentId => studentId.equals(userId))) {
+        if (section.students?.some((studentId) => studentId.equals(userId))) {
           section.isEnrolled = true;
         }
       });
@@ -186,6 +186,139 @@ router.get("/:sectionId/discard", async (req, res) => {
     res.json({ acknowledged: true });
   } catch (error) {
     res.status(error.status || 500).json({ error: error.message });
+  }
+});
+
+router.post("/addSection/:courseId", async (req, res) => {
+  let { courseId } = req.params;
+  const {
+    sectionName,
+    sectionInstructor,
+    sectionType,
+    sectionStartTime,
+    sectionEndTime,
+    sectionDay,
+    sectionCapacity,
+    sectionLocation,
+    sectionDescription,
+  } = req.body;
+  try {
+    verify.validateMongoId(courseId, "courseId");
+    const section = validateSection(
+      sectionName,
+      sectionInstructor,
+      sectionType,
+      sectionStartTime,
+      sectionEndTime,
+      sectionDay,
+      sectionCapacity,
+      sectionLocation,
+      sectionDescription
+    );
+    const result = await courseDataFunctions.registerSection(
+      courseId,
+      section.sectionName,
+      section.sectionInstructor,
+      section.sectionType,
+      section.sectionStartTime,
+      section.sectionEndTime,
+      section.sectionDay,
+      section.sectionCapacity,
+      section.sectionLocation,
+      section.sectionDescription
+    );
+
+    if (result.acknowledged) {
+      return res.json(result);
+    }
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+});
+
+router.put("/editSection/:sectionId", async (req, res) => {
+  const {
+    sectionId,
+    sectionName,
+    sectionInstructor,
+    sectionType,
+    sectionStartTime,
+    sectionEndTime,
+    sectionDay,
+    sectionCapacity,
+    sectionLocation,
+    sectionDescription,
+  } = req.body;
+
+  try {
+    verify.validateMongoId(sectionId, "sectionId");
+    let updateSection = validateSection(
+      sectionName,
+      sectionInstructor,
+      sectionType,
+      sectionStartTime,
+      sectionEndTime,
+      sectionDay,
+      sectionCapacity,
+      sectionLocation,
+      sectionDescription
+    );
+    const updatedSection = await courseDataFunctions.updateSection(
+      sectionId,
+      updateSection.sectionName,
+      sectionInstructor,
+      updateSection.sectionType,
+      updateSection.sectionStartTime,
+      updateSection.sectionEndTime,
+      updateSection.sectionDay,
+      updateSection.sectionCapacity,
+      updateSection.sectionLocation,
+      updateSection.sectionDescription
+    );
+    return res.json(updatedSection);
+  } catch (error) {
+    if (error.status !== 500 && error.status) {
+      return res.status(error.status).json({ error: error.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Internal Server Error" });
+    }
+  }
+});
+
+router.delete("/deleteSection/:sectionId", async (req, res) => {
+  let sectionId = req.params.sectionId;
+  try {
+    const deleteInfo = await courseDataFunctions.deleteSection(sectionId);
+    return res.json(deleteInfo);
+  } catch (error) {
+    if (error.status !== 500 && error.status) {
+      return res.json({ error: error.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+});
+
+router.get("/getSectionById/:sectionId", async (req, res) => {
+  let sectionId = req.params.sectionId;
+  try {
+    const section = await courseDataFunctions.getSectionById(sectionId);
+    return res.json(section);
+  } catch (error) {
+    if (error.status !== 500 && error.status) {
+      return res.json({ error: error.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
   }
 });
 
