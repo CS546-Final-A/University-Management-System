@@ -1,4 +1,5 @@
 import { users, assignments } from "../../config/mongoCollections.js";
+import { getgrade } from "../assignments/finalizegrades.js";
 import verify from "../../data_validation.js";
 
 function letterGrade(score) {
@@ -108,6 +109,7 @@ async function computeClassGrades(sectiondID) {
   for (let student of students) {
     student.grade = gradeForStudent(student._id, assignmentdata);
     student.lettergrade = letterGrade(student.grade);
+    student.finalgrade = await getgrade(sectiondID, student._id);
   }
 
   return students;
