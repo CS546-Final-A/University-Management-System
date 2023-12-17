@@ -378,7 +378,7 @@ a:focus {
   transition: all 0.2s linear;
 }
 
-.searchData:hover {
+.row.searchData:hover {
   background-color: #95959555;
 }
 
