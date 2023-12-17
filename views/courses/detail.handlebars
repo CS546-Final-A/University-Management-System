@@ -15,7 +15,7 @@
 
     <div class="my-3">{{this.courseDescription}}</div>
 
-    {{#if (eq ../type 'Admin')}}
+    {{#if (eq ../session_type 'Admin')}}
     <div class="my-4">
         <button type="button" class="btn btn-info" onclick="openAddSectionModal()">Add
             Section</button>
@@ -52,7 +52,7 @@
                     <td>{{this.sectionCapacity}}</td>
                     <td>{{this.students.length}}</td>
                     <td>
-                        {{#if (eq ../../type 'Admin')}}
+                        {{#if (eq ../../session_type 'Admin')}}
 
                         <button class="btn btn-warning edit-btn"
                             onclick="editSection('{{this.sectionId}}')">Edit</button>
@@ -61,7 +61,7 @@
 
                         {{/if}}
 
-                        {{#if (eq ../../type 'Student')}}
+                        {{#if (eq ../../session_type 'Student')}}
 
                         {{#if this.isEnrolled}}
 
@@ -85,7 +85,7 @@
     </div>
     <div id="tableError" style="color: red;"></div>
     {{/each}}
-    {{#if (eq type 'Admin')}}
+    {{#if (eq session_type 'Admin')}}
     <div class="modal fade" id="addSectionModal" tabindex="-1" role="dialog" aria-labelledby="addSectionModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -128,16 +128,16 @@
                             </select>
                         </div>
 
-                        <div class="form-floating my-4">
+                        <div class="my-4">
+                            <label for="sectionStartTime">Section Start Time:</label>
                             <input type="time" class="form-control" id="sectionStartTime" name="sectionStartTime"
                                 placeholder="" required>
-                            <label for="sectionStartTime">Section Start Time:</label>
                         </div>
 
                         <div class="my-4">
+                            <label for="sectionEndTime">Section End Time:</label>
                             <input type="time" class="form-control" id="sectionEndTime" name="sectionEndTime"
                                 placeholder="" required>
-                            <label for="sectionEndTime">Section End Time:</label>
                         </div>
 
                         <div class="my-4">
