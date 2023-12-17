@@ -1,13 +1,35 @@
 import { Router } from "express";
-import pdfkit from "pdfkit";
 
 import routeError from "../routeerror.js";
 import { getgrade } from "../../data/assignments/finalizegrades.js";
 import { courses } from "../../config/mongoCollections.js";
+import verify from "../../data_validation.js";
+import htmlToPdf from "html-pdf";
 
 const router = Router();
 
 // Used https://stackoverflow.com/questions/23624005/generate-pdf-file-using-pdfkit-and-send-it-to-browser-in-nodejs-expressjs
+function findSectionByStudentId(studentId, courses) {
+  let sections = [];
+  for (const course of courses) {
+    for (const section of course.sections) {
+      const foundStudent = section.students.find(
+        (student) => student.toString() === studentId
+      );
+      if (foundStudent) {
+        sections.push({
+          sectionId: section.sectionId,
+          courseName: course.courseName,
+          courseCredits: course.courseCredits,
+          courseSemester: course.courseSemester,
+          courseYear: course.courseYear,
+        });
+      }
+    }
+  }
+
+  return sections; // Section not found
+}
 
 router.get("/", async (req, res) => {
   try {
@@ -15,12 +37,12 @@ router.get("/", async (req, res) => {
       throw { status: 403, message: "Only students have a transcript" };
     }
     const coursecol = await courses();
-
+    let studentId = verify.validateMongoId(req.session.userid);
     const studentcourses = await coursecol
       .find({
         sections: {
           $elemMatch: {
-            students: req.session.userid,
+            students: studentId,
           },
         },
       })
@@ -29,79 +51,126 @@ router.get("/", async (req, res) => {
         courseSemester: 1,
       })
       .toArray();
+    const sections = findSectionByStudentId(req.session.userid, studentcourses);
 
-    const doc = new pdfkit();
-    doc.pipe(res);
+    // Group sections by semester and year
+    const groupedSections = sections.reduce((acc, section) => {
+      const key = section.courseSemester + section.courseYear;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(section);
+      return acc;
+    }, {});
 
-    res.set("Content-Type", "application/pdf");
-    res.set(
-      "Content-disposition",
-      `attachment;filename=${req.session.name} Transcript.pdf`
-    );
-
-    doc.font("Times-Roman").text(`Transcript for ${req.session.name}`);
     let credits = 0;
     let gradepoints = 0;
     let activesemester = "";
-    for (let course of studentcourses) {
-      let grade = await getgrade(course.sectionId, req.session.userid);
-      if (grade) {
-        let gpamult = 0;
-        switch (lettergrade) {
-          case "A":
-            gpamult = 4;
-            break;
-          case "A-":
-            gpamult = 3.7;
-            break;
-          case "B+":
-            gpamult = 3.4;
-            break;
-          case "B":
-            gpamult = 3.0;
-            break;
-          case "B-":
-            gpamult = 2.7;
-            break;
-          case "C+":
-            gpamult = 2.4;
-            break;
-          case "C":
-            gpamult = 2.0;
-            break;
-          case "C-":
-            gpamult = 1.7;
-            break;
-          case "D":
-            gpamult = 1;
-            break;
-          case "F":
-            gpamult = 0;
-            break;
-        }
-        credits += course.courseCredits;
-        gradepoints = course.courseCredits * gpamult;
-      } else {
-        grade = "";
-      }
-      if (activesemester !== course.courseSemester + course.courseYear) {
-        activesemester = course.courseSemester + course.courseYear;
-        doc.font("Times-Bold").text(activesemester);
-      }
-      doc
-        .font("Times-Roman")
-        .text(
-          `Course:${course.courseName}\ncredits:${course.courseCredits}\nGrade:${grade}`
-        );
-    }
-    let gpa = gradepoints / credits;
 
+    let htmlContent = `
+       <html>
+        <head>
+          <style>
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 8px;
+              text-align: left;
+            }
+          </style>
+        </head>
+        <body>
+          <h2>Transcript for ${req.session.name}</h2>
+          <table>
+            
+          `;
+    for (const semesterKey in groupedSections) {
+      htmlContent += `<tr><td colspan="3"><strong>${semesterKey}</strong></td></tr>
+      <tr>
+        <th>Course Name</th>
+        <th>Credits</th>
+        <th>Grade</th>
+      </tr>`;
+      for (let section of groupedSections[semesterKey]) {
+        let grade = await getgrade(
+          section.sectionId.toString(),
+          req.session.userid
+        );
+        if (grade) {
+          let gpamult = 0;
+          switch (grade) {
+            case "A":
+              gpamult = 4;
+              break;
+            case "A-":
+              gpamult = 3.7;
+              break;
+            case "B+":
+              gpamult = 3.4;
+              break;
+            case "B":
+              gpamult = 3.0;
+              break;
+            case "B-":
+              gpamult = 2.7;
+              break;
+            case "C+":
+              gpamult = 2.4;
+              break;
+            case "C":
+              gpamult = 2.0;
+              break;
+            case "C-":
+              gpamult = 1.7;
+              break;
+            case "D":
+              gpamult = 1;
+              break;
+            case "F":
+              gpamult = 0;
+              break;
+          }
+          credits += section.courseCredits;
+          gradepoints = section.courseCredits * gpamult;
+        } else {
+          grade = "";
+        }
+        htmlContent += `
+          <tr>
+            <td>${section.courseName}</td>
+            <td>${section.courseCredits}</td>
+            <td>${grade}</td>
+          </tr>`;
+      }
+    }
+
+    // Add summary information
+    let gpa = gradepoints / credits;
     if (isNaN(gpa)) {
       gpa = 0;
     }
-    doc.font("Times-Bold").text(`Credits Earned: ${credits}\nGPA:${gpa}`);
+    htmlContent += `
+      </table>
+      <p><strong>Credits Earned:</strong> ${credits}</p>
+      <p><strong>GPA:</strong> ${gpa.toFixed(2)}</p>
+    </body></html>`;
 
-    doc.end();
+    // Create PDF from HTML content
+    htmlToPdf.create(htmlContent).toBuffer((err, buffer) => {
+      if (err) {
+        throw err;
+      }
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-disposition",
+        `attachment;filename=${req.session.name} Transcript.pdf`
+      );
+      res.send(buffer);
+    });
   } catch (e) {
     routeError(res, e);
   }
