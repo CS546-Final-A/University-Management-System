@@ -9,7 +9,7 @@ import {
   getModuleById,
   uploadMaterial,
 } from "../../data/modules/modules.js";
-
+import { validateSection } from "../../data/courses/courseHelper.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
 import fileUpload from "express-fileupload";
 import path from "path";
@@ -20,7 +20,7 @@ import {
   computeGradeByUserID,
   computeClassGrades,
 } from "../../data/submissions/computeGrades.js";
-import { getgrade, setgrade } from "../../data/assignments/finalizegrades.js";
+import { setgrade } from "../../data/assignments/finalizegrades.js";
 import { getAssignmentsBySectionId } from "../../data/assignments/assignments.js";
 import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
 import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
@@ -34,79 +34,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const router = Router();
-
-router.use("/:sectionID*", async (req, res, next) => {
-  res.locals.sectionID = req.params.sectionID;
-  res.locals.layout = "sidebar";
-  try {
-    const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
-    if (await belongsincourse(req.session.userid, sectionID)) {
-      next();
-    } else {
-      res.status(403);
-      res.render("public/error", {
-        error: "You are not enrolled in this course",
-      });
-    }
-  } catch (e) {
-    if (e.status !== 500 && e.status) {
-      res.status(e.status);
-      return res.render("public/error", {
-        error: e.message,
-      });
-    } else {
-      console.log(e);
-      res.status(500);
-      return res.render("public/error", {
-        error: "Internal Server Error",
-      });
-    }
-  }
-});
-
-router.route("/:sectionId").get(async (req, res) => {
-  try {
-    let renderObjs = {};
-
-    const section = await courseDataFunctions.getSectionById(
-      res.locals.sectionID
-    );
-    const course = await courseDataFunctions.getCourseById(
-      section.courseId.toString()
-    );
-
-    const profName = await getUserByID(section.sectionInstructor, {
-      _id: 0,
-      firstname: 1,
-      lastname: 1,
-    });
-
-    renderObjs = {
-      ...renderObjs,
-      layout: "sidebar",
-      sideBarTitle: course[0].courseName,
-      courseId: section.courseId.toString(),
-      courseName: course[0].courseName,
-      sectionName: section.sectionName,
-      sectionInstructor: section.sectionInstructor,
-      fN: profName.firstname,
-      lN: profName.lastname,
-      sectionType: section.sectionType,
-      sectionStartTime: section.sectionStartTime,
-      sectionEndTime: section.sectionEndTime,
-      sectionDay: section.sectionDay,
-      sectionCapacity: section.sectionCapacity,
-      sectionYear: section.sectionYear,
-      sectionSemester: section.sectionSemester,
-      studentCount: section.students.length,
-      sectionLocation: section.sectionLocation,
-      sectionDescription: section.sectionDescription,
-    };
-    res.render("workspace/home", renderObjs);
-  } catch (e) {
-    routeError(res, e);
-  }
-});
 
 router.put("/:sectionId", async (req, res) => {
   const {
@@ -223,6 +150,79 @@ router.post("/:courseId/section", async (req, res) => {
       res.status(500);
       res.json({ error: "Login error" });
     }
+  }
+});
+
+router.use("/:sectionID*", async (req, res, next) => {
+  res.locals.sectionID = req.params.sectionID;
+  res.locals.layout = "sidebar";
+  try {
+    const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
+    if (await belongsincourse(req.session.userid, sectionID)) {
+      next();
+    } else {
+      res.status(403);
+      res.render("public/error", {
+        error: "You are not enrolled in this course",
+      });
+    }
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.render("public/error", {
+        error: e.message,
+      });
+    } else {
+      console.log(e);
+      res.status(500);
+      return res.render("public/error", {
+        error: "Internal Server Error",
+      });
+    }
+  }
+});
+
+router.route("/:sectionId").get(async (req, res) => {
+  try {
+    let renderObjs = {};
+
+    const section = await courseDataFunctions.getSectionById(
+      res.locals.sectionID
+    );
+    const course = await courseDataFunctions.getCourseById(
+      section.courseId.toString()
+    );
+
+    const profName = await getUserByID(section.sectionInstructor, {
+      _id: 0,
+      firstname: 1,
+      lastname: 1,
+    });
+
+    renderObjs = {
+      ...renderObjs,
+      layout: "sidebar",
+      sideBarTitle: course[0].courseName,
+      courseId: section.courseId.toString(),
+      courseName: course[0].courseName,
+      sectionName: section.sectionName,
+      sectionInstructor: section.sectionInstructor,
+      fN: profName.firstname,
+      lN: profName.lastname,
+      sectionType: section.sectionType,
+      sectionStartTime: section.sectionStartTime,
+      sectionEndTime: section.sectionEndTime,
+      sectionDay: section.sectionDay,
+      sectionCapacity: section.sectionCapacity,
+      sectionYear: section.sectionYear,
+      sectionSemester: section.sectionSemester,
+      studentCount: section.enrolledStudents.length,
+      sectionLocation: section.sectionLocation,
+      sectionDescription: section.sectionDescription,
+    };
+    res.render("workspace/home", renderObjs);
+  } catch (e) {
+    routeError(res, e);
   }
 });
 
