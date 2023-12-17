@@ -1,7 +1,7 @@
 $("#addModalButton").click(async function (e) {
   e.preventDefault();
-  document.getElementById("addFormError").innerText = "";
-  document.getElementById("addDepartmentName").value = "";
+  $("#addFormError").text("");
+  $("#addDepartmentName").val("");
   $("#addModal").modal("toggle");
   // window.location.href = `/courses/registration/`;
 });
@@ -10,19 +10,17 @@ $("#addModal .close").on("click", function (e) {
   $("#addModal").modal("hide");
 });
 
-
 $("#editModal .close").on("click", function (e) {
   $("#editModal").modal("hide");
 });
 
 const submitForm = async (event) => {
   event.preventDefault();
-  document.getElementById("addFormError").innerText = "";
-
-  const departmentName = document.getElementById("addDepartmentName").value;
-
+  $("#addFormError").text("");
   try {
-    const csrf = document.getElementById("csrf").value;
+    const departmentName = verify.string($("#addDepartmentName").val());
+
+    const csrf = $("#csrf").val();
 
     let requestData = {
       departmentName,
@@ -41,31 +39,31 @@ const submitForm = async (event) => {
       window.location.href = "/configuration/departments";
     }
   } catch (e) {
-    document.getElementById("addFormError").innerText = "";
+    $("#addFormError").text("");
     if (e.error) {
       setError(e.error, "addFormError");
-    } else {
+    } else if (e.message) {
       setError(e.message, "addFormError");
+    } else {
+      setError(e, "addFormError");
     }
   }
 };
 
 const openEditModal = async (id, name) => {
-  document.getElementById("editFormError").innerText = "";
-  document.getElementById("editDepartmentId").value = id;
-  document.getElementById("editDepartmentName").value = name;
+  $("#editFormError").text("");
+  $("#editDepartmentId").val(id);
+  $("#editDepartmentName").val(name);
   $("#editModal").modal("toggle");
 };
 
 const submitEditForm = async (event) => {
-    event.preventDefault();
-    document.getElementById("addFormError").innerText = "";
-  
-
-    const departmentId = document.getElementById("editDepartmentId").value;
-    const departmentName = document.getElementById("editDepartmentName").value;
+  event.preventDefault();
+  $("#addFormError").text("");
   try {
-    const csrf = document.getElementById("csrf").value;
+    const departmentId = $("#editDepartmentId").val();
+    const departmentName = verify.string($("#editDepartmentName").val());
+    const csrf = $("#csrf").val();
     let requestData = {
       departmentName,
     };
@@ -81,11 +79,13 @@ const submitEditForm = async (event) => {
       window.location.href = "/configuration/departments";
     }
   } catch (e) {
-    document.getElementById("editFormError").innerText = "";
+    $("#editFormError").text("");
     if (e.error) {
       setError(e.error, "editFormError");
-    } else {
+    } else if (e.message) {
       setError(e.message, "editFormError");
+    } else {
+      setError(e, "editFormError");
     }
   }
 };
