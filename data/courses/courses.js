@@ -114,6 +114,9 @@ export const updateDepartment = async (departmentId, departmentName) => {
   let department = await departmentCollection.findOne({
     _id: departmentId,
   });
+  if (!department) {
+    throw { status: 404, message: "Department not found" };
+  }
   department.departmentName = departmentName;
   const updateInfo = await departmentCollection.updateOne(
     { _id: department._id },
