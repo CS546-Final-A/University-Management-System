@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { getAllDepartments } from "../../data/courses/courses.js";
+import { deleteDepartment, getAllDepartments, registerDepartment, updateDepartment } from "../../data/courses/courses.js";
+import verify from "../../data_validation.js";
 
 const router = Router();
 
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
       };
       res.render('admin/configuration', renderObjs);
     } catch (error) {
-      res.render('admin/config', { error: 'Error fetching departments. Please try again.' });
+      res.render('admin/configuration', { error: 'Error fetching departments. Please try again.' });
     }
   });
   
@@ -26,7 +27,7 @@ router.get('/departments', async (req, res) => {
         session_type: req.session.type,
         session_email: req.session.email,
         departmentList,
-        script: 'admin/configuration',
+        script: 'admin/departments',
       };
       res.render('admin/departments', renderObjs);
     } catch (error) {
@@ -34,57 +35,32 @@ router.get('/departments', async (req, res) => {
     }
   });
   
-  // Render the form for department registration
-  router.get('/departments/register', (req, res) => {
-    let renderObjs = {
-      session_name: req.session.name,
-      session_type: req.session.type,
-      session_email: req.session.email,
-      script: 'admin/config',
-    };
-    res.render('admin/registerDepartment', renderObjs);
-  });
-  
   
   router.post('/departments/register', async (req, res) => {
     const { departmentName } = req.body;
   
     try {
-      const newDepartmentId = await registerDepartment(departmentName);
-      res.redirect('/departments'); // Redirect to the departments page after successful registration
+      departmentName = verify.string(departmentName, "departmentName");
+      const newDepartment = await registerDepartment(departmentName);
+      res.json(newDepartment);
     } catch (error) {
-      res.render('admin/registerDepartment', { error: 'Registration failed. Please try again.' });
-    }
-  });
-  
-  router.get('/departments/update/:id', async (req, res) => {
-    const departmentId = req.params.id;
-  
-    try {
-      const department = await getDepartmentById(departmentId);
-      let renderObjs = {
-        session_name: req.session.name,
-        session_type: req.session.type,
-        session_email: req.session.email,
-        department,
-        script: 'admin/config',
-      };
-      res.render('admin/updateDepartment', renderObjs);
-    } catch (error) {
-      res.render('admin/updateDepartment', { error: 'Error fetching department. Please try again.' });
+      res.json({error: error.message});
+      // res.render('admin/departments', { error: 'Registration failed. Please try again.' });
     }
   });
   
 
-  router.post('/departments/update/:id', async (req, res) => {
+  router.put('/departments/update/:id', async (req, res) => {
     const departmentId = req.params.id;
     const { departmentName } = req.body;
   
     try {
+      verify.validateMongoId(departmentId)
+      departmentName = verify.string(departmentName, "departmentName");
       const updatedDepartment = await updateDepartment(departmentId, departmentName);
-      res.redirect('/departments');
+      res.json(updatedDepartment);
     } catch (error) {
-      res.render('admin/updateDepartment', { error: 'Update failed. Please try again.' });
+      res.json({error: error.message});
     }
   });
 
@@ -92,10 +68,11 @@ router.get('/departments', async (req, res) => {
     const departmentId = req.params.id;
   
     try {
+      verify.validateMongoId(departmentId)
       const deletionResult = await deleteDepartment(departmentId);
-      res.redirect('/departments'); 
+      res.redirect('/configuration/departments'); 
     } catch (error) {
-      res.render('admin/config', { error: 'Deletion failed. Please try again.' });
+      res.render('admin/configuration', { error: 'Deletion failed. Please try again.' });
     }
   });
   

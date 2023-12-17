@@ -91,7 +91,7 @@ export const getDepartmentById = async (departmentId) => {
 };
 
 export const registerDepartment = async (departmentName) => {
-  const newDepartment = verify.string(departmentName, "departmentName");
+  departmentName = verify.string(departmentName, "departmentName");
 
   const departmentCollection = await departments();
   const department = await departmentCollection.findOne({
@@ -100,9 +100,11 @@ export const registerDepartment = async (departmentName) => {
   if (department) {
     throwerror("Department already exists!");
   } else {
+    const newDepartment = {
+      departmentName: departmentName,
+    };
     const insertInfo = await departmentCollection.insertOne(newDepartment);
-    const newId = insertInfo.insertedId.toString();
-    return newId;
+    return insertInfo;
   }
 };
 
@@ -120,7 +122,7 @@ export const updateDepartment = async (departmentId, departmentName) => {
   );
   if (!updateInfo) throwerror("Department was not updated successfully!");
 
-  return await getDepartmentById(departmentId);
+  return updateInfo;
 };
 
 export const deleteDepartment = async (departmentId) => {
