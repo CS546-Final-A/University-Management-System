@@ -1,10 +1,12 @@
 import fileUpload from "express-fileupload";
 import path from "path";
 import { Router, query } from "express";
+import fs from "fs";
 
 import verify, { santizeInputs } from "../../data_validation.js";
 
 import * as assignmentDataFunctions from "../../data/assignments/assignments.js";
+import routeError from "../routeerror.js";
 const router = Router();
 
 router.get(
@@ -24,6 +26,20 @@ router.get(
         submissionId
       );
 
+      if (!assignment || !submission) {
+        throw { status: 404, message: "Submission not found" };
+      }
+
+      let isTeacher = assignment.userId == req.session.userid;
+      let isStudent = submission.studentId == req.session.userid;
+      if (!isTeacher && !isStudent) {
+        const e = {
+          status: 403,
+          message: "You are not allowed to download this submission ",
+        };
+        throw e;
+      }
+
       const submissionPath = path.join(
         "files",
         assignmentId.toString(),
@@ -31,23 +47,22 @@ router.get(
         submission.file
       );
 
-      let isTeacher = assignment.userId == req.session.userid;
-      let isStudent = submission.studentId == req.session.userid;
-
-      if (isTeacher || isStudent) {
+      if (fs.existsSync(submissionPath)) {
         res.download(submissionPath, submission.filename, (err) => {
           if (err) {
             console.log(err);
           }
         });
       } else {
-        res
-          .status(403)
-          .json({ error: "You are not allowed to download this submission" });
-        return;
+        // Server error because files should exist if submitted
+        const e = {
+          status: 500,
+          message: "Submission file not found",
+        };
+        throw e;
       }
     } catch (e) {
-      res.status(404).json({ error: "Submission not found" });
+      routeError(res, e);
     }
   }
 );
