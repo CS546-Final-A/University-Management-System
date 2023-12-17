@@ -19,7 +19,36 @@
         <input type="file" id="fileInput" accept=".pdf" />
         <button type="submit">Submit</button>
     </form>
+    <h2>Files</h2>
+    {{#each files}}
+<div class="card my-4 glassEffect">
+    <div class="card-header glassEffect d-flex">
+        <div class="my-auto" id="heading">{{this.heading}}</div>
+        <div class="my-auto fs-6 ms-3" id="fileName">{{this.fileName}}</div>
+        <div class="my-auto fs-6 ms-3" id="filePath" hidden>{{this.filePath}}</div>
+        <div class="ms-auto">
+            <button class="btnSubmit p-2 downloadBtn">Download</button>
+        </div>
+    </div>
 </div>
+{{/each}}
+
+</div>
+{{/if}}
+ {{#if (eq type "Student")}}
+ <h2>Files</h2>
+    {{#each files}}
+<div class="card my-4 glassEffect">
+    <div class="card-header glassEffect d-flex">
+        <div class="my-auto" id="heading">{{this.heading}}</div>
+        <div class="my-auto fs-6 ms-3" id="fileName">{{this.fileName}}</div>
+        <div class="my-auto fs-6 ms-3" id="filePath" hidden>{{this.filePath}}</div>
+        <div class="ms-auto">
+            <button class="btnSubmit p-2 downloadBtn">Download</button>
+        </div>
+    </div>
+</div>
+{{/each}}
 {{/if}}
 <script>
     document.getElementById("headingUploadButton").addEventListener("click", async () => {
@@ -91,5 +120,19 @@ document.getElementById("fileUploadForm").addEventListener("submit", async (e) =
         console.error("Error:", error);
     }
 });
+
+
+const downloadButtons = document.querySelectorAll('.downloadBtn');
+
+    downloadButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const parentDiv = button.closest('.card-header');
+            const filePath = parentDiv.querySelector('#filePath').innerText;
+            const fileName = parentDiv.querySelector('#fileName').innerText;
+            const url = window.location.href+ `downloadFile?filePath=${filePath}&fileName=${fileName}`;
+            window.location.href = url;
+        });
+    });
+
 
 </script>

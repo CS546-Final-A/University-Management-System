@@ -233,7 +233,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
       sections: data[0].sections,
       headings: data[0].courseLearning.headings,
       files: data[0].courseLearning.files,
-      layout: "sidebar",
+      // layout: "sidebar",
       // sectionID,
     };
 
@@ -330,4 +330,22 @@ router
       }
     }
   );
+router.get("/:courseId/materials/downloadFile", async (req, res) => {
+  console.log(req);
+  try {
+    let courseId = req.params.courseId;
+    courseId = verify.validateMongoId(courseId);
+    const filePath = req.query.filePath;
+    const fileName = req.query.fileName;
+    res.download(filePath, fileName, (err) => {
+      if (err) {
+        console.log(err);
+        res.status(404).json({ error: "File not found" });
+      }
+    });
+  } catch (e) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;
