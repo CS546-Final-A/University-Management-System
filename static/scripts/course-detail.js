@@ -44,8 +44,9 @@ const sectionSubmit = async (event) => {
 
     const sectionRegistrationRoute =
       editMode === "true"
-        ? `/sections/${encodeURIComponent(requestData.sectionId)}`
-        : `/sections/${encodeURIComponent(courseId)}/section`;
+        ? `/courses/editSection/${encodeURIComponent(requestData.sectionId)}`
+        : `/courses/addSection/${encodeURIComponent(courseId)}`;
+
 
     const result = await request(
       editMode === "true" ? "PUT" : "POST",
@@ -77,7 +78,7 @@ const editSection = async (sectionId) => {
   const csrf = document.getElementById("csrf").value;
   let section;
   try {
-    const getSection = `/sections/${sectionId}`;
+    const getSection = `/courses/getSectionById/${sectionId}`;
     section = await request("GET", getSection, csrf);
 
     document.getElementById("addSectionForm").reset();
@@ -110,7 +111,7 @@ const deleteSection = async (sectionId) => {
   const csrf = document.getElementById("csrf").value;
   let deleteInfo;
   try {
-    const deleteSection = `/sections/${sectionId}`;
+    const deleteSection = `/courses/deleteSection/${sectionId}`;
     deleteInfo = await request("DELETE", deleteSection, csrf);
     if (deleteInfo?.error) {
       document.getElementById("error").innerText = result.error;
