@@ -160,16 +160,20 @@ router.get("/", async (req, res) => {
 
     // Create PDF from HTML content
     htmlToPdf.create(htmlContent).toBuffer((err, buffer) => {
-      if (err) {
-        throw err;
-      }
+      try {
+        if (err) {
+          throw err;
+        }
 
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-disposition",
-        `attachment;filename=${req.session.name} Transcript.pdf`
-      );
-      res.send(buffer);
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+          "Content-disposition",
+          `attachment;filename=${req.session.name} Transcript.pdf`
+        );
+        res.send(buffer);
+      } catch (e) {
+        routeError(res, e);
+      }
     });
   } catch (e) {
     routeError(res, e);
