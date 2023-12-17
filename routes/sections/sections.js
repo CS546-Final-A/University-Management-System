@@ -222,15 +222,20 @@ router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
     let sectionId = verify.validateMongoId(req.params.sectionId);
-
+    const section = await courseDataFunctions.getSectionById(
+      res.locals.sectionID
+    );
+    const course = await courseDataFunctions.getCourseById(
+      section.courseId.toString()
+    );
     let renderObjs = {};
-    const section = await courseDataFunctions.getSectionById(sectionId);
     const userType = req.session.type;
 
     renderObjs = {
       ...renderObjs,
       layout: "sidebar",
       // sideBarTitle: `${course.courseName}`,
+      courseId: section.courseId.toString(),
       modules: section.sectionModules,
       userType,
     };
@@ -281,6 +286,12 @@ router
   .get(async (req, res) => {
     let renderObjs = {};
     let { sectionId, moduleId } = req.params;
+    const sectionn = await courseDataFunctions.getSectionById(
+      res.locals.sectionID
+    );
+    const course = await courseDataFunctions.getCourseById(
+      sectionn.courseId.toString()
+    );
     let userId = req.session.userid;
     userId = verify.validateMongoId(userId);
     moduleId = verify.validateMongoId(moduleId);
@@ -340,6 +351,7 @@ router
             ...renderObjs,
             layout: "sidebar",
             // sideBarTitle: `${course.courseName}`,
+            courseId: sectionn.courseId.toString(),
             userType,
             name,
             studentsWithinRange,

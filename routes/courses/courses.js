@@ -227,7 +227,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
       name: req.session.name,
       type: req.session.type,
       email: req.session.email,
-      // courseId,
+      courseId,
       courseName: data[0].courseName,
       courseDescription: data[0].courseDescription,
       sections: data[0].sections,
@@ -249,20 +249,25 @@ router.route("/:courseId/materials").get(async (req, res) => {
   }
 });
 
-router.route("/:courseId/materials/heading").post(async (req, res) => {
-  try {
-    req.body = santizeInputs(req.body);
-    let { courseId } = req.params;
-    let userId = req.session.userid;
-    userId = verify.validateMongoId(userId);
-    courseId = verify.validateMongoId(courseId);
-    await courseDataFunctions.addHeading(req.params.courseId, req.body.heading);
-    res.status(200).json({ message: "Heading added successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+router
+  .route("/:courseId/materials/heading")
+  .post(upload.none(), async (req, res) => {
+    try {
+      req.body = santizeInputs(req.body);
+      let { courseId } = req.params;
+      let userId = req.session.userid;
+      userId = verify.validateMongoId(userId);
+      courseId = verify.validateMongoId(courseId);
+      await courseDataFunctions.addHeading(
+        req.params.courseId,
+        req.body.heading
+      );
+      res.status(200).json({ message: "Heading added successfully" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
 // Handling file uploads
 router
