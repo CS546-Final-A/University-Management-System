@@ -558,7 +558,7 @@ export const registerSection = async (
 
   const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
-    { $push: { sections: newSection.toString() } }
+    { $push: { sections: newSection } }
   );
   if (!updateInfo) {
     throwErrorWithStatus(
