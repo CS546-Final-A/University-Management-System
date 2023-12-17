@@ -158,8 +158,20 @@ router.get("/", async (req, res) => {
       <p><strong>GPA:</strong> ${gpa.toFixed(2)}</p>
     </body></html>`;
 
+    let compat = {};
+
+    if (process.env.UnixCompat) {
+      // https://stackoverflow.com/questions/60966814/node-html-pdf-auto-configuration-failed
+      compat = {
+        childProcessOptions: {
+          env: {
+            OPENSSL_CONF: "/dev/null",
+          },
+        },
+      };
+    }
     // Create PDF from HTML content
-    htmlToPdf.create(htmlContent).toBuffer((err, buffer) => {
+    htmlToPdf.create(htmlContent, compat).toBuffer((err, buffer) => {
       try {
         if (err) {
           throw err;
