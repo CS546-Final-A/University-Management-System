@@ -7,25 +7,25 @@ import routeError from "../routeerror.js";
 import verify, { santizeInputs } from "../../data_validation.js";
 import { validateAssignment } from "../../data/assignments/assignmentsHelper.js";
 
-import belongsincourse from "../../data/courses/belongsincourse.js";
 import fileUpload from "express-fileupload";
 import path from "path";
 import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
 import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
 import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
 
+import belongsincourse from "../../data/courses/belongsincourse.js";
+
 router.get("/create", async (req, res) => {
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to create assignments for this secion",
+      };
+    }
     let renderObjs = {};
     renderObjs.script = "assignments/create";
     //TODO: get all the assignments for this section and pass it to the renderObjs
-    let section = await courseDataFunctions.getSectionById(
-      res.locals.sectionID
-    );
-
-    if (!section) {
-      throw new Error("Section not found");
-    }
 
     res.render("assignments/create", renderObjs);
   } catch (e) {
@@ -34,20 +34,26 @@ router.get("/create", async (req, res) => {
 });
 
 router.post("/create", async (req, res) => {
-  req.body = santizeInputs(req.body);
-  const sectionId = res.locals.sectionID;
-  let userId = req.session.userid;
-  const {
-    assignmentName,
-    assignmentDescription,
-    assignmentWeight,
-    assignmentDueDate,
-
-    submissionLimit,
-
-    assignmentMaxScore,
-  } = req.body;
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to create assignments for this secion",
+      };
+    }
+    req.body = santizeInputs(req.body);
+    const sectionId = res.locals.sectionID;
+    let userId = req.session.userid;
+    const {
+      assignmentName,
+      assignmentDescription,
+      assignmentWeight,
+      assignmentDueDate,
+
+      submissionLimit,
+
+      assignmentMaxScore,
+    } = req.body;
     const assignment = validateAssignment(
       userId,
       assignmentName,
@@ -76,16 +82,6 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.use("/:action/:assignmentID", async (req, res, next) => {
-  if (await belongsincourse(req.session.userid, res.locals.sectionID)) {
-    next();
-  } else {
-    res.status(403);
-    res.render("public/error", {
-      error: "You are not enrolled in this course",
-    });
-  }
-});
 router.use("/:action/:assignmentID*", async (req, res, next) => {
   try {
     if (req.params.assignmentID) {
@@ -97,17 +93,31 @@ router.use("/:action/:assignmentID*", async (req, res, next) => {
       if (!res.locals.assignment) {
         throw { status: 404, message: "Assignment not found" };
       }
+
       res.locals.assignment.assignmentDueDate = new Date(
         res.locals.assignment.assignmentDueDate
       );
     }
-    next();
+    if (await belongsincourse(req.session.userid, res.locals.sectionID)) {
+      next();
+    } else {
+      throw {
+        status: 403,
+        message: "You are not allowed to access this assignment",
+      };
+    }
   } catch (e) {
     routeError(res, e);
   }
 });
 
 router.get("/edit/:assignmentID", async (req, res) => {
+  if (req.session.type !== "Professor") {
+    throw {
+      status: 403,
+      message: "You are not permitted to change assignments for this secion",
+    };
+  }
   try {
     if (req.session.type !== "Professor") {
       throw {
@@ -127,6 +137,12 @@ router.get("/edit/:assignmentID", async (req, res) => {
 });
 
 router.post("/edit/:assignmentID/", async (req, res) => {
+  if (req.session.type !== "Professor") {
+    throw {
+      status: 403,
+      message: "You are not permitted to change assignments for this secion",
+    };
+  }
   req.body = santizeInputs(req.body);
   const sectionId = res.locals.sectionID;
   const assignmentID = res.locals.assignmentID;
@@ -167,6 +183,12 @@ router.post("/edit/:assignmentID/", async (req, res) => {
 
 router.get("/delete/:assignmentID/", async (req, res) => {
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to delete assignments for this secion",
+      };
+    }
     let sectionId = res.locals.sectionID;
     let assignmentID = res.locals.assignmentID;
     assignmentID = verify.validateMongoId(assignmentID);
@@ -191,10 +213,22 @@ router.get("/delete/:assignmentID/", async (req, res) => {
 });
 router.get("/view/:assignmentID/submit", async (req, res) => {
   try {
+    if (req.session.type !== "Student") {
+      throw {
+        status: 403,
+        message: "You are not permitted to submit assignments in this secion",
+      };
+    }
     let renderObjs = {};
     renderObjs.currentDate = new Date();
-
-    res.render("assignments/submit", renderObjs);
+    if (await belongsincourse(req.session.userid, res.locals.sectionID)) {
+      res.render("assignments/submit", renderObjs);
+    } else {
+      throw {
+        status: 403,
+        message: "You are not permitted to submit assignments in this secion",
+      };
+    }
   } catch (e) {
     routeError(res, e);
   }
@@ -210,9 +244,15 @@ router.post(
 
   async (req, res) => {
     try {
+      if (req.session.type !== "Student") {
+        throw {
+          status: 403,
+          message: "You are not permitted to submit assignments in this secion",
+        };
+      }
       req.body = santizeInputs(req.body);
       const sectionId = res.locals.sectionID;
-      const assignmentID = res.locals.assignmentID;
+      let assignmentID = res.locals.assignmentID;
       let userId = req.session.userid;
 
       const files = req.files;
@@ -323,13 +363,6 @@ router.get("/view/:assignmentID/scores", async (req, res) => {
 
     assignmentID = verify.validateMongoId(assignmentID);
 
-    let section = await courseDataFunctions.getSectionById(sectionId);
-    if (!section) {
-      throw new Error("Section not found");
-    }
-
-    renderObjs.section = section;
-
     assignment._id = assignment._id.toString();
 
     let allStudents = await courseDataFunctions.getStudentsInSection(sectionId);
@@ -348,6 +381,13 @@ router.get("/view/:assignmentID/scores", async (req, res) => {
         score: getScore(scores, student.studentId),
       };
     });
+
+    if (req.session.type !== "Professor") {
+      renderObjs.students = renderObjs.students.find((student) => {
+        return student._id === req.session.userid;
+      });
+      renderObjs.students = [renderObjs.students];
+    }
     res.render("assignments/scores", renderObjs);
   } catch (e) {
     routeError(res, e);
@@ -355,11 +395,18 @@ router.get("/view/:assignmentID/scores", async (req, res) => {
 });
 
 router.post("/view/:assignmentID/scores", async (req, res) => {
-  let sectionId = res.locals.sectionID;
-  let assignmentID = res.locals.assignmentID;
-  let { studentId, score } = req.body;
-
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to change grades for this secion",
+      };
+    }
+
+    let sectionId = res.locals.sectionID;
+    let assignmentID = res.locals.assignmentID;
+    let { studentId, score } = req.body;
+
     // Validate the score
     // Ensure that you have a function to validate the score in your data functions
     score = parseFloat(score);

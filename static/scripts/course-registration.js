@@ -20,12 +20,18 @@ const courseSubmit = async () => {
       courseSemester,
       courseYear,
     };
-    
-    const result = await request("POST", "/courses/registration", csrf, requestData);
-    if(result?.error) {
+
+    const result = await request(
+      "POST",
+      "/courses/registration",
+      csrf,
+      requestData
+    );
+    if (result?.error) {
       document.getElementById("error").innerText = result.error;
     } else if (result?.acknowledged) {
-      window.location.href = "/courses/" + result.insertedId;
+      window.location.href =
+        "/courses/" + encodeURIComponent(result.insertedId);
     }
   } catch (e) {
     document.getElementById("error").innerText = "";
