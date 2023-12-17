@@ -5,6 +5,8 @@ function sessionLocals(req, res, next) {
     res.locals.session_type = req.session.type;
     res.locals.session_email = req.session.email;
     res.locals.darkmode = req.session.darkmode;
+  } else {
+    res.locals.darkmode = 0;
   }
   next();
 }
