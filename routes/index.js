@@ -45,6 +45,9 @@ function route(app) {
   app.use("/transcript", transcript);
   app.use("/configuration", adminsOnly);
   app.use("/configuration", configuration);
+  app.use("/", (req, res) => {
+    res.redirect("/dashboard");
+  });
 }
 
 export default route;
