@@ -31,8 +31,8 @@ router.get(
         submission.file
       );
 
-      let isTeacher = assignment.userId == req.session.user._id;
-      let isStudent = submission.studentId == req.session.user._id;
+      let isTeacher = assignment.userId == req.session.userid;
+      let isStudent = submission.studentId == req.session.userid;
 
       if (isTeacher || isStudent) {
         res.download(submissionPath, submission.filename, (err) => {
