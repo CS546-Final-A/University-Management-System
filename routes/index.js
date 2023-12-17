@@ -14,6 +14,7 @@ import dashboard from "./dashboard.js";
 import user_management from "./administration/users.js";
 import courses from "./courses/courses.js";
 import sections from "./sections/sections.js";
+import transcript from "./users/transcript.js";
 
 function route(app) {
   app.use("/scripts", express.static("./static/scripts"));
@@ -39,6 +40,7 @@ function route(app) {
   app.use("/download", downloads);
   app.use("/courses", courses);
   app.use("/sections", sections);
+  app.use("/transcript", transcript);
 }
 
 export default route;
