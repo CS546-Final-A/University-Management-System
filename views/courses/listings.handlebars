@@ -53,7 +53,7 @@
         <button class="btnSubmit w-100 py-1" id="filter-button">Apply</button>
     </div>
     <div class="courses">
-
+        {{#if courses.found }}
         {{#each courses}}
         <div class="card glassEffect">
             <div class="card-header glassEffect courseRedirect" data-id="{{this._id}}">{{this.courseNumber}} -
@@ -69,5 +69,15 @@
             </div>
         </div>
         {{/each}}
+        {{else}}
+        <div class="card glassEffect">
+            <div class="card-header glassEffect">No courses found</div>
+            <div class="card-body">
+                <p>There are no courses that match your search criteria. Try something else</p>
+            </div>
+
+
+        </div>
+        {{/if}}
     </div>
 </div>
