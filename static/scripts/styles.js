@@ -1,16 +1,20 @@
-//Menu On Hover
+//CSS Colors
+var getColor1 = $("html").css("--blackColor");
+var getColor2 = $("html").css("--whiteColor");
+var glassColor1 = $("html").css("--glassColor1");
+var glassColor2 = $("html").css("--glassColor2");
+var shadowColor1 = $("html").css("--shadowColor1");
+var shadowColor2 = $("html").css("--shadowColor2");
+var stripeTableColor1 = $("html").css("--stripeTableColor1");
+var stripeTableColor2 = $("html").css("--stripeTableColor2");
 
 //Avoid Flickering on load
 if (_isDarkMode) {
-  var getColor1 = $("html").css("--blackColor");
-  var getColor2 = $("html").css("--whiteColor");
-  var glassColor2 = $("html").css("--glassColor2");
-  var shadowColor2 = $("html").css("--shadowColor2");
-
   $("html").css("--activeTextColor", getColor2);
   $("html").css("--activeBgColor", getColor1);
   $("html").css("--activeGlassColor", glassColor2);
   $("html").css("--activeShadowColor", shadowColor2);
+  $("html").css("--activeStripeTableColor", stripeTableColor2);
 }
 $(document).ready(function () {
   if (_isDarkMode) {
@@ -47,13 +51,6 @@ $(document).ready(function () {
 
 //Switch light/dark
 function themeSwitch() {
-  var getColor1 = $("html").css("--blackColor");
-  var getColor2 = $("html").css("--whiteColor");
-  var glassColor1 = $("html").css("--glassColor1");
-  var glassColor2 = $("html").css("--glassColor2");
-  var shadowColor1 = $("html").css("--shadowColor1");
-  var shadowColor2 = $("html").css("--shadowColor2");
-
   if ($("body").hasClass("dark")) {
     $("body").removeClass("dark");
     _isDarkMode = 0;
@@ -64,6 +61,7 @@ function themeSwitch() {
     $("html").css("--activeBgColor", getColor2);
     $("html").css("--activeGlassColor", glassColor1);
     $("html").css("--activeShadowColor", shadowColor1);
+    $("html").css("--activeStripeTableColor", stripeTableColor1);
   } else {
     $("body").addClass("dark");
     _isDarkMode = 1;
@@ -74,6 +72,7 @@ function themeSwitch() {
     $("html").css("--activeBgColor", getColor1);
     $("html").css("--activeGlassColor", glassColor2);
     $("html").css("--activeShadowColor", shadowColor2);
+    $("html").css("--activeStripeTableColor", stripeTableColor2);
   }
 }
 

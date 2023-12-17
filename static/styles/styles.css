@@ -18,6 +18,9 @@
   --shadowColor1: #5959594f;
   --shadowColor2: #2c2c2c4f;
   --activeShadowColor: var(--shadowColor1);
+  --stripeTableColor1: #0000000f;
+  --stripeTableColor2: #ffffff1a;
+  --activeStripeTableColor: var(--stripeTableColor1);
 }
 
 body {
@@ -416,7 +419,7 @@ a:focus {
 
 .modal-backdrop.show {
   background-color: var(--activeBgColor) !important;
-  opacity: 0.6 !important;
+  opacity: 0.85 !important;
 }
 
 .form-floating > .form-control,
@@ -479,11 +482,12 @@ a:focus {
 .bootstrap-select > .dropdown-toggle {
   background-color: var(--activeBgColor) !important;
   color: var(--activeTextColor) !important;
-  border-color: var(--purpleAccent) !important;
+  border-color: var(--activeTextColor) !important;
 }
 
 .bootstrap-select .dropdown-menu li a {
   color: var(--activeTextColor) !important;
+  transition: all 0.15s linear;
 }
 
 .bootstrap-select .dropdown-menu li a:hover {
@@ -492,8 +496,8 @@ a:focus {
 }
 
 .bootstrap-select .dropdown-menu li a.active {
-  background-color: #000000 !important;
-  color: #ffffff !important;
+  background-color: var(--activeTextColor) !important;
+  color: var(--activeBgColor) !important;
 }
 
 .bootstrap-select .dropdown-toggle:focus,
@@ -503,5 +507,10 @@ a:focus {
 }
 
 .table {
+  color: var(--activeTextColor) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-accent-bg: var(--activeStripeTableColor) !important;
   color: var(--activeTextColor) !important;
 }

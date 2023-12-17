@@ -47,7 +47,6 @@ const sectionSubmit = async (event) => {
         ? `/courses/editSection/${encodeURIComponent(requestData.sectionId)}`
         : `/courses/addSection/${encodeURIComponent(courseId)}`;
 
-
     const result = await request(
       editMode === "true" ? "PUT" : "POST",
       sectionRegistrationRoute,
@@ -183,11 +182,16 @@ const discardSection = async (sectionId) => {
 
 function setError(error, id) {
   // Reset the fadout animation and overwrite text
-  const errdiv = document.getElementById(id);
-  errdiv.innerText = error;
-  errdiv.style.animationName = "";
-  errdiv.offsetHeight;
-  errdiv.style.animationName = "fadeout";
+  var toastRed1 = $("html").css("--toastRed1");
+  $(".toast-header").css("background-color", toastRed1);
+  $(".toast-header").css("color", "#000000");
+  $(".toast-header .me-auto").html("&nbsp;&nbsp;Login Failed");
+
+  // $(".toast-body").css("background-color", toastRed2);
+  $(".toast-body").css("color", "#000000");
+  $("#toastHeadMsg").html("Error");
+  $(".toast-body").html(error);
+  $("#liveToast").toast("show");
 }
 
 $(document).ready(function () {
