@@ -238,7 +238,7 @@ router
   })
   .post(async (req, res) => {
     req.body = santizeInputs(req.body);
-    const { sectionId } = req.params;
+    let { sectionId } = req.params;
     sectionId = verify.validateMongoId(req.params.sectionId);
     const { moduleName, moduleDescription, moduleDate } = req.body;
     try {

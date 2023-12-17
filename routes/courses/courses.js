@@ -1,14 +1,24 @@
 import { Router, query } from "express";
 import verify, { santizeInputs } from "../../data_validation.js";
-import * as courseDataFunctions from "../../data/courses/courses.js";
 import util from "util";
 import {
   validateCourse,
   validateSection,
 } from "../../data/courses/courseHelper.js";
+import multer from "multer";
+import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
+import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
+import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
+import * as courseDataFunctions from "../../data/courses/courses.js";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import routeError from "../routeerror.js";
+import fileUpload from "express-fileupload";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const router = Router();
-
+const upload = multer();
 router.get("/", async (req, res) => {
   let uniqueSectionYearandSemester =
     await courseDataFunctions.getUniqueSectionYearandSemester();
@@ -86,12 +96,16 @@ router.post("/registration", async (req, res) => {
 router.get("/:courseId", async (req, res) => {
   const { courseId } = req.params;
   try {
-    let userId = verify.validateMongoId(req.session.userid)
+    let userId = verify.validateMongoId(req.session.userid);
     let data = await courseDataFunctions.getCourseById(courseId);
     data.forEach((course) => {
       course.courseId = course._id.toString();
       course.sections.forEach((section) => {
-        if (section.enrolledStudents?.some(studentId => studentId.equals(userId))) {
+        if (
+          section.enrolledStudents?.some((studentId) =>
+            studentId.equals(userId)
+          )
+        ) {
           section.isEnrolled = true;
         }
       });
@@ -189,4 +203,206 @@ router.get("/:sectionId/discard", async (req, res) => {
   }
 });
 
+router.route("/:courseId/materials").get(async (req, res) => {
+  const { courseId } = req.params;
+  try {
+    let userId = verify.validateMongoId(req.session.userid);
+    let data = await courseDataFunctions.getCourseById(courseId);
+    // console.log(data);
+    data.forEach((course) => {
+      course.courseId = course._id.toString();
+      course.sections.forEach((section) => {
+        if (
+          section.enrolledStudents?.some((studentId) =>
+            studentId.equals(userId)
+          )
+        ) {
+          section.isEnrolled = true;
+        }
+      });
+    });
+
+    let renderObjs = {
+      userId: req.session.userid,
+      name: req.session.name,
+      type: req.session.type,
+      email: req.session.email,
+      // courseId,
+      courseName: data[0].courseName,
+      courseDescription: data[0].courseDescription,
+      sections: data[0].sections,
+      headings: data[0].courseLearning.headings,
+      files: data[0].courseLearning.files,
+      layout: "sidebar",
+    };
+
+    res.render("courses/materials", renderObjs);
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      console.log(e);
+      res.status(500);
+      res.json({ error: "Login error" });
+    }
+  }
+});
+
+router
+  .route("/:courseId/materials/heading")
+  .post(upload.none(), async (req, res) => {
+    try {
+      req.body = santizeInputs(req.body);
+      let { courseId } = req.params;
+      let userId = req.session.userid;
+      userId = verify.validateMongoId(userId);
+      courseId = verify.validateMongoId(courseId);
+      await courseDataFunctions.addHeading(
+        req.params.courseId,
+        req.body.heading
+      );
+      res.status(200).json({ message: "Heading added successfully" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+// Handling file uploads
+router
+  .route("/:courseId/materials/file")
+  .post(
+    upload.fields([{ name: "file" }, { name: "heading" }]),
+    fileUpload({ createParentPath: true }),
+    filesPayloadExists,
+    async (req, res) => {
+      console.log("in route");
+      console.log(req.files);
+
+      // Handle file upload logic here
+      // console.log(req.body.heading);
+      // console.log(req.body.file); // Access uploaded file
+      // ... handle file upload logic ...
+      try {
+        req.body = santizeInputs(req.body);
+        const files = req.files;
+        let { courseId } = req.params;
+        let userId = req.session.userid;
+        userId = verify.validateMongoId(userId);
+        courseId = verify.validateMongoId(courseId);
+        let section = await courseDataFunctions.checkStudentInSection(
+          sectionId,
+          userId
+        );
+
+        if (!section) {
+          throw new Error("Section not found");
+        }
+
+        let module = await getModuleById(moduleId);
+
+        if (!module) {
+          throw new Error("Assignment not found");
+        }
+        let fileName = "";
+        Object.keys(files).forEach((key) => {
+          const filepath = path.join(
+            "files",
+            moduleId.toString(),
+            userId.toString(),
+            files[key].name
+          );
+          fileName = files[key].name;
+          console.log(filepath);
+          files[key].mv(filepath, (err) => {
+            if (err)
+              return res.status(500).json({ status: "error", message: err });
+          });
+        });
+
+        let material = await uploadMaterial(
+          moduleId,
+          Date.now().toString(),
+          fileName
+        );
+        res.send({ status: "success", message: "File is uploaded" });
+      } catch (e) {
+        if (e.status !== 500 && e.status) {
+          return res
+            .status(e.status)
+            .json({ status: "Error", message: e.message });
+        } else {
+          console.log(e);
+          res.status(500);
+          res.json({ error: "Login error" });
+        }
+      }
+    }
+  );
+
+router.post(
+  "/:sectionId/modules/:moduleId/upload",
+  fileUpload({ createParentPath: true }),
+  filesPayloadExists,
+  fileExtLimiter([".zip"]),
+  fileSizesLimiter,
+
+  async (req, res) => {
+    try {
+      req.body = santizeInputs(req.body);
+      const files = req.files;
+      let { sectionId, moduleId } = req.params;
+      let userId = req.session.userid;
+      userId = verify.validateMongoId(userId);
+      moduleId = verify.validateMongoId(moduleId);
+      let section = await courseDataFunctions.checkStudentInSection(
+        sectionId,
+        userId
+      );
+
+      if (!section) {
+        throw new Error("Section not found");
+      }
+
+      let module = await getModuleById(moduleId);
+
+      if (!module) {
+        throw new Error("Assignment not found");
+      }
+      let fileName = "";
+      Object.keys(files).forEach((key) => {
+        const filepath = path.join(
+          "files",
+          moduleId.toString(),
+          userId.toString(),
+          files[key].name
+        );
+        fileName = files[key].name;
+        console.log(filepath);
+        files[key].mv(filepath, (err) => {
+          if (err)
+            return res.status(500).json({ status: "error", message: err });
+        });
+      });
+
+      let material = await uploadMaterial(
+        moduleId,
+        Date.now().toString(),
+        fileName
+      );
+      res.send({ status: "success", message: "File is uploaded" });
+    } catch (e) {
+      if (e.status !== 500 && e.status) {
+        return res
+          .status(e.status)
+          .json({ status: "Error", message: e.message });
+      } else {
+        console.log(e);
+        res.status(500);
+        res.json({ error: "Login error" });
+      }
+    }
+  }
+);
 export default router;

@@ -112,7 +112,7 @@
       const moduleId = pathSegments[4];
       const position = await getCurrentPosition();
       const { latitude, longitude } = position.coords;
-      const response = await fetch(`/workspace/${sectionId}/modules/${moduleId}/attendance`, {
+      const response = await fetch(window.location.href, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

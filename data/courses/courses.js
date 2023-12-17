@@ -328,6 +328,7 @@ export const getCourseById = async (courseId) => {
             _id: "$department._id",
             name: "$department.departmentName",
           },
+          courseLearning: 1,
         },
       },
     ])
@@ -862,5 +863,28 @@ export const checkEnrollment = async (sectionId, studentId) => {
     return !!enrollmentData;
   } catch (error) {
     return false;
+  }
+};
+
+export const addHeading = async (courseId, heading) => {
+  try {
+    courseId = verify.validateMongoId(courseId.toString(), "courseId");
+    const courseCollection = await courses();
+    const result = await courseCollection.updateOne(
+      { _id: courseId },
+      { $push: { "courseLearning.headings": heading } }
+    );
+
+    if (result.modifiedCount === 1) {
+      return { success: true, message: "Heading added successfully" };
+    } else {
+      return { success: false, message: "Failed to add heading" };
+    }
+  } catch (error) {
+    console.error("Error adding heading:", error);
+    return {
+      success: false,
+      message: "An error occurred while adding heading",
+    };
   }
 };
