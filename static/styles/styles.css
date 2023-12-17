@@ -407,6 +407,13 @@ a:focus {
   opacity: 1 !important;
 }
 
+.btn {
+  transition: all 0.2s linear;
+}
+.btn:hover {
+  filter: brightness(1.15);
+}
+
 .modal-backdrop.show {
   background-color: var(--activeBgColor) !important;
   opacity: 0.6 !important;
@@ -466,4 +473,35 @@ a:focus {
 }
 .invertColor {
   filter: invert(1);
+}
+
+.bootstrap-select .dropdown-menu,
+.bootstrap-select > .dropdown-toggle {
+  background-color: var(--activeBgColor) !important;
+  color: var(--activeTextColor) !important;
+  border-color: var(--purpleAccent) !important;
+}
+
+.bootstrap-select .dropdown-menu li a {
+  color: var(--activeTextColor) !important;
+}
+
+.bootstrap-select .dropdown-menu li a:hover {
+  background-color: var(--greenAccent) !important;
+  color: #ffffff !important;
+}
+
+.bootstrap-select .dropdown-menu li a.active {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.bootstrap-select .dropdown-toggle:focus,
+.bootstrap-select > select.mobile-device:focus + .dropdown-toggle {
+  outline: 0px !important;
+  border-color: var(--greenAccent) !important;
+}
+
+.table {
+  color: var(--activeTextColor) !important;
 }

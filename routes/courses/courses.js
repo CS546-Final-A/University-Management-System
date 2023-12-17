@@ -86,12 +86,12 @@ router.post("/registration", async (req, res) => {
 router.get("/:courseId", async (req, res) => {
   const { courseId } = req.params;
   try {
-    let userId = verify.validateMongoId(req.session.userid)
+    let userId = verify.validateMongoId(req.session.userid);
     let data = await courseDataFunctions.getCourseById(courseId);
     data.forEach((course) => {
       course.courseId = course._id.toString();
       course.sections.forEach((section) => {
-        if (section.students?.some(studentId => studentId.equals(userId))) {
+        if (section.students?.some((studentId) => studentId.equals(userId))) {
           section.isEnrolled = true;
         }
       });
@@ -189,7 +189,6 @@ router.get("/:sectionId/discard", async (req, res) => {
   }
 });
 
-
 router.post("/addSection/:courseId", async (req, res) => {
   let { courseId } = req.params;
   const {
@@ -242,7 +241,6 @@ router.post("/addSection/:courseId", async (req, res) => {
     }
   }
 });
-
 
 router.put("/editSection/:sectionId", async (req, res) => {
   const {
