@@ -44,8 +44,8 @@ const sectionSubmit = async (event) => {
 
     const sectionRegistrationRoute =
       editMode === "true"
-        ? `/sections/${requestData.sectionId}`
-        : `/sections/${courseId}/section`;
+        ? `/sections/${encodeURIComponent(requestData.sectionId)}`
+        : `/sections/${encodeURIComponent(courseId)}/section`;
 
     const result = await request(
       editMode === "true" ? "PUT" : "POST",
@@ -56,7 +56,7 @@ const sectionSubmit = async (event) => {
     if (result?.error) {
       document.getElementById("error").innerText = result.error;
     } else if (result?.acknowledged) {
-      window.location.href = "/courses/" + courseId;
+      window.location.href = "/courses/" + encodeURIComponent(courseId);
     }
 
     $("#addSectionModal").modal("hide");
@@ -117,7 +117,8 @@ const deleteSection = async (sectionId) => {
     } else if (deleteInfo?.acknowledged) {
       const errdiv = document.getElementById("tableError");
       errdiv.innerText = "";
-      window.location.href = "/courses/" + deleteInfo.courseId;
+      window.location.href =
+        "/courses/" + encodeURIComponent(deleteInfo.courseId);
     }
   } catch (e) {
     document.getElementById("tableError").innerText = "";
@@ -139,11 +140,10 @@ const enrollSection = async (sectionId) => {
     if (enrollInfo?.error) {
       document.getElementById("tableError").innerText = result.error;
       // setError(result.error, "tableError");
-    } else 
-    if (enrollInfo?.acknowledged) {
+    } else if (enrollInfo?.acknowledged) {
       const errdiv = document.getElementById("tableError");
       errdiv.innerText = "";
-      window.location.href = "/courses/" + courseId;
+      window.location.href = "/courses/" + encodeURIComponent(courseId);
     }
   } catch (e) {
     document.getElementById("tableError").innerText = "";
@@ -165,11 +165,10 @@ const discardSection = async (sectionId) => {
     if (discardInfo?.error) {
       document.getElementById("tableError").innerText = result.error;
       // setError(result.error, "tableError");
-    } else 
-    if (discardInfo?.acknowledged) {
+    } else if (discardInfo?.acknowledged) {
       const errdiv = document.getElementById("tableError");
       errdiv.innerText = "";
-      window.location.href = "/courses/" + courseId;
+      window.location.href = "/courses/" + encodeURIComponent(courseId);
     }
   } catch (e) {
     document.getElementById("tableError").innerText = "";

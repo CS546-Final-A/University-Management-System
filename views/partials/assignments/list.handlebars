@@ -1,11 +1,11 @@
 {{#if (eq session_type "Professor")}}
-    <script>
-        $('.btn-danger').click(function (e) {
-            e.preventDefault()
-            if (confirm('Are you sure you want to delete this assignment?')) {
-                window.location.href = $(this).attr('href');
-            }
-        });
+<script>
+    $('.btn-danger').click(function (e) {
+        e.preventDefault()
+        if (confirm('Are you sure you want to delete this assignment?')) {
+            window.location.href = encodeURIComponent($(this).attr('href'));
+        }
+    });
 
-    </script>
+</script>
 {{/if}}
