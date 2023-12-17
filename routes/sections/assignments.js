@@ -13,6 +13,8 @@ import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
 import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
 import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
 
+import belongsincourse from "../../data/courses/belongsincourse.js";
+
 router.get("/create", async (req, res) => {
   try {
     if (req.session.type !== "Professor") {
@@ -91,11 +93,19 @@ router.use("/:action/:assignmentID*", async (req, res, next) => {
       if (!res.locals.assignment) {
         throw { status: 404, message: "Assignment not found" };
       }
+
       res.locals.assignment.assignmentDueDate = new Date(
         res.locals.assignment.assignmentDueDate
       );
     }
-    next();
+    if (await belongsincourse(req.session.userid, res.locals.sectionID)) {
+      next();
+    } else {
+      throw {
+        status: 403,
+        message: "You are not allowed to access this assignment",
+      };
+    }
   } catch (e) {
     routeError(res, e);
   }
@@ -211,8 +221,14 @@ router.get("/view/:assignmentID/submit", async (req, res) => {
     }
     let renderObjs = {};
     renderObjs.currentDate = new Date();
-
-    res.render("assignments/submit", renderObjs);
+    if (await belongsincourse(req.session.userid, res.locals.sectionID)) {
+      res.render("assignments/submit", renderObjs);
+    } else {
+      throw {
+        status: 403,
+        message: "You are not permitted to submit assignments in this secion",
+      };
+    }
   } catch (e) {
     routeError(res, e);
   }
@@ -236,7 +252,7 @@ router.post(
       }
       req.body = santizeInputs(req.body);
       const sectionId = res.locals.sectionID;
-      const assignmentID = res.locals.assignmentID;
+      let assignmentID = res.locals.assignmentID;
       let userId = req.session.userid;
 
       const files = req.files;
