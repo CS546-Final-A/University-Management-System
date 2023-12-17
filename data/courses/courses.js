@@ -91,7 +91,7 @@ export const getDepartmentById = async (departmentId) => {
 };
 
 export const registerDepartment = async (departmentName) => {
-  const newDepartment = verify.string(departmentName, "departmentName");
+  departmentName = verify.string(departmentName, "departmentName");
 
   const departmentCollection = await departments();
   const department = await departmentCollection.findOne({
@@ -100,9 +100,11 @@ export const registerDepartment = async (departmentName) => {
   if (department) {
     throwerror("Department already exists!");
   } else {
+    const newDepartment = {
+      departmentName: departmentName,
+    };
     const insertInfo = await departmentCollection.insertOne(newDepartment);
-    const newId = insertInfo.insertedId.toString();
-    return newId;
+    return insertInfo;
   }
 };
 
@@ -120,7 +122,7 @@ export const updateDepartment = async (departmentId, departmentName) => {
   );
   if (!updateInfo) throwerror("Department was not updated successfully!");
 
-  return await getDepartmentById(departmentId);
+  return updateInfo;
 };
 
 export const deleteDepartment = async (departmentId) => {
@@ -171,37 +173,22 @@ export const getAllCourses = async (
       },
       {
         $match: {
-          sections: {
-            $elemMatch: {
-              sectionYear: year,
-              sectionSemester: semester,
-            },
-          },
+          courseSemester: semester,
+          courseYear: year,
         },
       },
       {
         $project: {
           _id: 1,
-          // Include all other fields from the "courses" collection
           courseName: 1,
           courseNumber: 1,
           courseDepartmentId: 1,
           courseCredits: 1,
-          sections: {
-            $filter: {
-              input: "$sections",
-              as: "section",
-              cond: {
-                $and: [
-                  { $eq: ["$$section.sectionYear", year] },
-                  { $eq: ["$$section.sectionSemester", semester] },
-                ],
-              },
-            },
-          },
+          courseSemester: 1,
+          courseYear: 1,
+          sections: 1,
           departmentName: "$department.departmentName",
           courseDescription: 1,
-          // Include all fields from the "sections" collection
           instructors: "$instructor",
         },
       },
