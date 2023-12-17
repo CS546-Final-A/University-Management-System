@@ -148,6 +148,8 @@ router.get("/:year/:semester/listings", async (req, res) => {
       meetingDaysFilter,
       deliveryModeFilter
     );
+    data.found = data.length !== 0;
+
     data.year = year;
     data.semester = semester;
 
@@ -172,6 +174,7 @@ router.get("/:year/:semester/listings", async (req, res) => {
       courses: data,
       script: "courses/listings",
     };
+
     res.render("courses/listings", renderObjs);
   } catch (e) {
     routeError(res, e);

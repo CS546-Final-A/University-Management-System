@@ -30,7 +30,7 @@ async function setgrade(sectionID, userID, grade) {
   }
   const gradecol = await finalgrades();
 
-  const result = gradecol.insertOne({
+  const result = await gradecol.insertOne({
     userID: userID,
     sectionID: sectionID,
     grade: grade,

@@ -134,7 +134,7 @@ router.get("/", async (req, res) => {
               break;
           }
           credits += section.courseCredits;
-          gradepoints = section.courseCredits * gpamult;
+          gradepoints += section.courseCredits * gpamult;
         } else {
           grade = "";
         }

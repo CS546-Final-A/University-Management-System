@@ -12,7 +12,7 @@ async function initiatePasswordReset(email) {
   const resetscol = await passwordresets();
 
   const user = await usercol.findOne(
-    { email: email },
+    { email: email, status: "Active" },
     { projection: { _id: 1 } }
   );
 
