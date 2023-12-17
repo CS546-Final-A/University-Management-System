@@ -34,7 +34,7 @@ function gradeForStudent(studentid, assignmentdata) {
 
   for (let assignment of assignmentdata) {
     const mark = assignment.scores.find((markObj) => {
-      return markObj.studentId === studentid;
+      return markObj.studentId.toString() === studentid.toString();
     });
     if (mark) {
       score = score + assignment.assignmentWeight * mark.score;
