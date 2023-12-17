@@ -84,6 +84,7 @@ async function computeClassGrades(sectiondID) {
   const students = await usercol
     .find(
       {
+        type: "Student",
         registeredCourses: sectiondID.toString(),
       },
       { projection: { _id: 1, firstname: 1, lastname: 1 } }
