@@ -41,7 +41,7 @@ router.get(
       }
 
       const submissionPath = path.join(
-        "files",
+        "files/Assignments/",
         assignmentId.toString(),
         submission.studentId.toString(),
         submission.file
