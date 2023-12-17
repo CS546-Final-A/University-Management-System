@@ -65,43 +65,47 @@ router.use("/:sectionID*", async (req, res, next) => {
 });
 
 router.route("/:sectionId").get(async (req, res) => {
-  let renderObjs = {};
+  try {
+    let renderObjs = {};
 
-  const section = await courseDataFunctions.getSectionById(
-    res.locals.sectionID
-  );
-  const course = await courseDataFunctions.getCourseById(
-    section.courseId.toString()
-  );
+    const section = await courseDataFunctions.getSectionById(
+      res.locals.sectionID
+    );
+    const course = await courseDataFunctions.getCourseById(
+      section.courseId.toString()
+    );
 
-  const profName = await getUserByID(section.sectionInstructor, {
-    _id: 0,
-    firstname: 1,
-    lastname: 1,
-  });
+    const profName = await getUserByID(section.sectionInstructor, {
+      _id: 0,
+      firstname: 1,
+      lastname: 1,
+    });
 
-  renderObjs = {
-    ...renderObjs,
-    layout: "sidebar",
-    sideBarTitle: course[0].courseName,
-    courseId: section.courseId.toString(),
-    courseName: course[0].courseName,
-    sectionName: section.sectionName,
-    sectionInstructor: section.sectionInstructor,
-    fN: profName.firstname,
-    lN: profName.lastname,
-    sectionType: section.sectionType,
-    sectionStartTime: section.sectionStartTime,
-    sectionEndTime: section.sectionEndTime,
-    sectionDay: section.sectionDay,
-    sectionCapacity: section.sectionCapacity,
-    sectionYear: section.sectionYear,
-    sectionSemester: section.sectionSemester,
-    studentCount: section.students.length,
-    sectionLocation: section.sectionLocation,
-    sectionDescription: section.sectionDescription,
-  };
-  res.render("workspace/home", renderObjs);
+    renderObjs = {
+      ...renderObjs,
+      layout: "sidebar",
+      sideBarTitle: course[0].courseName,
+      courseId: section.courseId.toString(),
+      courseName: course[0].courseName,
+      sectionName: section.sectionName,
+      sectionInstructor: section.sectionInstructor,
+      fN: profName.firstname,
+      lN: profName.lastname,
+      sectionType: section.sectionType,
+      sectionStartTime: section.sectionStartTime,
+      sectionEndTime: section.sectionEndTime,
+      sectionDay: section.sectionDay,
+      sectionCapacity: section.sectionCapacity,
+      sectionYear: section.sectionYear,
+      sectionSemester: section.sectionSemester,
+      studentCount: section.students.length,
+      sectionLocation: section.sectionLocation,
+      sectionDescription: section.sectionDescription,
+    };
+    res.render("workspace/home", renderObjs);
+  } catch (e) {
+    routeError(res, e);
+  }
 });
 
 router.put("/:sectionId", async (req, res) => {
