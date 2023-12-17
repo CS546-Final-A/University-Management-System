@@ -5,12 +5,20 @@
     <meta charset="utf-8" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <link rel="stylesheet" href="/styles/bootstrap.min.css" />
     <link rel="stylesheet" href="/styles/bootstrap-select.min.css" />
     <link rel="stylesheet" href="/styles/styles.css" />
     <link rel="stylesheet" href="/styles/sidebar.css" />
     <script src="/scripts/jquery.min.js"></script>
+    <script>
+        // Access the darkmode variable from res.locals
+        var _isDarkMode = {{ darkmode }} || 0;
+    </script>
+    <script src="/scripts/styles.js"></script>
+    <!-- JS Imports -->
+    <script src="/scripts/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/bootstrap-select.min.js"></script>
+
     <title>University Management System</title>
 </head>
 
@@ -112,11 +120,6 @@
         </div>
     </div>
 
-
-    <!-- JS Imports -->
-    <script src="/scripts/bootstrap.bundle.min.js"></script>
-    <script src="/scripts/bootstrap-select.min.js"></script>
-    <script src="/scripts/styles.js"></script>
     <script>
         $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {

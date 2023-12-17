@@ -1,8 +1,52 @@
 //Menu On Hover
 
-//Switch light/dark
+//Avoid Flickering on load
+if (_isDarkMode) {
+  var getColor1 = $("html").css("--blackColor");
+  var getColor2 = $("html").css("--whiteColor");
+  var glassColor2 = $("html").css("--glassColor2");
+  var shadowColor2 = $("html").css("--shadowColor2");
 
-$("#switch").on("click", function () {
+  $("html").css("--activeTextColor", getColor2);
+  $("html").css("--activeBgColor", getColor1);
+  $("html").css("--activeGlassColor", glassColor2);
+  $("html").css("--activeShadowColor", shadowColor2);
+}
+$(document).ready(function () {
+  if (_isDarkMode) {
+    $("body").addClass("dark");
+    $("#switch").addClass("switched");
+    $(".iconSwitch").addClass("invertColor");
+  }
+
+  $("#switch").on("click", async function () {
+    themeSwitch();
+
+    try {
+      const response = await fetch(`/dashboard`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          darkmode: _isDarkMode,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.message);
+      } else {
+        console.error(`Failed to update theme. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error updating theme:", error);
+    }
+  });
+});
+
+//Switch light/dark
+function themeSwitch() {
   var getColor1 = $("html").css("--blackColor");
   var getColor2 = $("html").css("--whiteColor");
   var glassColor1 = $("html").css("--glassColor1");
@@ -12,6 +56,7 @@ $("#switch").on("click", function () {
 
   if ($("body").hasClass("dark")) {
     $("body").removeClass("dark");
+    _isDarkMode = 0;
     $("#switch").removeClass("switched");
     $(".iconSwitch").removeClass("invertColor");
 
@@ -21,6 +66,7 @@ $("#switch").on("click", function () {
     $("html").css("--activeShadowColor", shadowColor1);
   } else {
     $("body").addClass("dark");
+    _isDarkMode = 1;
     $("#switch").addClass("switched");
     $(".iconSwitch").addClass("invertColor");
 
@@ -29,7 +75,7 @@ $("#switch").on("click", function () {
     $("html").css("--activeGlassColor", glassColor2);
     $("html").css("--activeShadowColor", shadowColor2);
   }
-});
+}
 
 $(document).ready(function () {
   var currentPageUrl = window.location.pathname;
