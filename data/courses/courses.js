@@ -431,7 +431,7 @@ export const getSectionById = async (sectionId) => {
     "sections.sectionId": sectionId,
   });
   if (!course) {
-    throwErrorWithStatus(400, `Section was not found!`);
+    throwErrorWithStatus(404, `Section was not found!`);
   }
   const section = course.sections.find(
     (section) => section.sectionId.toString() === sectionId.toString()

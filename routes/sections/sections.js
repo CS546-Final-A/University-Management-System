@@ -122,6 +122,7 @@ router
         ...renderObjs,
         layout: "sidebar",
         // sideBarTitle: `${course.courseName}`,
+        script: "workspace/module",
         modules: section.sectionModules,
         userType,
       };
@@ -133,7 +134,7 @@ router
   .post(async (req, res) => {
     try {
       req.body = santizeInputs(req.body);
-      const { sectionId } = req.params;
+      let { sectionId } = req.params;
       sectionId = verify.validateMongoId(req.params.sectionId);
       const { moduleName, moduleDescription, moduleDate } = req.body;
       await addModuleToSection(

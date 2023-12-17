@@ -39,6 +39,7 @@
                                 <input class="form-control" type="date" id="moduleDate">
                                 <label for="#moduleDate">Date</label>
                             </div>
+                            <input type="hidden" id="csrf" value="{{_csrf}}">
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -70,44 +71,3 @@
     {{/each}}
 </div>
 
-<script>
-    document.getElementById('addModuleButton').addEventListener('click', () => {
-        document.getElementById('moduleForm').style.display = 'block';
-    });
-
-    document.getElementById('moduleFormBtn').addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        const moduleName = document.getElementById('moduleName').value;
-        const moduleDesc = document.getElementById('moduleDesc').value;
-        const moduleDate = document.getElementById('moduleDate').value;
-        const pathSegments = window.location.pathname.split('/');
-        const sectionId = pathSegments[2];
-
-
-
-        try {
-            const response = await fetch(`/workspace/${sectionId}/modules`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    moduleName,
-                    moduleDescription: moduleDesc,
-                    moduleDate,
-                }),
-            });
-
-            if (response.ok) {
-                window.location.reload();
-            } else {
-
-                console.error('Failed to add module');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
-
-</script>
