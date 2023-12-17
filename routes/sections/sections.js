@@ -36,6 +36,12 @@ const __dirname = dirname(__filename);
 const router = Router();
 
 router.put("/:sectionId", async (req, res) => {
+  if (req.session.type !== "Admin") {
+    throw {
+      status: 403,
+      message: "You are not authorized to perform this action",
+    };
+  }
   const {
     sectionId,
     sectionName,
@@ -86,6 +92,12 @@ router.put("/:sectionId", async (req, res) => {
 });
 
 router.delete("/:sectionId", async (req, res) => {
+  if (req.session.type !== "Admin") {
+    throw {
+      status: 403,
+      message: "You are not authorized to perform this action",
+    };
+  }
   let sectionId = req.params.sectionId;
   try {
     const deleteInfo = await courseDataFunctions.deleteSection(sectionId);
@@ -101,19 +113,26 @@ router.delete("/:sectionId", async (req, res) => {
 });
 
 router.post("/:courseId/section", async (req, res) => {
-  let { courseId } = req.params;
-  const {
-    sectionName,
-    sectionInstructor,
-    sectionType,
-    sectionStartTime,
-    sectionEndTime,
-    sectionDay,
-    sectionCapacity,
-    sectionLocation,
-    sectionDescription,
-  } = req.body;
   try {
+    if (req.session.type !== "Admin") {
+      throw {
+        status: 403,
+        message: "You are not authorized to perform this action",
+      };
+    }
+    let { courseId } = req.params;
+    const {
+      sectionName,
+      sectionInstructor,
+      sectionType,
+      sectionStartTime,
+      sectionEndTime,
+      sectionDay,
+      sectionCapacity,
+      sectionLocation,
+      sectionDescription,
+    } = req.body;
+
     verify.validateMongoId(courseId, "courseId");
     const section = validateSection(
       sectionName,
