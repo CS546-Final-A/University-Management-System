@@ -20,3 +20,4 @@ export const courses = await getCollectionFn("courses");
 export const sections = await getCollectionFn("sections");
 export const departments = await getCollectionFn("departments");
 export const assignments = await getCollectionFn("assignments");
+export const finalgrades = await getCollectionFn("finalgrades");

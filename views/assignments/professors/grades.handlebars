@@ -14,10 +14,17 @@
             <td>{{this.grade}}</td>
             <td>{{this.lettergrade}}</td>
             <td>{{this.scores}}</td>
-            <td><a class="btn btn-primary">Finalize Grade</td>
+            <td>
+                <form class="submitform">
+                    <input type="hidden" name="studentid" value="{{this._id}}">
+                    <input type="hidden" name="grade" value="{{this.lettergrade}}">
+                    <input type="hidden" name="csrf" value="{{_csrf}}">
+                    <button type="submit" class="btn btn-primary">Finalize Grade</button></td>
+                </form>
+            </td>
         </tr>
         {{/each}}
 
     </tbody>
-
+    
 </table>

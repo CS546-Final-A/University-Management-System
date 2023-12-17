@@ -20,6 +20,7 @@ import {
   computeGradeByUserID,
   computeClassGrades,
 } from "../../data/submissions/computeGrades.js";
+import { getgrade, setgrade } from "../../data/assignments/finalizegrades.js";
 import { getAssignmentsBySectionId } from "../../data/assignments/assignments.js";
 import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
 import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
@@ -578,17 +579,50 @@ router.use("/:sectionID/grades/:studentID", async (req, res) => {
   }
 });
 
-router.use("/:sectionID/grades", async (req, res) => {
+router.get("/:sectionID/grades", async (req, res) => {
   try {
     if (req.session.type === "Student") {
       return await renderStudentView(res, req.session.userid);
     } else {
       // Professor view
       const students = await computeClassGrades(res.locals.sectionID);
-      res.render("assignments/professors/grades", { students: students });
+      res.render("assignments/professors/grades", {
+        students: students,
+        script: "assignments/finalizegrade",
+      });
     }
   } catch (e) {
     routeError(res, e);
+  }
+});
+
+router.post("/:sectionID/grades", async (req, res) => {
+  try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not authorized to perform this action",
+      };
+    }
+    const userid = verify.validateMongoId(req.body.studentid);
+    const grade = verify.letterGrade(req.body.grade);
+
+    const result = await setgrade(res.locals.sectionID, userid, grade);
+
+    res.json({ successful: result.acknowledged });
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      if (e.message) {
+        console.log("Error: " + e.message);
+      } else {
+        console.log("Error: " + e);
+      }
+      res.status(500);
+      res.json({ error: "Internal server error" });
+    }
   }
 });
 
