@@ -1,27 +1,29 @@
-<div class="card col-12 glassEffect">
-    <div class="card-header glassEffect d-flex">
-        <div class="my-auto"><img src="./icons/dashboardCourse.svg" alt="loginIcon"> Workspace</div>
+<h2>
+    <div class="d-flex">
+        <div class="my-auto">
+            <img class="iconSwitch" src="./icons/dashboardCourse.svg" alt="loginIcon"> Workspace
+        </div>
         <div class="my-auto text-muted fs-5" id="reportCount"></div>
         <div class="form-floating ms-auto fs-6">
             <input class="form-control" type="text" placeholder="sad" id="searchInput" />
             <label for="#searchInput">Search</label>
         </div>
     </div>
-    <div class="card-body">
-        <div class="row">
-            {{#each workspace}}
-            <div class="col-md-4 col-12 searchData">
-                <a class="text-decoration-none" href="/sections/{{sectionId}}">
-                    <div class="card glassEffect">
-                        <div class="card-header">{{courseNumber}}: {{courseName}}</div>
-                        <div class="card-body">Section: {{sectionName}} | Delivery: {{sectionType}}</div>
-                    </div>
-                </a>
+</h2>
+
+<div class="row mt-4">
+    {{#each workspace}}
+    <div class="col-md-4 col-12 searchData">
+        <a class="text-decoration-none" href="/sections/{{sectionId}}">
+            <div class="card glassEffect">
+                <div class="card-header">{{courseNumber}}: {{courseName}}</div>
+                <div class="card-body">Section: {{sectionName}} | Delivery: {{sectionType}}</div>
             </div>
-            {{/each}}
-        </div>
+        </a>
     </div>
+    {{/each}}
 </div>
+
 
 
 <script>
