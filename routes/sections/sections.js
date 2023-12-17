@@ -216,7 +216,7 @@ router.route("/:sectionId").get(async (req, res) => {
       sectionCapacity: section.sectionCapacity,
       sectionYear: section.sectionYear,
       sectionSemester: section.sectionSemester,
-      studentCount: section.enrolledStudents.length,
+      studentCount: section.students.length,
       sectionLocation: section.sectionLocation,
       sectionDescription: section.sectionDescription,
     };
