@@ -335,10 +335,10 @@ export const getCourseById = async (courseId) => {
         sectionInstructor;
     }
   } catch (e) {
+    if (!existingCourse.length) {
+      throwErrorWithStatus(404, `Course with ${courseId} not found`);
+    }
     throw "Internal Server Error";
-  }
-  if (!existingCourse) {
-    throwErrorWithStatus(400, `Course with ${courseId} not found`);
   }
 
   return existingCourse;

@@ -6,6 +6,7 @@ import {
   validateCourse,
   validateSection,
 } from "../../data/courses/courseHelper.js";
+import routeError from "../routeerror.js";
 
 const router = Router();
 
@@ -112,14 +113,7 @@ router.get("/:courseId", async (req, res) => {
     }
     res.render("courses/detail", renderObjs);
   } catch (e) {
-    if (e.status !== 500 && e.status) {
-      res.status(e.status);
-      return res.json({ error: e.message });
-    } else {
-      console.log(e);
-      res.status(500);
-      res.json({ error: "Login error" });
-    }
+    routeError(res, e);
   }
 });
 
