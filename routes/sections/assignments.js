@@ -7,7 +7,6 @@ import routeError from "../routeerror.js";
 import verify, { santizeInputs } from "../../data_validation.js";
 import { validateAssignment } from "../../data/assignments/assignmentsHelper.js";
 
-import belongsincourse from "../../data/courses/belongsincourse.js";
 import fileUpload from "express-fileupload";
 import path from "path";
 import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
@@ -81,16 +80,6 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.use("/:action/:assignmentID", async (req, res, next) => {
-  if (await belongsincourse(req.session.userid, res.locals.sectionID)) {
-    next();
-  } else {
-    res.status(403);
-    res.render("public/error", {
-      error: "You are not enrolled in this course",
-    });
-  }
-});
 router.use("/:action/:assignmentID*", async (req, res, next) => {
   try {
     if (req.params.assignmentID) {
