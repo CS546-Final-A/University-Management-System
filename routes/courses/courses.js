@@ -117,7 +117,7 @@ router.get("/:courseId", async (req, res) => {
       courses: data,
       script: "courses/detail",
     };
-    if (renderObjs.type === "Admin") {
+    if (renderObjs.session_type === "Admin") {
       renderObjs.instructors =
         await courseDataFunctions.getUniqueInstructorNamesandId();
       renderObjs.instructors.sort((a, b) => a.name.localeCompare(b.name));
