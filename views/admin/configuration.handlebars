@@ -4,6 +4,10 @@
     <div id="departments" class="menuCard">
         Departments
     </div>
+    {{#if error}}
+        <br>
+        <div id="error">{{error}}</div>
+    {{/if}}
     {{!-- <div id="locations" class="menuCard">
         Locations
     </div> --}}
