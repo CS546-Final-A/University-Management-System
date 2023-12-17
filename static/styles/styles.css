@@ -373,7 +373,7 @@ a:focus {
   text-decoration: none;
 }
 
-.searchData {
+.row.searchData {
   border-bottom: 1px solid var(--activeTextColor);
   transition: all 0.2s linear;
 }
@@ -409,4 +409,10 @@ a:focus {
 .modal-backdrop.show {
   background-color: var(--activeBgColor) !important;
   opacity: 0.6 !important;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-control-plaintext,
+.form-floating > .form-select {
+  height: calc(3.5rem + 0px) !important;
 }
