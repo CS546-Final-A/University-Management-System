@@ -300,7 +300,18 @@ router.post(
       );
       res.send({ status: "success", message: "File is uploaded" });
     } catch (e) {
-      routeError(res, e);
+      if (e.status !== 500 && e.status) {
+        res.status(e.status);
+        return res.json({ message: e.message });
+      } else {
+        if (e.message) {
+          console.log("Error: " + e.message);
+        } else {
+          console.log("Error: " + e);
+        }
+        res.status(500);
+        res.json({ message: "Internal server error" });
+      }
     }
   }
 );

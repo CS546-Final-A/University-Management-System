@@ -23,6 +23,8 @@ function sendform() {
 
       if (result.successful) {
         form[3].disabled = true;
+        form[3].classList.add("btn-secondary");
+        form[3].classList.remove("btn-info");
       } else {
         throw "Unexpected result from server";
       }
