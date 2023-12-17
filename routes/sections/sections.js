@@ -9,14 +9,18 @@ import {
   getModuleById,
   uploadMaterial,
 } from "../../data/modules/modules.js";
-
+import { validateSection } from "../../data/courses/courseHelper.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
 import fileUpload from "express-fileupload";
 import path from "path";
 import verify, { santizeInputs } from "../../data_validation.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 import assignmentRoutes from "./assignments.js";
-import { computeGradeByUserID } from "../../data/submissions/computeGrades.js";
+import {
+  computeGradeByUserID,
+  computeClassGrades,
+} from "../../data/submissions/computeGrades.js";
+import { setgrade } from "../../data/assignments/finalizegrades.js";
 import { getAssignmentsBySectionId } from "../../data/assignments/assignments.js";
 import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
 import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
@@ -31,12 +35,13 @@ const __dirname = dirname(__filename);
 
 const router = Router();
 
+
 router.use("/:sectionID*", async (req, res, next) => {
   res.locals.sectionID = req.params.sectionID;
   res.locals.layout = "sidebar";
   try {
     const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
-    if (await belongsincourse(req.session.userid, sectionID)) {
+    if (await belongsincourse(req.session.userid.toString(), sectionID)) {
       next();
     } else {
       res.status(403);
@@ -61,160 +66,46 @@ router.use("/:sectionID*", async (req, res, next) => {
 });
 
 router.route("/:sectionId").get(async (req, res) => {
-  let renderObjs = {};
-
-  const section = await courseDataFunctions.getSectionById(
-    res.locals.sectionID
-  );
-  const course = await courseDataFunctions.getCourseById(
-    section.courseId.toString()
-  );
-
-  const profName = await getUserByID(section.sectionInstructor, {
-    _id: 0,
-    firstname: 1,
-    lastname: 1,
-  });
-
-  renderObjs = {
-    ...renderObjs,
-    layout: "sidebar",
-    sideBarTitle: course[0].courseName,
-    courseId: section.courseId.toString(),
-    courseName: course[0].courseName,
-    sectionName: section.sectionName,
-    sectionInstructor: section.sectionInstructor,
-    fN: profName.firstname,
-    lN: profName.lastname,
-    sectionType: section.sectionType,
-    sectionStartTime: section.sectionStartTime,
-    sectionEndTime: section.sectionEndTime,
-    sectionDay: section.sectionDay,
-    sectionCapacity: section.sectionCapacity,
-    sectionYear: section.sectionYear,
-    sectionSemester: section.sectionSemester,
-    studentCount: section.students.length,
-    sectionLocation: section.sectionLocation,
-    sectionDescription: section.sectionDescription,
-  };
-  res.render("workspace/home", renderObjs);
-});
-
-router.put("/:sectionId", async (req, res) => {
-  const {
-    sectionId,
-    sectionName,
-    sectionInstructor,
-    sectionType,
-    sectionStartTime,
-    sectionEndTime,
-    sectionDay,
-    sectionCapacity,
-    sectionLocation,
-    sectionDescription,
-  } = req.body;
-
   try {
-    verify.validateMongoId(sectionId, "sectionId");
-    let updateSection = validateSection(
-      sectionName,
-      sectionInstructor,
-      sectionType,
-      sectionStartTime,
-      sectionEndTime,
-      sectionDay,
-      sectionCapacity,
-      sectionLocation,
-      sectionDescription
-    );
-    const updatedSection = await courseDataFunctions.updateSection(
-      sectionId,
-      updateSection.sectionName,
-      sectionInstructor,
-      updateSection.sectionType,
-      updateSection.sectionStartTime,
-      updateSection.sectionEndTime,
-      updateSection.sectionDay,
-      updateSection.sectionCapacity,
-      updateSection.sectionLocation,
-      updateSection.sectionDescription
-    );
-    return res.json(updatedSection);
-  } catch (error) {
-    if (error.status !== 500 && error.status) {
-      return res.status(error.status).json({ error: error.message });
-    } else {
-      res.status(500);
-      res.json({ error: "Internal Server Error" });
-    }
-  }
-});
+    let renderObjs = {};
 
-router.delete("/:sectionId", async (req, res) => {
-  let sectionId = req.params.sectionId;
-  try {
-    const deleteInfo = await courseDataFunctions.deleteSection(sectionId);
-    return res.json(deleteInfo);
-  } catch (error) {
-    if (error.status !== 500 && error.status) {
-      return res.json({ error: error.message });
-    } else {
-      res.status(500);
-      res.json({ error: "Login error" });
-    }
-  }
-});
-
-router.post("/:courseId/section", async (req, res) => {
-  let { courseId } = req.params;
-  const {
-    sectionName,
-    sectionInstructor,
-    sectionType,
-    sectionStartTime,
-    sectionEndTime,
-    sectionDay,
-    sectionCapacity,
-    sectionLocation,
-    sectionDescription,
-  } = req.body;
-  try {
-    verify.validateMongoId(courseId, "courseId");
-    const section = validateSection(
-      sectionName,
-      sectionInstructor,
-      sectionType,
-      sectionStartTime,
-      sectionEndTime,
-      sectionDay,
-      sectionCapacity,
-      sectionLocation,
-      sectionDescription
+    const section = await courseDataFunctions.getSectionById(
+      res.locals.sectionID
     );
-    const result = await courseDataFunctions.registerSection(
-      courseId,
-      section.sectionName,
-      section.sectionInstructor,
-      section.sectionType,
-      section.sectionStartTime,
-      section.sectionEndTime,
-      section.sectionDay,
-      section.sectionCapacity,
-      section.sectionLocation,
-      section.sectionDescription
+    const course = await courseDataFunctions.getCourseById(
+      section.courseId.toString()
     );
 
-    if (result.acknowledged) {
-      return res.json(result);
-    }
+    const profName = await getUserByID(section.sectionInstructor, {
+      _id: 0,
+      firstname: 1,
+      lastname: 1,
+    });
+
+    renderObjs = {
+      ...renderObjs,
+      layout: "sidebar",
+      sideBarTitle: course[0].courseName,
+      courseId: section.courseId.toString(),
+      courseName: course[0].courseName,
+      sectionName: section.sectionName,
+      sectionInstructor: section.sectionInstructor,
+      fN: profName.firstname,
+      lN: profName.lastname,
+      sectionType: section.sectionType,
+      sectionStartTime: section.sectionStartTime,
+      sectionEndTime: section.sectionEndTime,
+      sectionDay: section.sectionDay,
+      sectionCapacity: section.sectionCapacity,
+      sectionYear: section.sectionYear,
+      sectionSemester: section.sectionSemester,
+      studentCount: section.students.length,
+      sectionLocation: section.sectionLocation,
+      sectionDescription: section.sectionDescription,
+    };
+    res.render("workspace/home", renderObjs);
   } catch (e) {
-    if (e.status !== 500 && e.status) {
-      res.status(e.status);
-      return res.json({ error: e.message });
-    } else {
-      res.status(500);
-      res.json({ error: "Login error" });
-    }
+    routeError(res, e);
   }
 });
 
@@ -525,72 +416,100 @@ router.post(
   }
 );
 
-router.get("/:sectionId/assignments/create", async (req, res) => {
-  try {
-    const sectionID = verify.validateMongoId(req.params.sectionID, "SectionID");
-    if (await belongsincourse(req.session.userid, sectionID)) {
-      next();
+async function renderStudentView(res, StudentID) {
+  const assignments = await getAssignmentsBySectionId(res.locals.sectionID);
+  const finalgrades = await computeGradeByUserID(
+    res.locals.sectionID,
+    StudentID
+  );
+
+  if (!assignments) {
+    throw (
+      "Assignments returned " +
+      assignments +
+      " which is not an expected return type"
+    );
+  }
+
+  for (let assignment of assignments) {
+    assignment.scores = assignment.scores.find((markObj) => {
+      return markObj.studentId.toString() === StudentID;
+    });
+    if (!assignment.scores) {
+      assignment.scores = "N/A";
     } else {
-      res.status(403);
-      res.render("public/error", {
-        error: "You are not enrolled in this course",
-      });
+      assignment.scores = assignment.scores.score.toString();
+    }
+  }
+
+  res.render("assignments/students/grades", {
+    assignments: assignments,
+    grades: finalgrades,
+  });
+}
+
+router.use("/:sectionID/grades/:studentID", async (req, res) => {
+  try {
+    if (
+      req.session.type === "Professor" ||
+      req.session.userid === req.params.studentID
+    ) {
+      return await renderStudentView(res, req.params.studentID);
+    } else {
+      throw {
+        status: 403,
+        message: "You are not authorized to view that grade",
+      };
     }
   } catch (e) {
-    if (e.status !== 500 && e.status) {
-      res.status(e.status);
-      return res.render("public/error", {
-        error: e.message,
-      });
-    } else {
-      console.log(e);
-      res.status(500);
-      return res.render("public/error", {
-        error: "Internal Server Error",
-      });
-    }
+    routeError(res, e);
   }
 });
 
-router.use("/:sectionID/grades", async (req, res) => {
+router.get("/:sectionID/grades", async (req, res) => {
   try {
-    if (req.session.type !== "Student") {
-      res.status(403);
-      return res.render("public/error", {
-        error: "You are not a student",
+    if (req.session.type === "Student") {
+      return await renderStudentView(res, req.session.userid);
+    } else {
+      // Professor view
+      const students = await computeClassGrades(res.locals.sectionID);
+      res.render("assignments/professors/grades", {
+        students: students,
+        script: "assignments/finalizegrade",
       });
     }
-    const assignments = await getAssignmentsBySectionId(res.locals.sectionID);
-    const finalgrades = await computeGradeByUserID(
-      res.locals.sectionID,
-      req.session.userid
-    );
-
-    if (!assignments) {
-      throw (
-        "Assignments returned " +
-        assignments +
-        " which is not an expected return type"
-      );
-    }
-
-    for (let assignment of assignments) {
-      assignment.scores = assignment.scores.find((markObj) => {
-        return markObj.studentId.toString() === req.session.userid;
-      });
-      if (!assignment.scores) {
-        assignment.scores = "N/A";
-      } else {
-        assignment.scores = assignment.scores.score.toString();
-      }
-    }
-
-    res.render("assignments/students/grades", {
-      assignments: assignments,
-      grades: finalgrades,
-    });
   } catch (e) {
     routeError(res, e);
+  }
+});
+
+router.post("/:sectionID/grades", async (req, res) => {
+  try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not authorized to perform this action",
+      };
+    }
+    const userid = verify.validateMongoId(req.body.studentid);
+    const grade = verify.letterGrade(req.body.grade);
+
+    const result = await setgrade(res.locals.sectionID, userid, grade);
+
+    res.json({ successful: result.acknowledged });
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      if (e.message) {
+        console.log("Error: " + e.message);
+      } else {
+        console.log("Error: " + e);
+      }
+      res.status(500);
+      res.json({ error: "Internal server error" });
+    }
   }
 });
 

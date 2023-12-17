@@ -52,7 +52,7 @@
                                     <td>{{this.sectionLocation}}</td>
                                     <td>{{this.sectionDescription}}</td>
                                     <td>{{this.sectionCapacity}}</td>
-                                    <td>{{this.enrolledStudents.length}}</td>
+                                    <td>{{this.students.length}}</td>
 
                                     {{#if (eq ../../type 'Admin')}}
                                     <td>
@@ -71,7 +71,7 @@
                                         <button class="btn btn-danger" onclick="discardSection('{{this.sectionId}}')">Discard</button>
                                     </td>
                                     {{else}}
-                                    {{#if (gt this.sectionCapacity this.enrolledStudents.length)}}
+                                    {{#if (gt this.sectionCapacity this.students.length)}}
                                     <td><button class="btn btn-primary"
                                             onclick="enrollSection('{{this.sectionId}}')">Enroll</button></td>
                                     {{else}}
