@@ -33,14 +33,14 @@
                             <span class="fs-5 position-relative" id="homeText">Dashboard</span>
                         </a>
                     </li>
-                    {{#ifUserType session_type allowedRoles=['Admin', 'Student']}}
+                    {{#ifUserType 'Admin,Student' session_type}}
                     <li class="nav-item">
                         <a class="nav-link" href="/courses/">
                             <span class="fs-5 position-relative" id="coursesText">Courses</span>
                         </a>
                     </li>
                     {{/ifUserType}}
-                    {{#ifUserType session_type allowedRoles=['Admin']}}
+                    {{#ifUserType 'Admin' session_type}}
                     <li class="nav-item">
                         <a class="nav-link" href="/configuration/">
                             <span class="fs-5 position-relative" id="configurationText">Configuration</span>
