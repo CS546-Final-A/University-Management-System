@@ -4,7 +4,7 @@ const router = Router();
 
 router.get("/", (req, res) => {
   req.session.destroy();
-  res.render("public/logout");
+  res.redirect("/login");
 });
 
 export default router;
