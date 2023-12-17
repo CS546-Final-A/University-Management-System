@@ -13,6 +13,7 @@ $("#switch").on("click", function () {
   if ($("body").hasClass("dark")) {
     $("body").removeClass("dark");
     $("#switch").removeClass("switched");
+    $(".iconSwitch").removeClass("invertColor");
 
     $("html").css("--activeTextColor", getColor1);
     $("html").css("--activeBgColor", getColor2);
@@ -21,6 +22,7 @@ $("#switch").on("click", function () {
   } else {
     $("body").addClass("dark");
     $("#switch").addClass("switched");
+    $(".iconSwitch").addClass("invertColor");
 
     $("html").css("--activeTextColor", getColor2);
     $("html").css("--activeBgColor", getColor1);

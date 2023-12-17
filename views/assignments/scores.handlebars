@@ -3,14 +3,15 @@
 {{#each students}}
 <h3>Student: {{name}}</h3>
 <ul>
+    <p>Current Recorded Score: {{this.score}}</p>
+    {{#if (eq ../session_type "Professor")}}
     <form action="/sections/{{../sectionID}}/assignments/view/{{../assignment._id}}/scores" method="post">
-
         <input type="hidden" name="studentId" value="{{this._id}}">
-        <p>Current Recorded Score: {{this.score}}</p>
         <label for="score">Score:</label>
         <input type="text" name="score" value="">
         <button type="submit">Submit Score</button>
     </form>
+    {{/if}}
     {{#each submissions}}
     <li>
         <p>File Name: {{this.file}}</p>

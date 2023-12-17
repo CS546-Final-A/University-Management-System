@@ -13,15 +13,16 @@ $("#selectSemesterRegistration").click(async function (e) {
 
   const year = $("#yearRegistration").val();
   const semester = $("#semesterRegistration").val();
+
   const currentYear = new Date().getFullYear();
   if (year < currentYear || year > 2100) {
     alert(`Please select a valid year between ${currentYear} and 2050.`);
   } else {
-    window.location.href = `/courses/${year}/${semester}/registration/`;
+    window.location.href = `/courses/${encodeURIComponent(
+      year
+    )}/${encodeURIComponent(semester)}/registration/`;
     $("#yearAndSemesterSelect").modal("hide");
   }
-
-  
 });
 
 $("#yearAndSemesterSelectRegistration .close").on("click", function (e) {
@@ -33,7 +34,9 @@ $("#selectSemester").click(async function (e) {
   const year = $("#year").val();
   const semester = $("#semester").val();
 
-  window.location.href = `/courses/${year}/${semester}/listings/`;
+  window.location.href = `/courses/${encodeURIComponent(
+    year
+  )}/${encodeURIComponent(semester)}/listings/`;
 });
 
 $("#yearAndSemesterSelect .close").on("click", function (e) {

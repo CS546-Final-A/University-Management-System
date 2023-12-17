@@ -1,47 +1,41 @@
-import { Router, query } from "express";
+import { Router } from "express";
+const router = Router();
 import {
   addStudentToAttendance,
   getAttendanceData,
 } from "../../data/attendance/attendance.js";
-
 import {
   addModuleToSection,
   getModuleById,
   uploadMaterial,
 } from "../../data/modules/modules.js";
-import { validateSection } from "../../data/courses/courseHelper.js";
+import * as courseData from "../../data/courses/courses.js";
 import getUserByID from "../../data/users/getUserInfoByID.js";
+import belongsincourse from "../../data/courses/belongsincourse.js";
+import assignmentRoutes from "../sections/assignments.js";
+import verify, { santizeInputs } from "../../data_validation.js";
 import fileUpload from "express-fileupload";
 import path from "path";
-import verify, { santizeInputs } from "../../data_validation.js";
-import belongsincourse from "../../data/courses/belongsincourse.js";
-import assignmentRoutes from "./assignments.js";
-import {
-  computeGradeByUserID,
-  computeClassGrades,
-} from "../../data/submissions/computeGrades.js";
-import { setgrade } from "../../data/assignments/finalizegrades.js";
-import { getAssignmentsBySectionId } from "../../data/assignments/assignments.js";
 import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
 import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
 import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import routeError from "../routeerror.js";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const router = Router();
-
+function getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+}
 
 router.use("/:sectionID*", async (req, res, next) => {
   res.locals.sectionID = req.params.sectionID;
   res.locals.layout = "sidebar";
   try {
     const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
-    if (await belongsincourse(req.session.userid.toString(), sectionID)) {
+    if (await belongsincourse(req.session.userid, sectionID)) {
       next();
     } else {
       res.status(403);
@@ -66,56 +60,47 @@ router.use("/:sectionID*", async (req, res, next) => {
 });
 
 router.route("/:sectionId").get(async (req, res) => {
-  try {
-    let renderObjs = {};
+  let renderObjs = {};
 
-    const section = await courseDataFunctions.getSectionById(
-      res.locals.sectionID
-    );
-    const course = await courseDataFunctions.getCourseById(
-      section.courseId.toString()
-    );
+  const section = await courseData.getSectionById(res.locals.sectionID);
+  const course = await courseData.getCourseById(section.courseId.toString());
 
-    const profName = await getUserByID(section.sectionInstructor, {
-      _id: 0,
-      firstname: 1,
-      lastname: 1,
-    });
+  const profName = await getUserByID(section.sectionInstructor, {
+    _id: 0,
+    firstname: 1,
+    lastname: 1,
+  });
 
-    renderObjs = {
-      ...renderObjs,
-      layout: "sidebar",
-      sideBarTitle: course[0].courseName,
-      courseId: section.courseId.toString(),
-      courseName: course[0].courseName,
-      sectionName: section.sectionName,
-      sectionInstructor: section.sectionInstructor,
-      fN: profName.firstname,
-      lN: profName.lastname,
-      sectionType: section.sectionType,
-      sectionStartTime: section.sectionStartTime,
-      sectionEndTime: section.sectionEndTime,
-      sectionDay: section.sectionDay,
-      sectionCapacity: section.sectionCapacity,
-      sectionYear: section.sectionYear,
-      sectionSemester: section.sectionSemester,
-      studentCount: section.students.length,
-      sectionLocation: section.sectionLocation,
-      sectionDescription: section.sectionDescription,
-    };
-    res.render("workspace/home", renderObjs);
-  } catch (e) {
-    routeError(res, e);
-  }
+  renderObjs = {
+    ...renderObjs,
+    layout: "sidebar",
+    sideBarTitle: course[0].courseName,
+    courseId: section.courseId.toString(),
+    courseName: course[0].courseName,
+    sectionName: section.sectionName,
+    sectionInstructor: section.sectionInstructor,
+    fN: profName.firstname,
+    lN: profName.lastname,
+    sectionType: section.sectionType,
+    sectionStartTime: section.sectionStartTime,
+    sectionEndTime: section.sectionEndTime,
+    sectionDay: section.sectionDay,
+    sectionCapacity: section.sectionCapacity,
+    sectionYear: section.sectionYear,
+    sectionSemester: section.sectionSemester,
+    studentCount: section.students.length,
+    sectionLocation: section.sectionLocation,
+    sectionDescription: section.sectionDescription,
+  };
+  res.render("workspace/home", renderObjs);
 });
-
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
     let sectionId = verify.validateMongoId(req.params.sectionId);
 
     let renderObjs = {};
-    const section = await courseDataFunctions.getSectionById(sectionId);
+    const section = await courseData.getSectionById(sectionId);
     const userType = req.session.type;
 
     renderObjs = {
@@ -146,7 +131,6 @@ router
       res.status(500).json({ error: "Internal server error" });
     }
   });
-
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
   // Implementation of the Haversine formula
   const R = 6371; // Radius of the Earth in kilometers
@@ -416,221 +400,4 @@ router.post(
   }
 );
 
-async function renderStudentView(res, StudentID) {
-  const assignments = await getAssignmentsBySectionId(res.locals.sectionID);
-  const finalgrades = await computeGradeByUserID(
-    res.locals.sectionID,
-    StudentID
-  );
-
-  if (!assignments) {
-    throw (
-      "Assignments returned " +
-      assignments +
-      " which is not an expected return type"
-    );
-  }
-
-  for (let assignment of assignments) {
-    assignment.scores = assignment.scores.find((markObj) => {
-      return markObj.studentId.toString() === StudentID;
-    });
-    if (!assignment.scores) {
-      assignment.scores = "N/A";
-    } else {
-      assignment.scores = assignment.scores.score.toString();
-    }
-  }
-
-  res.render("assignments/students/grades", {
-    assignments: assignments,
-    grades: finalgrades,
-  });
-}
-
-router.use("/:sectionID/grades/:studentID", async (req, res) => {
-  try {
-    if (
-      req.session.type === "Professor" ||
-      req.session.userid === req.params.studentID
-    ) {
-      return await renderStudentView(res, req.params.studentID);
-    } else {
-      throw {
-        status: 403,
-        message: "You are not authorized to view that grade",
-      };
-    }
-  } catch (e) {
-    routeError(res, e);
-  }
-});
-
-router.get("/:sectionID/grades", async (req, res) => {
-  try {
-    if (req.session.type === "Student") {
-      return await renderStudentView(res, req.session.userid);
-    } else {
-      // Professor view
-      const students = await computeClassGrades(res.locals.sectionID);
-      res.render("assignments/professors/grades", {
-        students: students,
-        script: "assignments/finalizegrade",
-      });
-    }
-  } catch (e) {
-    routeError(res, e);
-  }
-});
-
-router.post("/:sectionID/grades", async (req, res) => {
-  try {
-    if (req.session.type !== "Professor") {
-      throw {
-        status: 403,
-        message: "You are not authorized to perform this action",
-      };
-    }
-    const userid = verify.validateMongoId(req.body.studentid);
-    const grade = verify.letterGrade(req.body.grade);
-
-    const result = await setgrade(res.locals.sectionID, userid, grade);
-
-    res.json({ successful: result.acknowledged });
-  } catch (e) {
-    if (e.status !== 500 && e.status) {
-      res.status(e.status);
-      return res.json({ error: e.message });
-    } else {
-      if (e.message) {
-        console.log("Error: " + e.message);
-      } else {
-        console.log("Error: " + e);
-      }
-      res.status(500);
-      res.json({ error: "Internal server error" });
-    }
-  }
-});
-
-router.use("/:sectionID/assignments", assignmentRoutes);
-
 export default router;
-
-// router.get(
-//   "/:sectionId/assignments/:assignmentId/submissions",
-//   async (req, res) => {
-//     try {
-//       let renderObjs = {
-//         name: req.session.name,
-//         type: req.session.type,
-//         email: req.session.email,
-//         sectionId: res.locals.sectionID,
-//         assignmentId: req.params.assignmentId,
-//       };
-//       let sectionId = res.locals.sectionID;
-//       let assignmentId = req.params.assignmentId;
-//       assignmentId = verify.validateMongoId(assignmentId);
-//       let section = await courseDataFunctions.getSectionById(sectionId);
-//       if (!section) {
-//         throw new Error("Section not found");
-//       }
-//       renderObjs.section = section;
-//       let assignment = await assignmentDataFunctions.getAssignmentById(
-//         assignmentId
-//       );
-//       if (!assignment) {
-//         throw new Error("Assignment not found");
-//       }
-//       renderObjs.assignment = assignment;
-//       let submissions =
-//         await assignmentDataFunctions.getSubmissionsByAssignmentId(
-//           assignmentId
-//         );
-//       renderObjs.submissions = submissions;
-//       res.render("assignments/submissions", renderObjs);
-//     } catch (e) {
-//       if (e.status !== 500 && e.status) {
-//         return res.json({ error: e.message });
-//       } else {
-//         res.status(500);
-//         res.json({ error: "Login error" });
-//       }
-//     }
-//   }
-// );
-
-// router.get(
-//   "/:sectionId/assignments/:assignmentId/submissions/:submissionId",
-//   async (req, res) => {
-//     try {
-//       let renderObjs = {
-//         name: req.session.name,
-//         type: req.session.type,
-//         email: req.session.email,
-//         sectionId: res.locals.sectionID,
-//         assignmentId: req.params.assignmentId,
-//         submissionId: req.params.submissionId,
-//       };
-//       let sectionId = res.locals.sectionID;
-//       let assignmentId = req.params.assignmentId;
-//       let submissionId = req.params.submissionId;
-//       assignmentId = verify.validateMongoId(assignmentId);
-//       submissionId = verify.validateMongoId(submissionId);
-//       let section = await courseDataFunctions.getSectionById(sectionId);
-//       if (!section) {
-//         throw new Error("Section not found");
-//       }
-//       renderObjs.section = section;
-//       let assignment = await assignmentDataFunctions.getAssignmentById(
-//         assignmentId
-//       );
-//       if (!assignment) {
-//         throw new Error("Assignment not found");
-//       }
-//       renderObjs.assignment = assignment;
-//       let submission = await assignmentDataFunctions.getSubmissionById(
-//         submissionId
-//       );
-//       if (!submission) {
-//         throw new Error("Submission not found");
-//       }
-//       renderObjs.submission = submission;
-//       res.render("assignments/submission", renderObjs);
-//     } catch (e) {
-//       if (e.status !== 500 && e.status) {
-//         return res.json({ error: e.message });
-//       } else {
-//         res.status(500);
-//         res.json({ error: "Login error" });
-//       }
-//     }
-//   }
-// );
-
-// router.get(
-//   "/:sectionId/assignments/:assignmentId/submissions/:submissionId/download",
-//   async (req, res) => {
-//     try {
-//       let sectionId = res.locals.sectionID;
-//       let assignmentId = req.params.assignmentId;
-//       let submissionId = req.params.submissionId;
-//       assignmentId = verify.validateMongoId(assignmentId);
-//       submissionId = verify.validateMongoId(submissionId);
-//       let submission = await assignmentDataFunctions.getSubmissionById(
-//         submissionId
-//       );
-//       if (!submission) {
-//         throw new Error("Submission not found");
-//       }
-//       res.download(submission.filePath);
-//     } catch (e) {
-//       if (e.status !== 500 && e.status) {
-//         return res.json({ error: e.message });
-//       } else {
-//         res.status(500);
-//         res.json({ error: "Login error" });
-//       }
-//     }
-//   }
-// );

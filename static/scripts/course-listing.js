@@ -37,12 +37,12 @@ $("#filter-button").click(async function (e) {
   // ...
 
   // Redirect to the URL
-  window.location.href = url;
+  window.location.href = encodeURIComponent(url);
 });
 $(".courseRedirect").click(async function (e) {
   e.preventDefault();
   const courseID = $(this).attr("data-id");
   // console.log(courseID);
   // console.log(window.location.href);
-  window.location.href = "/courses/" + courseID;
+  window.location.href = "/courses/" + encodeURIComponent(courseID);
 });
