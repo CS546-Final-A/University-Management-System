@@ -7,9 +7,9 @@ const router = Router();
 
 router.get("/create", (req, res) => {
   let renderObjs = {
-    name: req.session.name,
-    type: req.session.type,
-    email: req.session.email,
+    session_name: req.session.name,
+    session_type: req.session.type,
+    session_email: req.session.email,
     script: "users/createuser",
   };
 

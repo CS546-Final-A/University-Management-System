@@ -15,9 +15,12 @@
   --glassColor2: #29292936;
   --activeGlassColor: var(--glassColor1);
   --toastRed1: #e84848;
-  --shadowCol1: #5959594f;
-  --shadowCol2: #2c2c2c4f;
-  --activeShadowcolor: var(--shadowCol1);
+  --shadowColor1: #5959594f;
+  --shadowColor2: #2c2c2c4f;
+  --activeShadowColor: var(--shadowColor1);
+  --stripeTableColor1: #0000000f;
+  --stripeTableColor2: #ffffff1a;
+  --activeStripeTableColor: var(--stripeTableColor1);
 }
 
 body {
@@ -37,7 +40,7 @@ body {
 .start-header {
   opacity: 1;
   padding: 10px 0px;
-  box-shadow: 5px 5px 30px 10px rgb(138 155 165 / 35%);
+  box-shadow: 0px 10px 30px 0px var(--activeShadowColor);
   -webkit-transition: all 0.2s linear;
   transition: all 0.2s linear;
 }
@@ -222,10 +225,6 @@ h1 span {
   display: none;
 }
 
-body.dark .start-header {
-  box-shadow: 0 10px 30px 0 rgba(0, 0, 0);
-}
-
 .logo {
   position: absolute;
   bottom: 30px;
@@ -354,7 +353,7 @@ input.autofill:active::after {
 
 .glassEffect {
   background-color: var(--activeGlassColor) !important;
-  box-shadow: 0 2px 10px var(--activeShadowcolor) !important;
+  box-shadow: 0 2px 10px var(--activeShadowColor) !important;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   border: 1px solid #ffffff73;
@@ -411,9 +410,16 @@ a:focus {
   opacity: 1 !important;
 }
 
+.btn {
+  transition: all 0.2s linear;
+}
+.btn:hover {
+  filter: brightness(1.15);
+}
+
 .modal-backdrop.show {
   background-color: var(--activeBgColor) !important;
-  opacity: 0.6 !important;
+  opacity: 0.85 !important;
 }
 
 .form-floating > .form-control,
@@ -470,4 +476,41 @@ a:focus {
 }
 .invertColor {
   filter: invert(1);
+}
+
+.bootstrap-select .dropdown-menu,
+.bootstrap-select > .dropdown-toggle {
+  background-color: var(--activeBgColor) !important;
+  color: var(--activeTextColor) !important;
+  border-color: var(--activeTextColor) !important;
+}
+
+.bootstrap-select .dropdown-menu li a {
+  color: var(--activeTextColor) !important;
+  transition: all 0.15s linear;
+}
+
+.bootstrap-select .dropdown-menu li a:hover {
+  background-color: var(--greenAccent) !important;
+  color: #ffffff !important;
+}
+
+.bootstrap-select .dropdown-menu li a.active {
+  background-color: var(--activeTextColor) !important;
+  color: var(--activeBgColor) !important;
+}
+
+.bootstrap-select .dropdown-toggle:focus,
+.bootstrap-select > select.mobile-device:focus + .dropdown-toggle {
+  outline: 0px !important;
+  border-color: var(--greenAccent) !important;
+}
+
+.table {
+  color: var(--activeTextColor) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-accent-bg: var(--activeStripeTableColor) !important;
+  color: var(--activeTextColor) !important;
 }

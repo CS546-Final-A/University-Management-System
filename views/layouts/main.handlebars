@@ -2,6 +2,10 @@
 <html lang="en">
 
 <head>
+    <script>
+        // Access the darkmode variable from res.locals
+        var _isDarkMode = {{ darkmode }};
+    </script>
     <meta charset="utf-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +13,12 @@
     <link rel="stylesheet" href="/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/styles/bootstrap-select.min.css">
     <link rel="stylesheet" href="/styles/styles.css">
-    <script language="JavaScript" type="text/javascript" src="/scripts/jquery.min.js"></script>
+    <script src="/scripts/jquery.min.js"></script>
+
+    <script src="/scripts/styles.js"></script>
+    <!-- JS Imports -->
+    <script src="/scripts/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/bootstrap-select.min.js"></script>
 
     <title>University Management System</title>
 </head>
@@ -24,12 +33,20 @@
                             <span class="fs-5 position-relative" id="homeText">Dashboard</span>
                         </a>
                     </li>
-                    {{#if session_name}}
+                    {{#ifUserType session_type allowedRoles=['Admin', 'Student']}}
                     <li class="nav-item">
                         <a class="nav-link" href="/courses/">
                             <span class="fs-5 position-relative" id="coursesText">Courses</span>
                         </a>
                     </li>
+                    {{/ifUserType}}
+                    {{#ifUserType session_type allowedRoles=['Admin']}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/configuration/">
+                            <span class="fs-5 position-relative" id="configurationText">Configuration</span>
+                        </a>
+                    </li>
+                    {{/ifUserType}}
                     <li class="nav-item ms-auto dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             data-bs-auto-close="outside" aria-expanded="false"><img class="iconSwitch"
@@ -61,7 +78,6 @@
                             </li>
                         </ul>
                     </li>
-                    {{/if}}
                 </ul>
             </header>
         </div>
@@ -75,7 +91,7 @@
                 data-bs-autohide="false">
                 <div class="toast-header">
                     <img src="/icons/error.svg" alt="errorIcon">
-                    <strong class="me-auto" id="toastHeadMsg">Bootstrap</strong>
+                    <strong class="me-auto ms-2" id="toastHeadMsg">Bootstrap</strong>
                     <small>Just Now</small>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
@@ -89,9 +105,6 @@
 
 
     <!-- JS Imports -->
-    <script language="JavaScript" type="text/javascript" src="/scripts/bootstrap.bundle.min.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/scripts/bootstrap-select.min.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/scripts/styles.js"></script>
     <script language="JavaScript" type="text/javascript" src="/scripts/verification.js"></script>
     <script language="JavaScript" type="text/javascript" src="/scripts/request.js"></script>
     {{#if script}}

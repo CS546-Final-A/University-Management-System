@@ -20,7 +20,7 @@ async function belongsincourse(userid, sectionid) {
     registeredCourses: 1,
   });
 
-  return usercourses.registeredCourses.includes(sectionid.toString());
+  return usercourses.registeredCourses?.includes(sectionid.toString());
 }
 
 export default belongsincourse;

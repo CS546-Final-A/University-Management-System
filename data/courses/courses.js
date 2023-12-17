@@ -91,7 +91,7 @@ export const getDepartmentById = async (departmentId) => {
 };
 
 export const registerDepartment = async (departmentName) => {
-  const newDepartment = verify.string(departmentName, "departmentName");
+  departmentName = verify.string(departmentName, "departmentName");
 
   const departmentCollection = await departments();
   const department = await departmentCollection.findOne({
@@ -100,9 +100,11 @@ export const registerDepartment = async (departmentName) => {
   if (department) {
     throwerror("Department already exists!");
   } else {
+    const newDepartment = {
+      departmentName: departmentName,
+    };
     const insertInfo = await departmentCollection.insertOne(newDepartment);
-    const newId = insertInfo.insertedId.toString();
-    return newId;
+    return insertInfo;
   }
 };
 
@@ -120,7 +122,7 @@ export const updateDepartment = async (departmentId, departmentName) => {
   );
   if (!updateInfo) throwerror("Department was not updated successfully!");
 
-  return await getDepartmentById(departmentId);
+  return updateInfo;
 };
 
 export const deleteDepartment = async (departmentId) => {
@@ -171,37 +173,22 @@ export const getAllCourses = async (
       },
       {
         $match: {
-          sections: {
-            $elemMatch: {
-              sectionYear: year,
-              sectionSemester: semester,
-            },
-          },
+          courseSemester: semester,
+          courseYear: year,
         },
       },
       {
         $project: {
           _id: 1,
-          // Include all other fields from the "courses" collection
           courseName: 1,
           courseNumber: 1,
           courseDepartmentId: 1,
           courseCredits: 1,
-          sections: {
-            $filter: {
-              input: "$sections",
-              as: "section",
-              cond: {
-                $and: [
-                  { $eq: ["$$section.sectionYear", year] },
-                  { $eq: ["$$section.sectionSemester", semester] },
-                ],
-              },
-            },
-          },
+          courseSemester: 1,
+          courseYear: 1,
+          sections: 1,
           departmentName: "$department.departmentName",
           courseDescription: 1,
-          // Include all fields from the "sections" collection
           instructors: "$instructor",
         },
       },
@@ -435,7 +422,7 @@ export const getSectionsByCourseId = async (courseId) => {
 };
 
 export const getSectionById = async (sectionId) => {
-  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  sectionId = verify.validateMongoId(sectionId.toString(), "sectionId");
   const courseCollection = await courses();
   const course = await courseCollection.findOne({
     "sections.sectionId": sectionId,
@@ -556,7 +543,7 @@ export const registerSection = async (
     throwErrorWithStatus(400, "Section with the same name already exists");
 
   newSection.sectionId = new ObjectId();
-  newSection.enrolledStudents = [];
+  newSection.students = [];
 
   const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
@@ -673,11 +660,11 @@ export const enrollSection = async (sectionId, userId) => {
   );
 
   // Capacity Check
-  if (section?.enrolledStudents?.length >= section.sectionCapacity) {
+  if (section?.students?.length >= section.sectionCapacity) {
     throwErrorWithStatus(400, `Section is at maximum capacity. Cannot enroll.`);
   }
   // Enrollment Check
-  if (section.enrolledStudents.includes(userId)) {
+  if (section.students.includes(userId)) {
     throwErrorWithStatus(400, `User is already enrolled in this section.`);
   }
   const userCollection = await users();
@@ -736,7 +723,7 @@ export const enrollSection = async (sectionId, userId) => {
     }
   }
 
-  section.enrolledStudents.push(userId);
+  section.students.push(userId);
 
   await userCollection.updateOne(
     { _id: userId },
@@ -780,7 +767,7 @@ export const discardSection = async (sectionId, userId) => {
   );
 
   if (
-    !section.enrolledStudents.some(
+    !section.students.some(
       (enrolledUserId) => enrolledUserId.toString() === userId.toString()
     )
   ) {
@@ -796,7 +783,7 @@ export const discardSection = async (sectionId, userId) => {
     }
   );
 
-  section.enrolledStudents = section.enrolledStudents.filter(
+  section.students = section.students.filter(
     (enrolledUserId) => enrolledUserId.toString() !== userId.toString()
   );
 
@@ -856,7 +843,7 @@ export const checkEnrollment = async (sectionId, studentId) => {
     const courseCollection = await courses();
     const enrollmentData = await courseCollection.findOne({
       "sections.sectionId": sectionId,
-      "sections.enrolledStudents": studentId,
+      "sections.students": studentId,
     });
 
     return !!enrollmentData;

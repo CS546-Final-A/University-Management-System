@@ -24,6 +24,7 @@ router.post("/", async (req, res) => {
       req.session.type = result.type;
       req.session.name = result.name;
       req.session.email = result.email;
+      req.session.darkmode = result.preferences.darkmode || 0;
     }
 
     res.json({ loggedin: result.successful });
