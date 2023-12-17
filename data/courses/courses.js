@@ -537,6 +537,7 @@ export const registerSection = async (
   );
 
   const courseCollection = await courses();
+  const userCollection = await users();
   const existingSection = await courseCollection.findOne({
     _id: courseId,
     "sections.sectionName": newSection.sectionName,
@@ -548,9 +549,16 @@ export const registerSection = async (
   newSection.sectionId = new ObjectId();
   newSection.students = [];
 
+  const userupdate = await userCollection.updateOne(
+    {
+      _id: newSection.sectionInstructor,
+    },
+    { $push: { registeredCourses: newSection.sectionId } }
+  );
+
   const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
-    { $push: { sections: newSection } }
+    { $push: { sections: newSection.toString() } }
   );
   if (!updateInfo) {
     throwErrorWithStatus(
