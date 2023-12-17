@@ -81,7 +81,7 @@ export async function getAssignmentById(assignmentId) {
   });
 
   if (!assignment) {
-    throwErrorWithStatus(400, "Assignment not found");
+    throwErrorWithStatus(404, "Assignment not found");
   }
 
   assignment._id = assignment._id.toString();
