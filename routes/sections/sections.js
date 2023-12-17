@@ -31,12 +31,12 @@ const __dirname = dirname(__filename);
 
 const router = Router();
 
-router.use("/:sectionID*", async (req, res, next) => {
+router.use("/:sectionID", async (req, res, next) => {
   res.locals.sectionID = req.params.sectionID;
   res.locals.layout = "sidebar";
   try {
     const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
-    if (await belongsincourse(req.session.userid, sectionID)) {
+    if (await belongsincourse(req.session.userid.toString(), sectionID)) {
       next();
     } else {
       res.status(403);
@@ -98,124 +98,6 @@ router.route("/:sectionId").get(async (req, res) => {
     sectionDescription: section.sectionDescription,
   };
   res.render("workspace/home", renderObjs);
-});
-
-router.put("/:sectionId", async (req, res) => {
-  const {
-    sectionId,
-    sectionName,
-    sectionInstructor,
-    sectionType,
-    sectionStartTime,
-    sectionEndTime,
-    sectionDay,
-    sectionCapacity,
-    sectionLocation,
-    sectionDescription,
-  } = req.body;
-
-  try {
-    verify.validateMongoId(sectionId, "sectionId");
-    let updateSection = validateSection(
-      sectionName,
-      sectionInstructor,
-      sectionType,
-      sectionStartTime,
-      sectionEndTime,
-      sectionDay,
-      sectionCapacity,
-      sectionLocation,
-      sectionDescription
-    );
-    const updatedSection = await courseDataFunctions.updateSection(
-      sectionId,
-      updateSection.sectionName,
-      sectionInstructor,
-      updateSection.sectionType,
-      updateSection.sectionStartTime,
-      updateSection.sectionEndTime,
-      updateSection.sectionDay,
-      updateSection.sectionCapacity,
-      updateSection.sectionLocation,
-      updateSection.sectionDescription
-    );
-    return res.json(updatedSection);
-  } catch (error) {
-    if (error.status !== 500 && error.status) {
-      return res.status(error.status).json({ error: error.message });
-    } else {
-      res.status(500);
-      res.json({ error: "Internal Server Error" });
-    }
-  }
-});
-
-router.delete("/:sectionId", async (req, res) => {
-  let sectionId = req.params.sectionId;
-  try {
-    const deleteInfo = await courseDataFunctions.deleteSection(sectionId);
-    return res.json(deleteInfo);
-  } catch (error) {
-    if (error.status !== 500 && error.status) {
-      return res.json({ error: error.message });
-    } else {
-      res.status(500);
-      res.json({ error: "Login error" });
-    }
-  }
-});
-
-router.post("/:courseId/section", async (req, res) => {
-  let { courseId } = req.params;
-  const {
-    sectionName,
-    sectionInstructor,
-    sectionType,
-    sectionStartTime,
-    sectionEndTime,
-    sectionDay,
-    sectionCapacity,
-    sectionLocation,
-    sectionDescription,
-  } = req.body;
-  try {
-    verify.validateMongoId(courseId, "courseId");
-    const section = validateSection(
-      sectionName,
-      sectionInstructor,
-      sectionType,
-      sectionStartTime,
-      sectionEndTime,
-      sectionDay,
-      sectionCapacity,
-      sectionLocation,
-      sectionDescription
-    );
-    const result = await courseDataFunctions.registerSection(
-      courseId,
-      section.sectionName,
-      section.sectionInstructor,
-      section.sectionType,
-      section.sectionStartTime,
-      section.sectionEndTime,
-      section.sectionDay,
-      section.sectionCapacity,
-      section.sectionLocation,
-      section.sectionDescription
-    );
-
-    if (result.acknowledged) {
-      return res.json(result);
-    }
-  } catch (e) {
-    if (e.status !== 500 && e.status) {
-      res.status(e.status);
-      return res.json({ error: e.message });
-    } else {
-      res.status(500);
-      res.json({ error: "Login error" });
-    }
-  }
 });
 
 router

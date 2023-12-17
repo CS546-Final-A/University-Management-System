@@ -435,7 +435,7 @@ export const getSectionsByCourseId = async (courseId) => {
 };
 
 export const getSectionById = async (sectionId) => {
-  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  sectionId = verify.validateMongoId(sectionId.toString(), "sectionId");
   const courseCollection = await courses();
   const course = await courseCollection.findOne({
     "sections.sectionId": sectionId,
@@ -556,7 +556,7 @@ export const registerSection = async (
     throwErrorWithStatus(400, "Section with the same name already exists");
 
   newSection.sectionId = new ObjectId();
-  newSection.enrolledStudents = [];
+  newSection.students = [];
 
   const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
@@ -673,11 +673,11 @@ export const enrollSection = async (sectionId, userId) => {
   );
 
   // Capacity Check
-  if (section?.enrolledStudents?.length >= section.sectionCapacity) {
+  if (section?.students?.length >= section.sectionCapacity) {
     throwErrorWithStatus(400, `Section is at maximum capacity. Cannot enroll.`);
   }
   // Enrollment Check
-  if (section.enrolledStudents.includes(userId)) {
+  if (section.students.includes(userId)) {
     throwErrorWithStatus(400, `User is already enrolled in this section.`);
   }
   const userCollection = await users();
@@ -736,7 +736,7 @@ export const enrollSection = async (sectionId, userId) => {
     }
   }
 
-  section.enrolledStudents.push(userId);
+  section.students.push(userId);
 
   await userCollection.updateOne(
     { _id: userId },
@@ -780,7 +780,7 @@ export const discardSection = async (sectionId, userId) => {
   );
 
   if (
-    !section.enrolledStudents.some(
+    !section.students.some(
       (enrolledUserId) => enrolledUserId.toString() === userId.toString()
     )
   ) {
@@ -796,7 +796,7 @@ export const discardSection = async (sectionId, userId) => {
     }
   );
 
-  section.enrolledStudents = section.enrolledStudents.filter(
+  section.students = section.students.filter(
     (enrolledUserId) => enrolledUserId.toString() !== userId.toString()
   );
 
@@ -856,7 +856,7 @@ export const checkEnrollment = async (sectionId, studentId) => {
     const courseCollection = await courses();
     const enrollmentData = await courseCollection.findOne({
       "sections.sectionId": sectionId,
-      "sections.enrolledStudents": studentId,
+      "sections.students": studentId,
     });
 
     return !!enrollmentData;
