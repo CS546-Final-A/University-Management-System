@@ -35,11 +35,10 @@ const __dirname = dirname(__filename);
 
 const router = Router();
 
-
 router.use("/:sectionID*", async (req, res, next) => {
-  res.locals.sectionID = req.params.sectionID;
-  res.locals.layout = "sidebar";
   try {
+    res.locals.sectionID = req.params.sectionID;
+    res.locals.layout = "sidebar";
     const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
     if (await belongsincourse(req.session.userid.toString(), sectionID)) {
       next();
@@ -112,27 +111,31 @@ router.route("/:sectionId").get(async (req, res) => {
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
-    let sectionId = verify.validateMongoId(req.params.sectionId);
+    try {
+      let sectionId = verify.validateMongoId(req.params.sectionId);
 
-    let renderObjs = {};
-    const section = await courseDataFunctions.getSectionById(sectionId);
-    const userType = req.session.type;
+      let renderObjs = {};
+      const section = await courseDataFunctions.getSectionById(sectionId);
+      const userType = req.session.type;
 
-    renderObjs = {
-      ...renderObjs,
-      layout: "sidebar",
-      // sideBarTitle: `${course.courseName}`,
-      modules: section.sectionModules,
-      userType,
-    };
-    res.render("workspace/module", renderObjs);
+      renderObjs = {
+        ...renderObjs,
+        layout: "sidebar",
+        // sideBarTitle: `${course.courseName}`,
+        modules: section.sectionModules,
+        userType,
+      };
+      res.render("workspace/module", renderObjs);
+    } catch (e) {
+      routeError(res, e);
+    }
   })
   .post(async (req, res) => {
-    req.body = santizeInputs(req.body);
-    const { sectionId } = req.params;
-    sectionId = verify.validateMongoId(req.params.sectionId);
-    const { moduleName, moduleDescription, moduleDate } = req.body;
     try {
+      req.body = santizeInputs(req.body);
+      const { sectionId } = req.params;
+      sectionId = verify.validateMongoId(req.params.sectionId);
+      const { moduleName, moduleDescription, moduleDate } = req.body;
       await addModuleToSection(
         sectionId,
         moduleName,
@@ -170,170 +173,174 @@ const toRadians = (degrees) => {
 router
   .route("/:sectionId/modules/:moduleId/attendance")
   .get(async (req, res) => {
-    let renderObjs = {};
-    let { sectionId, moduleId } = req.params;
-    let userId = req.session.userid;
-    userId = verify.validateMongoId(userId);
-    moduleId = verify.validateMongoId(moduleId);
-    let section = await courseDataFunctions.checkStudentInSection(
-      sectionId,
-      userId
-    );
+    try {
+      let renderObjs = {};
+      let { sectionId, moduleId } = req.params;
+      let userId = req.session.userid;
+      userId = verify.validateMongoId(userId);
+      moduleId = verify.validateMongoId(moduleId);
+      let section = await courseDataFunctions.checkStudentInSection(
+        sectionId,
+        userId
+      );
 
-    if (!section) {
-      throw new Error("Section not found");
-    }
-    if (req.session.type === "Professor") {
-      const userType = req.session.type;
-      try {
+      if (!section) {
+        throw new Error("Section not found");
+      }
+      if (req.session.type === "Professor") {
+        const userType = req.session.type;
+        try {
+          const attendanceData = await getAttendanceData(moduleId);
+          console.log(attendanceData);
+
+          const professor = await attendanceData.find(
+            (entry) => entry.type === "Professor"
+          );
+          let needButton = true;
+          if (professor) needButton = false;
+
+          let studentsWithinRange = [];
+          if (professor) {
+            const professorLocation = {
+              latitude: professor.latitude,
+              longitude: professor.longitude,
+            };
+
+            if (attendanceData) {
+              studentsWithinRange = attendanceData
+                .filter((entry) => entry.type === "Student")
+                .map((student) => {
+                  const studentLocation = {
+                    latitude: student.latitude,
+                    longitude: student.longitude,
+                  };
+                  const distance = calculateDistance(
+                    professorLocation.latitude,
+                    professorLocation.longitude,
+                    studentLocation.latitude,
+                    studentLocation.longitude
+                  );
+                  return {
+                    name: student.name,
+                    userId: student.userId,
+                    distanceFromProfessor: distance,
+                  };
+                })
+                .filter((student) => student.distanceFromProfessor <= 20);
+            }
+          }
+          if (studentsWithinRange) {
+            const name = req.session.name;
+            renderObjs = {
+              ...renderObjs,
+              layout: "sidebar",
+              // sideBarTitle: `${course.courseName}`,
+              userType,
+              name,
+              studentsWithinRange,
+              needButton,
+            };
+            res.status(200).render("workspace/attendance", renderObjs);
+          }
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: "Internal server error" });
+        }
+      } else {
         const attendanceData = await getAttendanceData(moduleId);
-        console.log(attendanceData);
-
         const professor = await attendanceData.find(
           (entry) => entry.type === "Professor"
         );
-        let needButton = true;
-        if (professor) needButton = false;
-
-        let studentsWithinRange = [];
-        if (professor) {
-          const professorLocation = {
-            latitude: professor.latitude,
-            longitude: professor.longitude,
-          };
-
-          if (attendanceData) {
-            studentsWithinRange = attendanceData
-              .filter((entry) => entry.type === "Student")
-              .map((student) => {
-                const studentLocation = {
-                  latitude: student.latitude,
-                  longitude: student.longitude,
-                };
-                const distance = calculateDistance(
-                  professorLocation.latitude,
-                  professorLocation.longitude,
-                  studentLocation.latitude,
-                  studentLocation.longitude
-                );
-                return {
-                  name: student.name,
-                  userId: student.userId,
-                  distanceFromProfessor: distance,
-                };
-              })
-              .filter((student) => student.distanceFromProfessor <= 20);
-          }
-        }
-        if (studentsWithinRange) {
-          const name = req.session.name;
+        let needButton = false;
+        let n = 0;
+        const userType = req.session.type;
+        const name = req.session.name;
+        if (!professor) {
+          n = 1;
           renderObjs = {
             ...renderObjs,
             layout: "sidebar",
             // sideBarTitle: `${course.courseName}`,
+            sectionID: sectionId,
             userType,
             name,
-            studentsWithinRange,
-            needButton,
+            n,
           };
-          res.status(200).render("workspace/attendance", renderObjs);
+          res.render("workspace/attendance", renderObjs);
+        } else {
+          const ts = professor.timeStamp;
+          const date = new Date(ts);
+          let hours = date.getHours();
+          let minutes = date.getMinutes();
+          let amOrPm = hours >= 12 ? "PM" : "AM";
+          let H = hours;
+          let M = minutes < 10 ? "0" + minutes : minutes;
+          let k = amOrPm;
+          const userFromDb = await attendanceData.find(
+            (entry) => entry.userId === req.session.userid
+          );
+          let userThereButton = false;
+          if (userFromDb) userThereButton = true;
+          if (professor) needButton = true;
+          let t = new Date();
+          let timeLeft = t.getTime() - ts < 600000 ? true : false;
+          if (needButton === false) n = 1;
+          if (
+            needButton === true &&
+            userThereButton === false &&
+            timeLeft === true
+          )
+            n = 2;
+          if (
+            needButton === true &&
+            userThereButton === false &&
+            timeLeft === false
+          )
+            n = 3;
+          if (needButton === true && userThereButton === true) n = 4;
+          renderObjs = {
+            ...renderObjs,
+            layout: "sidebar",
+            // sideBarTitle: `${course.courseName}`,
+            sectionID: sectionId,
+            userType,
+            name,
+            n,
+            H,
+            M,
+            k,
+          };
+          res.render("workspace/attendance", renderObjs);
         }
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal server error" });
       }
-    } else {
-      const attendanceData = await getAttendanceData(moduleId);
-      const professor = await attendanceData.find(
-        (entry) => entry.type === "Professor"
-      );
-      let needButton = false;
-      let n = 0;
-      const userType = req.session.type;
-      const name = req.session.name;
-      if (!professor) {
-        n = 1;
-        renderObjs = {
-          ...renderObjs,
-          layout: "sidebar",
-          // sideBarTitle: `${course.courseName}`,
-          sectionID: sectionId,
-          userType,
-          name,
-          n,
-        };
-        res.render("workspace/attendance", renderObjs);
-      } else {
-        const ts = professor.timeStamp;
-        const date = new Date(ts);
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        let amOrPm = hours >= 12 ? "PM" : "AM";
-        let H = hours;
-        let M = minutes < 10 ? "0" + minutes : minutes;
-        let k = amOrPm;
-        const userFromDb = await attendanceData.find(
-          (entry) => entry.userId === req.session.userid
-        );
-        let userThereButton = false;
-        if (userFromDb) userThereButton = true;
-        if (professor) needButton = true;
-        let t = new Date();
-        let timeLeft = t.getTime() - ts < 600000 ? true : false;
-        if (needButton === false) n = 1;
-        if (
-          needButton === true &&
-          userThereButton === false &&
-          timeLeft === true
-        )
-          n = 2;
-        if (
-          needButton === true &&
-          userThereButton === false &&
-          timeLeft === false
-        )
-          n = 3;
-        if (needButton === true && userThereButton === true) n = 4;
-        renderObjs = {
-          ...renderObjs,
-          layout: "sidebar",
-          // sideBarTitle: `${course.courseName}`,
-          sectionID: sectionId,
-          userType,
-          name,
-          n,
-          H,
-          M,
-          k,
-        };
-        res.render("workspace/attendance", renderObjs);
-      }
+    } catch (e) {
+      routeError(res, e);
     }
   })
   .post(async (req, res) => {
-    req.body = santizeInputs(req.body);
-    const moduleId = req.params.moduleId;
-    const userId = req.session.userid;
-    const name = req.session.name;
-    const type = req.session.type;
-    const { latitude, longitude } = req.body;
-    const attendanceData = await getAttendanceData(moduleId);
-    const now = new Date();
-    const timeStamp = now.getTime();
-
-    const professor = await attendanceData.find(
-      (entry) => entry.type === "Professor"
-    );
-    if (professor) {
-      const d = calculateDistance(
-        latitude,
-        longitude,
-        professor.latitude,
-        professor.longitude
-      );
-      if (d > 0.1) alert("you'll be marked absent ");
-    }
     try {
+      req.body = santizeInputs(req.body);
+      const moduleId = req.params.moduleId;
+      const userId = req.session.userid;
+      const name = req.session.name;
+      const type = req.session.type;
+      const { latitude, longitude } = req.body;
+      const attendanceData = await getAttendanceData(moduleId);
+      const now = new Date();
+      const timeStamp = now.getTime();
+
+      const professor = await attendanceData.find(
+        (entry) => entry.type === "Professor"
+      );
+      if (professor) {
+        const d = calculateDistance(
+          latitude,
+          longitude,
+          professor.latitude,
+          professor.longitude
+        );
+        if (d > 0.1) alert("you'll be marked absent ");
+      }
       await addStudentToAttendance(
         name,
         userId,
@@ -417,35 +424,39 @@ router.post(
 );
 
 async function renderStudentView(res, StudentID) {
-  const assignments = await getAssignmentsBySectionId(res.locals.sectionID);
-  const finalgrades = await computeGradeByUserID(
-    res.locals.sectionID,
-    StudentID
-  );
-
-  if (!assignments) {
-    throw (
-      "Assignments returned " +
-      assignments +
-      " which is not an expected return type"
+  try {
+    const assignments = await getAssignmentsBySectionId(res.locals.sectionID);
+    const finalgrades = await computeGradeByUserID(
+      res.locals.sectionID,
+      StudentID
     );
-  }
 
-  for (let assignment of assignments) {
-    assignment.scores = assignment.scores.find((markObj) => {
-      return markObj.studentId.toString() === StudentID;
-    });
-    if (!assignment.scores) {
-      assignment.scores = "N/A";
-    } else {
-      assignment.scores = assignment.scores.score.toString();
+    if (!assignments) {
+      throw (
+        "Assignments returned " +
+        assignments +
+        " which is not an expected return type"
+      );
     }
-  }
 
-  res.render("assignments/students/grades", {
-    assignments: assignments,
-    grades: finalgrades,
-  });
+    for (let assignment of assignments) {
+      assignment.scores = assignment.scores.find((markObj) => {
+        return markObj.studentId.toString() === StudentID;
+      });
+      if (!assignment.scores) {
+        assignment.scores = "N/A";
+      } else {
+        assignment.scores = assignment.scores.score.toString();
+      }
+    }
+
+    res.render("assignments/students/grades", {
+      assignments: assignments,
+      grades: finalgrades,
+    });
+  } catch (e) {
+    routeError(res, e);
+  }
 }
 
 router.use("/:sectionID/grades/:studentID", async (req, res) => {

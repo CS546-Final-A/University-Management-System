@@ -106,28 +106,32 @@ router.post("/:registrationcode", async (req, res) => {
   if (req.session.registrationuserid) {
     return res.redirect("/register/setpassword/");
   }
-  let user;
   try {
-    const registrationcode = verify.UUID(req.params.registrationcode);
-    user = await getRegistrationInfo(registrationcode);
+    let user;
+    try {
+      const registrationcode = verify.UUID(req.params.registrationcode);
+      user = await getRegistrationInfo(registrationcode);
+    } catch (e) {
+      return routeError(res, e);
+    }
+    const idnum = req.body.idconf;
+    const idtype = req.body.idtype;
+    if (
+      user.identification.type === idtype &&
+      user.identification.number === idnum
+    ) {
+      req.session.registrationuserid = user._id;
+      return res.redirect("/register/setpassword/");
+    } else {
+      res.render("public/registration", {
+        identification: identification.type,
+        identificationverification: `users/registerby${identification.type}`,
+        error: "Invalid identification",
+        script: "users/registration",
+      });
+    }
   } catch (e) {
-    return routeError(res, e);
-  }
-  const idnum = req.body.idconf;
-  const idtype = req.body.idtype;
-  if (
-    user.identification.type === idtype &&
-    user.identification.number === idnum
-  ) {
-    req.session.registrationuserid = user._id;
-    return res.redirect("/register/setpassword/");
-  } else {
-    res.render("public/registration", {
-      identification: identification.type,
-      identificationverification: `users/registerby${identification.type}`,
-      error: "Invalid identification",
-      script: "users/registration",
-    });
+    routeError(res, e);
   }
 });
 

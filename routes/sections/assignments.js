@@ -112,13 +112,13 @@ router.use("/:action/:assignmentID*", async (req, res, next) => {
 });
 
 router.get("/edit/:assignmentID", async (req, res) => {
-  if (req.session.type !== "Professor") {
-    throw {
-      status: 403,
-      message: "You are not permitted to change assignments for this secion",
-    };
-  }
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to change assignments for this secion",
+      };
+    }
     if (req.session.type !== "Professor") {
       throw {
         status: 403,
@@ -137,27 +137,27 @@ router.get("/edit/:assignmentID", async (req, res) => {
 });
 
 router.post("/edit/:assignmentID/", async (req, res) => {
-  if (req.session.type !== "Professor") {
-    throw {
-      status: 403,
-      message: "You are not permitted to change assignments for this secion",
-    };
-  }
-  req.body = santizeInputs(req.body);
-  const sectionId = res.locals.sectionID;
-  const assignmentID = res.locals.assignmentID;
-  let userId = req.session.userid;
-  const {
-    assignmentName,
-    assignmentDescription,
-    assignmentWeight,
-    assignmentDueDate,
-
-    submissionLimit,
-
-    assignmentMaxScore,
-  } = req.body;
   try {
+    if (req.session.type !== "Professor") {
+      throw {
+        status: 403,
+        message: "You are not permitted to change assignments for this secion",
+      };
+    }
+    req.body = santizeInputs(req.body);
+    const sectionId = res.locals.sectionID;
+    const assignmentID = res.locals.assignmentID;
+    let userId = req.session.userid;
+    const {
+      assignmentName,
+      assignmentDescription,
+      assignmentWeight,
+      assignmentDueDate,
+
+      submissionLimit,
+
+      assignmentMaxScore,
+    } = req.body;
     const assignment = validateAssignment(
       userId,
       assignmentName,
