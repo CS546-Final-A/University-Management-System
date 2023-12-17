@@ -11,6 +11,7 @@ import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
 import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
 import * as courseDataFunctions from "../../data/courses/courses.js";
 import { fileURLToPath } from "url";
+import path from "path";
 import { dirname } from "path";
 import routeError from "../routeerror.js";
 import fileUpload from "express-fileupload";
@@ -208,7 +209,6 @@ router.route("/:courseId/materials").get(async (req, res) => {
   try {
     let userId = verify.validateMongoId(req.session.userid);
     let data = await courseDataFunctions.getCourseById(courseId);
-    // console.log(data);
     data.forEach((course) => {
       course.courseId = course._id.toString();
       course.sections.forEach((section) => {
@@ -234,6 +234,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
       headings: data[0].courseLearning.headings,
       files: data[0].courseLearning.files,
       layout: "sidebar",
+      // sectionID,
     };
 
     res.render("courses/materials", renderObjs);
@@ -278,37 +279,23 @@ router
     fileExtLimiter([".pdf"]),
     fileSizesLimiter,
     async (req, res) => {
-      console.log("in route");
-      console.log(req.files);
-
-      // Handle file upload logic here
-      // console.log(req.body.heading);
-      // console.log(req.body.file); // Access uploaded file
-      // ... handle file upload logic ...
       try {
+        console.log(req.files);
+        console.log(req.body.heading);
+
+        const heading = req.body.heading;
         req.body = santizeInputs(req.body);
+
         const files = req.files;
         let { courseId } = req.params;
         let userId = req.session.userid;
         userId = verify.validateMongoId(userId);
         courseId = verify.validateMongoId(courseId);
-        let section = await courseDataFunctions.checkStudentInSection(
-          sectionId,
-          userId
-        );
-
-        if (!section) {
-          throw new Error("Section not found");
-        }
-
-        let module = await getModuleById(moduleId);
-
-        if (!module) {
-          throw new Error("Assignment not found");
-        }
         let fileName = "";
+        let filepath = "";
+
         Object.keys(files).forEach((key) => {
-          const filepath = path.join(
+          filepath = path.join(
             "files",
             "materials",
             courseId.toString(),
@@ -323,88 +310,24 @@ router
           });
         });
 
-        let material = await uploadMaterial(
-          moduleId,
-          Date.now().toString(),
-          fileName
+        await courseDataFunctions.addFileDetails(
+          heading,
+          fileName,
+          filepath,
+          courseId
         );
-        res.send({ status: "success", message: "File is uploaded" });
-      } catch (e) {
-        if (e.status !== 500 && e.status) {
-          return res
-            .status(e.status)
-            .json({ status: "Error", message: e.message });
+
+        res.status(200).json({ message: "file details added successfully" });
+      } catch (error) {
+        console.error(error);
+        if (error.status !== 500 && error.status) {
+          res
+            .status(error.status)
+            .json({ status: "Error", message: error.message });
         } else {
-          console.log(e);
-          res.status(500);
-          res.json({ error: "Login error" });
+          res.status(500).json({ error: "Internal server error" });
         }
       }
     }
   );
-
-router.post(
-  "/:sectionId/modules/:moduleId/upload",
-  fileUpload({ createParentPath: true }),
-  filesPayloadExists,
-  fileExtLimiter([".zip"]),
-  fileSizesLimiter,
-
-  async (req, res) => {
-    try {
-      req.body = santizeInputs(req.body);
-      const files = req.files;
-      let { sectionId, moduleId } = req.params;
-      let userId = req.session.userid;
-      userId = verify.validateMongoId(userId);
-      moduleId = verify.validateMongoId(moduleId);
-      let section = await courseDataFunctions.checkStudentInSection(
-        sectionId,
-        userId
-      );
-
-      if (!section) {
-        throw new Error("Section not found");
-      }
-
-      let module = await getModuleById(moduleId);
-
-      if (!module) {
-        throw new Error("Assignment not found");
-      }
-      let fileName = "";
-      Object.keys(files).forEach((key) => {
-        const filepath = path.join(
-          "files",
-          moduleId.toString(),
-          userId.toString(),
-          files[key].name
-        );
-        fileName = files[key].name;
-        console.log(filepath);
-        files[key].mv(filepath, (err) => {
-          if (err)
-            return res.status(500).json({ status: "error", message: err });
-        });
-      });
-
-      let material = await uploadMaterial(
-        moduleId,
-        Date.now().toString(),
-        fileName
-      );
-      res.send({ status: "success", message: "File is uploaded" });
-    } catch (e) {
-      if (e.status !== 500 && e.status) {
-        return res
-          .status(e.status)
-          .json({ status: "Error", message: e.message });
-      } else {
-        console.log(e);
-        res.status(500);
-        res.json({ error: "Login error" });
-      }
-    }
-  }
-);
 export default router;

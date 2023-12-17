@@ -888,3 +888,32 @@ export const addHeading = async (courseId, heading) => {
     };
   }
 };
+
+export const addFileDetails = async (heading, fileName, filePath, courseId) => {
+  try {
+    courseId = verify.validateMongoId(courseId.toString(), "courseId");
+    const courseCollection = await courses();
+    const fileId = new ObjectId();
+    const result = await courseCollection.updateOne(
+      { _id: new ObjectId(courseId) },
+      {
+        $push: {
+          "courseLearning.files": {
+            _id: fileId,
+            heading: heading,
+            fileName: fileName,
+            filePath: filePath,
+          },
+        },
+      }
+    );
+
+    if (result.modifiedCount === 1) {
+      console.log("File details added successfully");
+    } else {
+      console.log("Failed to add file details");
+    }
+  } catch (error) {
+    console.error("Error adding file details:", error);
+  }
+};

@@ -50,36 +50,46 @@
     });
 
 
-    document.getElementById("fileUploadForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
+document.getElementById("fileUploadForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        const selectedHeading = document.getElementById("headingDropdown").value.trim();
-        const uploadedFiles = document.getElementById("fileInput").files;
-        if (uploadedFiles.length === 0) {
-            return alert("Please select a file");
-        }
-        if (uploadedFiles.length > 1) {
-            return alert("Please select only one file");
-        }
-        if (!selectedHeading || !uploadedFiles) {
-            alert("Please select a heading and upload a file");
-            return;
-        }
-        const formData = new FormData();
-        Object.keys(uploadedFiles).forEach((key) => {
-            formData.append(uploadedFiles.item(key).name, uploadedFiles.item(key));
-        });
-        formData.append("heading", selectedHeading);
+    const selectedHeading = document.getElementById("headingDropdown").value.trim();
+    const uploadedFiles = document.getElementById("fileInput").files;
 
-        try {
-            const response = await fetch(window.location.href + 'file', {
-                method: "POST",
-                body: formData,
-            });
-            console.log(response);
+    if (uploadedFiles.length === 0) {
+        return alert("Please select a file");
+    }
 
-        } catch (error) {
-            console.error("Error:", error);
-        }
+    if (uploadedFiles.length > 1) {
+        return alert("Please select only one file");
+    }
+
+    if (!selectedHeading || !uploadedFiles) {
+        alert("Please select a heading and upload a file");
+        return;
+    }
+
+    const formData = new FormData();
+    Object.keys(uploadedFiles).forEach((key) => {
+        formData.append(uploadedFiles.item(key).name, uploadedFiles.item(key));
     });
+    formData.append("heading", selectedHeading);
+
+    try {
+        const response = await fetch(window.location.href + 'file', {
+            method: "POST",
+            body: formData,
+        });
+
+        if (response.ok) {
+            console.log("File uploaded successfully");
+            window.location.reload(); 
+        } else {
+            console.log("File upload failed");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+});
+
 </script>
