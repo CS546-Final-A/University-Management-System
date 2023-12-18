@@ -22,3 +22,5 @@ SMTPPassword="Password"
 MailServerDomain="The domain from which your emails will be sent"
 SiteDomain="The url from which the site can be accessed"
 ```
+
+Extra Features : PDF transcript generator and emails
