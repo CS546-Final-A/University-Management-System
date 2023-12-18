@@ -204,7 +204,6 @@ export const getAllCourses = async (
   }
 
   if (searchTerm) {
-    console.log(searchTerm);
     courseList = courseList.filter((course) => {
       let x = course.courseNumber + " - " + course.courseName.toLowerCase();
       console.log(x);
@@ -274,6 +273,8 @@ export const registerCourse = async (
   const existingCourse = await courseCollection.findOne({
     courseNumber: courseNumber,
     courseName: courseName,
+    courseSemester: courseSemester,
+    courseYear: courseYear,
   });
   if (existingCourse) {
     throwErrorWithStatus(400, "Course already exists");
@@ -285,12 +286,15 @@ export const registerCourse = async (
     throwErrorWithStatus(400, "Department not found");
   }
   newCourse.sections = [];
+  newCourse.courseLearning = {
+    headings: [],
+    files: [],
+  }
   const insertInfo = await courseCollection.insertOne(newCourse);
   return insertInfo;
 };
 export const getCourseById = async (courseId) => {
   courseId = verify.validateMongoId(courseId, "courseId");
-  // console.log(courseId);
   const courseCollection = await courses();
   const existingCourse = await courseCollection
     .aggregate([
@@ -553,6 +557,7 @@ export const registerSection = async (
   newSection.sectionId = new ObjectId();
   newSection.students = [];
 
+
   const userupdate = await userCollection.updateOne(
     {
       _id: newSection.sectionInstructor,
@@ -605,6 +610,23 @@ export const updateSection = async (
 
   if (!course) {
     throwErrorWithStatus(400, `Section was not found!`);
+  }
+
+  const section = course.sections.find(
+    (section) => section.sectionId.toString() === sectionId.toString()
+  );
+
+  let removeSection, addSection;
+  if (section.sectionInstructor.toString() !== sectionInstructor) {
+    const userCollection = await users();
+    removeSection = await userCollection.updateOne(
+      { _id: section.sectionInstructor },
+      { $pull: { registeredCourses: sectionId } }
+    );
+    addSection = await userCollection.updateOne(
+      { _id: updatedSection.sectionInstructor },
+      { $push: { registeredCourses: sectionId } }
+    );
   }
 
   updatedSection.sectionId = sectionId;
