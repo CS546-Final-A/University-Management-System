@@ -106,8 +106,8 @@ router.post("/:registrationcode", async (req, res) => {
   if (req.session.registrationuserid) {
     return res.redirect("/register/setpassword/");
   }
+  let user;
   try {
-    let user;
     try {
       const registrationcode = verify.UUID(req.params.registrationcode);
       user = await getRegistrationInfo(registrationcode);
@@ -124,8 +124,8 @@ router.post("/:registrationcode", async (req, res) => {
       return res.redirect("/register/setpassword/");
     } else {
       res.render("public/registration", {
-        identification: identification.type,
-        identificationverification: `users/registerby${identification.type}`,
+        identification: user.identification.type,
+        identificationverification: `users/registerby${user.identification.type}`,
         error: "Invalid identification",
         script: "users/registration",
       });
