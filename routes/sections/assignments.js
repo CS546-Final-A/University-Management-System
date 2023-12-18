@@ -13,6 +13,7 @@ import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
 import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
 import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
 
+import sendSubmissionReceipt from "../../data/emails/sendSubmissionReceipt.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 
 router.get("/create", async (req, res) => {
@@ -287,8 +288,12 @@ router.post(
         fileName = files[key].name;
         console.log(filepath);
         files[key].mv(filepath, (err) => {
-          if (err)
-            return res.status(500).json({ status: "error", message: err });
+          if (err) {
+            console.log("Error: " + err);
+            return res
+              .status(500)
+              .json({ status: "error", message: "Internal server error" });
+          }
         });
       });
 
@@ -298,6 +303,8 @@ router.post(
         Date.now().toString(),
         fileName
       );
+
+      await sendSubmissionReceipt(userId, submission._id, fileName, assignment);
       res.send({ status: "success", message: "File is uploaded" });
     } catch (e) {
       if (e.status !== 500 && e.status) {
