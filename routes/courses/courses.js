@@ -492,7 +492,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
       headings: data[0].courseLearning.headings,
       files: data[0].courseLearning.files,
       allFiles: organizedHeadings,
-      // layout: "sidebar",
+      //
       // sectionID,
     };
 

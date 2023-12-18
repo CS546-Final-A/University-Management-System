@@ -21,7 +21,6 @@
   display: flex;
   width: 100%;
   align-items: stretch;
-  margin-top: 90px;
 }
 
 #sidebar {
@@ -45,12 +44,20 @@
 
 #sidebar ul.components {
   padding: 20px 15px;
-  border-bottom: 1px solid #47748b;
+  /* border-bottom: 1px solid #47748b; */
 }
 
 #sidebar ul p {
   color: #fff;
   padding: 10px;
+}
+
+.headSidebar {
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--activeTextColor);
+  border-top: 1px solid var(--activeTextColor);
 }
 
 #sidebar ul li a {

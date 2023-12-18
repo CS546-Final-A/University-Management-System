@@ -41,7 +41,7 @@ router.get("/edit/:assignmentID", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const renderObjs = { layout: "sidebar", script: "assignments/list" };
+    const renderObjs = { script: "assignments/list" };
     renderObjs.assignments = await getAssignmentsBySectionId(
       res.locals.sectionID
     );
