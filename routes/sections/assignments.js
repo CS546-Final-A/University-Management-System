@@ -14,6 +14,7 @@ import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
 import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
 
 import sendSubmissionReceipt from "../../data/emails/sendSubmissionReceipt.js";
+import sendAssignmentGraded from "../../data/emails/sendAssignmentGraded.js";
 import belongsincourse from "../../data/courses/belongsincourse.js";
 
 router.get("/create", async (req, res) => {
@@ -438,6 +439,8 @@ router.post("/view/:assignmentID/scores", async (req, res) => {
       studentId,
       score
     );
+
+    await sendAssignmentGraded(studentId, res.locals.assignment.assignmentName);
 
     res.redirect(
       `/sections/${sectionId}/assignments/view/${assignmentID}/scores/`
