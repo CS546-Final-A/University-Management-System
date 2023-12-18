@@ -111,27 +111,29 @@ router.route("/:sectionId").get(async (req, res) => {
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
+    try {
+      let sectionId = verify.validateMongoId(req.params.sectionId);
+      const section = await courseDataFunctions.getSectionById(
+        res.locals.sectionID
+      );
+      const course = await courseDataFunctions.getCourseById(
+        section.courseId.toString()
+      );
+      let renderObjs = {};
+      const userType = req.session.type;
 
-    let sectionId = verify.validateMongoId(req.params.sectionId);
-    const section = await courseDataFunctions.getSectionById(
-      res.locals.sectionID
-    );
-    const course = await courseDataFunctions.getCourseById(
-      section.courseId.toString()
-    );
-    let renderObjs = {};
-    const userType = req.session.type;
-
-    renderObjs = {
-      ...renderObjs,
-      layout: "sidebar",
-      // sideBarTitle: `${course.courseName}`,
-      courseId: section.courseId.toString(),
-      modules: section.sectionModules,
-      userType,
-    };
-    res.render("workspace/module", renderObjs);
-
+      renderObjs = {
+        ...renderObjs,
+        layout: "sidebar",
+        // sideBarTitle: `${course.courseName}`,
+        courseId: section.courseId.toString(),
+        modules: section.sectionModules,
+        userType,
+      };
+      res.render("workspace/module", renderObjs);
+    } catch (e) {
+      res.status(500).json({ error: "Internal server error" });
+    }
   })
   .post(async (req, res) => {
     try {

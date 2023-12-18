@@ -8,10 +8,16 @@ import {
 } from "../../data/courses/courseHelper.js";
 import routeError from "../routeerror.js";
 import fileUpload from "express-fileupload";
+import multer from "multer";
+import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
+import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
+import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
+import { fileURLToPath } from "url";
+import path from "path";
+import { dirname } from "path";
 import { inflateRawSync } from "zlib";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
 
 const router = Router();
 const upload = multer();
@@ -338,7 +344,6 @@ router.get("/getSectionById/:sectionId", async (req, res) => {
     }
   }
 });
-
 
 router.use("/:courseId*", async (req, res, next) => {
   try {
