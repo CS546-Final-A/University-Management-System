@@ -6,13 +6,13 @@
         // Access the darkmode variable from res.locals
         var _isDarkMode = {{ darkmode }};
     </script>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="/styles/bootstrap.min.css" />
-    <link rel="stylesheet" href="/styles/bootstrap-select.min.css" />
-    <link rel="stylesheet" href="/styles/styles.css" />
-    <link rel="stylesheet" href="/styles/sidebar.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/bootstrap-select.min.css">
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/sidebar.css">
     <script src="/scripts/jquery.min.js"></script>
 
     <script src="/scripts/styles.js"></script>
@@ -81,7 +81,7 @@
 
                     <li class="py-1">
                         <a href="#"><span class="animateHover"></span><span><img class="iconSwitch"
-                                    src="/icons/user-circle.svg" alt="user-circle-icon" />{{session_name}}</span></a>
+                                    src="/icons/user-circle.svg" alt="user-circle-icon">{{session_name}}</span></a>
                     </li>
                     <li class="py-1">
                         <a href="#"><span class="animateHover"></span><span>{{session_email}}</span></a>
@@ -141,8 +141,8 @@
             });
         });
     </script>
-    <script language="JavaScript" type="text/javascript" src="/scripts/verification.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/scripts/request.js"></script>
+    <script src="/scripts/verification.js"></script>
+    <script src="/scripts/request.js"></script>
     {{#if script}}
     {{> (lookup . 'script') }}
     {{/if}}
