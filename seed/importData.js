@@ -13,22 +13,22 @@ function replaceOid(jsonObject) {
       for (const key in item) {
         for (const key2 in item[key]) {
           if (key2 === "$oid") {
-            item[key] = new ObjectId(key[key2]);
+            item[key] = new ObjectId(item[key][key2]);
           }
           if (key2 === "$date") {
-            item[key] = new Date(key[key2]);
+            item[key] = new Date(item[key][key2]);
           }
           if (key2 === "$numberInt") {
-            item[key] = parseInt(key[key2]);
+            item[key] = parseInt(item[key][key2]);
           }
           if (key2 === "$numberDecimal") {
-            item[key] = parseFloat(key[key2]);
+            item[key] = parseFloat(item[key][key2]);
           }
           if (key2 === "$numberLong") {
-            item[key] = parseInt(key[key2]);
+            item[key] = parseInt(item[key][key2]);
           }
           if (key2 === "$numberDouble") {
-            item[key] = parseFloat(key[key2]);
+            item[key] = parseFloat(item[key][key2]);
           } else {
             processItem(item[key]);
           }
@@ -55,6 +55,7 @@ const importData = async () => {
       "finalgrades",
       "assignments",
     ];
+
     const loadJSON = (filePath) => {
       try {
         let jsonData = fs.readFileSync(filePath, "utf8");
@@ -70,17 +71,20 @@ const importData = async () => {
       const data = loadJSON(`seed/seeds/${collection}Data.json`);
 
       replaceOid(data);
-
+      console.log(data);
       if (data) {
         const dbCollection = await mongoCollections[collection]();
+        dbCollection.drop();
         await dbCollection.deleteMany({});
         await dbCollection.insertMany(data);
         console.log(`Inserted ${data.length} documents into ${collection}`);
       }
     }
+  } catch (e) {
+    console.error(e);
   } finally {
     process.exit();
   }
 };
-
-importData();
+console.log("hi");
+await importData();
