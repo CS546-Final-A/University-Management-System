@@ -16,6 +16,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import { dirname } from "path";
 import { inflateRawSync } from "zlib";
+import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -99,7 +100,7 @@ router.put("/update", async (req, res) => {
       courseName,
       courseDepartmentId,
       courseCredits,
-      courseDescription,
+      courseDescription
     );
     let result = await courseDataFunctions.updateCourse(
       courseId,
@@ -107,7 +108,7 @@ router.put("/update", async (req, res) => {
       course.courseName,
       course.courseDepartmentId,
       course.courseCredits,
-      course.courseDescription,
+      course.courseDescription
     );
     if (result.acknowledged) {
       // window.location.href = "/courses/" + result.insertedId;
@@ -621,7 +622,9 @@ router.get("/:courseId/materials/downloadFile", async (req, res) => {
     if (!belongs) {
       throw { status: 403, message: "You do not belong to this course" };
     }
-    res.download(filePath, fileName, (err) => {
+    var data = fs.readFileSync(filePath);
+    res.contentType("application/pdf");
+    res.send(data, fileName, (err) => {
       if (err) {
         console.log(err);
         res.status(404).json({ error: "File not found" });
