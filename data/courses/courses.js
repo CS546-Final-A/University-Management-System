@@ -317,6 +317,8 @@ export const getCourseById = async (courseId) => {
           courseName: 1,
           courseCredits: 1,
           courseDescription: 1,
+          courseYear: 1,
+          courseSemester: 1,
           sections: 1,
           courseLearning: 1,
           courseYear: 1,
@@ -389,6 +391,8 @@ export const updateCourse = async (
     courseCredits,
     courseDescription
   );
+  delete existingCourse?.courseSemester;
+  delete existingCourse?.courseYear;
   const courseCollection = await courses();
   const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
