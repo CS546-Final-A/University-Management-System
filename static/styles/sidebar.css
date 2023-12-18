@@ -246,7 +246,7 @@ a.article:hover {
   cursor: pointer;
 }
 
-.hover text {
+.hover span {
   position: relative;
   z-index: 2;
 
@@ -257,7 +257,7 @@ a.article:hover {
   color: var(--activeBgColor);
 }
 
-.hover span {
+.hover span.animateHover {
   position: absolute;
   display: block;
   content: "";
@@ -272,7 +272,7 @@ a.article:hover {
   transition: width var(--time), padding-top var(--time);
 }
 
-.hover:hover span {
+.hover:hover span.animateHover {
   width: calc(var(--width) * 2.35);
   padding-top: calc(var(--width) * 2.35);
 }

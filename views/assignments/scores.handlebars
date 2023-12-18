@@ -1,7 +1,8 @@
 <div class="container-fluid">
 
-    <div class="d-flex my-2">
-        <div class="my-auto">Scores for {{assignment.assignmentName}}</div>
+    <div class="d-flex fs-2">
+        <div class="my-auto"><img class="iconSwitch" src="/icons/score.svg" alt="score Icon">Scores for
+            '{{assignment.assignmentName}}'</div>
         <div class="my-auto text-muted fs-5" id="reportCount"></div>
         <div class="form-floating ms-auto fs-6">
             <input class="form-control blockdisplay" type="text" placeholder="" id="searchInput" />
@@ -11,14 +12,13 @@
     </div>
 
 
-
     {{#each students}}
-    <div class="searchData my-5">
+    <div class="searchData my-5 glassEffect p-4">
         <h3>Student: {{name}}</h3>
 
         <p>Current Recorded Score: {{this.score}}</p>
 
-        <div class="mt-4">
+        <div class="my-5">
             {{#each submissions}}
             <div class="my-2">
                 <p>File Name: {{this.file}}</p>
@@ -33,8 +33,8 @@
         <form action="/sections/{{../sectionID}}/assignments/view/{{../assignment._id}}/scores" method="post">
             <input type="hidden" name="studentId" value="{{this._id}}">
             <div class="form-floating my-3 col-md-4">
-                <input class="form-control" type="text" name="score" value="" placeholder="">
-                <label for="score">Score:</label>
+                <input id="score-{{this._id}}" class="form-control" type="text" name="score" value="" placeholder="">
+                <label for="score-{{this._id}}">Score:</label>
             </div>
 
 
