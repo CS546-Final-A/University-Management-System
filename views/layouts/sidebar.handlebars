@@ -30,13 +30,13 @@
             <header class="col-12">
                 <ul id="navigationList" class="nav d-flex mx-5">
                     <li class="nav-item hamIcon me-4">
-                        <button type="button" id="sidebarCollapse" class="border-0 p-0 m-0">
+                        <div id="sidebarCollapse" class="border-0 p-0 m-0">
                             <div class="hamburger p-1" id="hamburger-4">
                                 <span class="line"></span>
                                 <span class="line"></span>
                                 <span class="line"></span>
                             </div>
-                        </button>
+                        </div>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/dashboard">
@@ -76,8 +76,7 @@
                                         <div id="circle"></div>
                                     </div>
                                     <div class="my-auto d-flex justify-content-center btnNavbar">
-                                        <a class="w-100 ps-0" href="/logout"><button
-                                                class="mb-0 py-2 w-100 btnNavbar">Logout</button></a>
+                                        <a class="w-100 ps-0 mb-0 py-2 w-100 btnNavbar" href="/logout">Logout</a>
                                     </div>
 
                                 </div>
@@ -95,21 +94,20 @@
         <nav id="sidebar" class="glassEffect">
             <ul class="list-unstyled components">
                 <li class="py-1">
-                    <a class="hover" href="/sections/{{sectionID}}"><span></span><text>Home</text></a>
+                    <a class="hover" href="/sections/{{sectionID}}"><span></span>Home</a>
                 </li>
                 <li class="py-1">
-                    <a class="hover" href="/sections/{{sectionID}}/modules"><span></span><text>Modules</text></a>
+                    <a class="hover" href="/sections/{{sectionID}}/modules"><span></span>Modules</a>
                 </li>
                 <li class="py-1">
-                    <a class="hover"
-                        href="/sections/{{sectionID}}/assignments/"><span></span><text>Assignments</text></a>
+                    <a class="hover" href="/sections/{{sectionID}}/assignments/"><span></span>Assignments</a>
                 </li>
                 <li class="py-1">
-                    <a class="hover" href="/sections/{{sectionID}}/grades/"><span></span><text>Grades</text></a>
+                    <a class="hover" href="/sections/{{sectionID}}/grades/"><span></span>Grades</a>
                 </li>
                 <li class="py-1">
-                    <a class="hover" href="/courses/{{courseId}}/materials/"><span></span><text>Course
-                            Learning</text></a>
+                    <a class="hover" href="/courses/{{courseId}}/materials/"><span></span>Course
+                        Learning</a>
                 </li>
             </ul>
         </nav>

@@ -3,16 +3,18 @@
     <input type="hidden" id="csrf" value="{{_csrf}}">
     {{#each courses}}
     <input type="text" class="form-control" id="courseId" name="courseId" hidden value="{{this.courseId}}">
-    
-        <div class="d-flex">
-            <div class="my-auto"><h2>{{this.courseNumber}} : {{this.courseName}}</h2></div>
-            <div class="mx-4 my-auto text-muted fs-5">
-                {{this.courseDepartmentId.name}}
-            </div>
-            {{#if (eq ../session_type 'Admin')}}
-            <button class="btn btn-warning edit-btn" onclick="editCourse('{{this.courseId}}')">Edit Course</button>
-            {{/if}}
+
+
+    <div class="d-flex">
+        <div class="my-auto">{{this.courseNumber}} : {{this.courseName}}</div>
+        <div class="mx-4 my-auto text-muted fs-5">
+            {{this.courseDepartmentId.name}}
         </div>
+        {{#if (eq ../session_type 'Admin')}}
+        <button class="btn btn-warning edit-btn" onclick="editCourse('{{this.courseId}}')">Edit Course</button>
+        {{/if}}
+    </div>
+
     <div class="my-3"><strong>Credits:</strong> {{this.courseCredits}}</div>
 
     <div class="my-3">{{this.courseDescription}}</div>
