@@ -22,7 +22,6 @@ const courseSubmit = async () => {
     };
     verify.string(requestData.courseName);
     verify.string(requestData.courseDescription);
-    verify.string(requestData.courseDescription);
     if (
       isNaN(requestData.courseCredits) ||
       requestData.courseCredits < 0 ||
@@ -42,6 +41,59 @@ const courseSubmit = async () => {
     } else if (result?.acknowledged) {
       window.location.href =
         "/courses/" + encodeURIComponent(result.insertedId);
+    }
+  } catch (e) {
+    document.getElementById("error").innerText = "";
+    if (e.error) {
+      setError(e.error);
+    } else if (e.message) {
+      setError(e.message);
+    } else {
+      setError(e);
+    }
+  }
+};
+
+const updateSubmit = async () => {
+  const courseId = document.getElementById("courseId").value;
+  const courseNumber = document.getElementById("courseNumber").value;
+  const courseName = document.getElementById("courseName").value;
+  const courseDepartmentId =
+    document.getElementById("courseDepartmentId").value;
+  const courseCredits = document.getElementById("courseCredits").value;
+  const courseDescription = document.getElementById("courseDescription").value;
+  try {
+    const csrf = document.getElementById("csrf").value;
+
+    let requestData = {
+      courseId,
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription,
+    };
+    verify.string(requestData.courseName);
+    verify.string(requestData.courseDescription);
+    if (
+      isNaN(requestData.courseCredits) ||
+      requestData.courseCredits < 0 ||
+      requestData.courseCredits > 30
+    ) {
+      throw "Invalid amount of credits";
+    }
+
+    const result = await request(
+      "PUT",
+      "/courses/update",
+      csrf,
+      requestData
+    );
+    if (result?.error) {
+      setError(result);
+    } else if (result?.acknowledged) {
+      window.location.href =
+        "/courses/" + encodeURIComponent(courseId);
     }
   } catch (e) {
     document.getElementById("error").innerText = "";

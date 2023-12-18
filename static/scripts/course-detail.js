@@ -72,13 +72,7 @@ const sectionSubmit = async (event) => {
 };
 
 const editCourse = async (courseId) => {
-  const csrf = document.getElementById("csrf").value;
-  console.log(courseId);
-  const result = await request(
-    "GET",
-    `/courses/update/${courseId}`,
-    csrf,
-  );
+  window.location.href = `/courses/update/${courseId}`;
 };
 
 const editSection = async (sectionId) => {

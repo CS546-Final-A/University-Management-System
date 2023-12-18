@@ -53,9 +53,10 @@ router.get("/update/:courseId", async (req, res) => {
     const { courseId } = req.params;
     let courses = await courseDataFunctions.getCourseById(courseId);
     let uniqueDepartmentNames =
-    await courseDataFunctions.getUniqueDepartmentNamesandId();
-    courses.forEach(course => {
+      await courseDataFunctions.getUniqueDepartmentNamesandId();
+    courses.forEach((course) => {
       course.departmentId = course.courseDepartmentId._id.toString();
+      course.courseId = course._id.toString();
     });
     let renderObjs = {
       session_name: req.session.name,
@@ -66,9 +67,51 @@ router.get("/update/:courseId", async (req, res) => {
       course: courses[0],
       script: "courses/registration",
     };
-    return res.redirect("courses/registration", renderObjs);
+    return res.render("courses/registration", renderObjs);
   } catch (e) {
     routeError(res, e);
+  }
+});
+
+router.put("/update", async (req, res) => {
+  try {
+    const {
+      courseId,
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription,
+    } = req.body;
+    const course = validateCourse(
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription,
+    );
+    let result = await courseDataFunctions.updateCourse(
+      courseId,
+      course.courseNumber,
+      course.courseName,
+      course.courseDepartmentId,
+      course.courseCredits,
+      course.courseDescription,
+    );
+    if (result.acknowledged) {
+      // window.location.href = "/courses/" + result.insertedId;
+      return res.json(result);
+    } else {
+      throw "Unexpected result";
+    }
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Internal Server Error" });
+    }
   }
 });
 

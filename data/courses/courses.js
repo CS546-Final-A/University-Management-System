@@ -383,6 +383,8 @@ export const updateCourse = async (
     courseCredits,
     courseDescription
   );
+  delete existingCourse?.courseSemester;
+  delete existingCourse?.courseYear;
   const courseCollection = await courses();
   const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
