@@ -111,34 +111,27 @@ router.route("/:sectionId").get(async (req, res) => {
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
+    try {
+      let sectionId = verify.validateMongoId(req.params.sectionId);
 
+      let renderObjs = {};
+      const section = await courseDataFunctions.getSectionById(sectionId);
+      const userType = req.session.type;
 
-    let sectionId = verify.validateMongoId(req.params.sectionId);
-    const section = await courseDataFunctions.getSectionById(
-      res.locals.sectionID
-    );
-    const course = await courseDataFunctions.getCourseById(
-      section.courseId.toString()
-    );
-    let renderObjs = {};
-    const userType = req.session.type;
-
-    renderObjs = {
-      ...renderObjs,
-      layout: "sidebar",
-      // sideBarTitle: `${course.courseName}`,
-      courseId: section.courseId.toString(),
-      modules: section.sectionModules,
-      userType,
-    };
-    res.render("workspace/module", renderObjs);
+      renderObjs = {
+        ...renderObjs,
+        layout: "sidebar",
+        // sideBarTitle: `${course.courseName}`,
+        script: "workspace/module",
+        modules: section.sectionModules,
+        userType,
+      };
+      res.render("workspace/module", renderObjs);
+    } catch (e) {
+      routeError(res, e);
+    }
   })
   .post(async (req, res) => {
-    req.body = santizeInputs(req.body);
-    let { sectionId } = req.params;
-    sectionId = verify.validateMongoId(req.params.sectionId);
-    const { moduleName, moduleDescription, moduleDate } = req.body;
-
     try {
       req.body = santizeInputs(req.body);
       let { sectionId } = req.params;
@@ -181,23 +174,16 @@ const toRadians = (degrees) => {
 router
   .route("/:sectionId/modules/:moduleId/attendance")
   .get(async (req, res) => {
-
-    let renderObjs = {};
-    let { sectionId, moduleId } = req.params;
-    const sectionn = await courseDataFunctions.getSectionById(
-      res.locals.sectionID
-    );
-    const course = await courseDataFunctions.getCourseById(
-      sectionn.courseId.toString()
-    );
-    let userId = req.session.userid;
-    userId = verify.validateMongoId(userId);
-    moduleId = verify.validateMongoId(moduleId);
-    let section = await courseDataFunctions.checkStudentInSection(
-      sectionId,
-      userId
-    );
-
+    try {
+      let renderObjs = {};
+      let { sectionId, moduleId } = req.params;
+      let userId = req.session.userid;
+      userId = verify.validateMongoId(userId);
+      moduleId = verify.validateMongoId(moduleId);
+      let section = await courseDataFunctions.checkStudentInSection(
+        sectionId,
+        userId
+      );
 
       if (!section) {
         throw new Error("Section not found");
@@ -317,8 +303,7 @@ router
             ...renderObjs,
             layout: "sidebar",
             // sideBarTitle: `${course.courseName}`,
-
-            courseId: sectionn.courseId.toString(),
+            sectionID: sectionId,
             userType,
             name,
             n,
