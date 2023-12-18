@@ -111,25 +111,27 @@ router.route("/:sectionId").get(async (req, res) => {
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
-    try {
-      let sectionId = verify.validateMongoId(req.params.sectionId);
 
-      let renderObjs = {};
-      const section = await courseDataFunctions.getSectionById(sectionId);
-      const userType = req.session.type;
+    let sectionId = verify.validateMongoId(req.params.sectionId);
+    const section = await courseDataFunctions.getSectionById(
+      res.locals.sectionID
+    );
+    const course = await courseDataFunctions.getCourseById(
+      section.courseId.toString()
+    );
+    let renderObjs = {};
+    const userType = req.session.type;
 
-      renderObjs = {
-        ...renderObjs,
-        layout: "sidebar",
-        // sideBarTitle: `${course.courseName}`,
-        script: "workspace/module",
-        modules: section.sectionModules,
-        userType,
-      };
-      res.render("workspace/module", renderObjs);
-    } catch (e) {
-      routeError(res, e);
-    }
+    renderObjs = {
+      ...renderObjs,
+      layout: "sidebar",
+      // sideBarTitle: `${course.courseName}`,
+      courseId: section.courseId.toString(),
+      modules: section.sectionModules,
+      userType,
+    };
+    res.render("workspace/module", renderObjs);
+
   })
   .post(async (req, res) => {
     try {
@@ -177,6 +179,14 @@ router
     try {
       let renderObjs = {};
       let { sectionId, moduleId } = req.params;
+
+      const sectionn = await courseDataFunctions.getSectionById(
+        res.locals.sectionID
+      );
+      const course = await courseDataFunctions.getCourseById(
+        sectionn.courseId.toString()
+      );
+
       let userId = req.session.userid;
       userId = verify.validateMongoId(userId);
       moduleId = verify.validateMongoId(moduleId);
