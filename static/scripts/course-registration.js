@@ -20,19 +20,37 @@ const courseSubmit = async () => {
       courseSemester,
       courseYear,
     };
-    
-    const result = await request("POST", "/courses/registration", csrf, requestData);
-    if(result?.error) {
-      document.getElementById("error").innerText = result.error;
+    verify.string(requestData.courseName);
+    verify.string(requestData.courseDescription);
+    verify.string(requestData.courseDescription);
+    if (
+      isNaN(requestData.courseCredits) ||
+      requestData.courseCredits < 0 ||
+      requestData.courseCredits > 30
+    ) {
+      throw "Invalid amount of credits";
+    }
+
+    const result = await request(
+      "POST",
+      "/courses/registration",
+      csrf,
+      requestData
+    );
+    if (result?.error) {
+      setError(result);
     } else if (result?.acknowledged) {
-      window.location.href = "/courses/" + result.insertedId;
+      window.location.href =
+        "/courses/" + encodeURIComponent(result.insertedId);
     }
   } catch (e) {
     document.getElementById("error").innerText = "";
     if (e.error) {
       setError(e.error);
-    } else {
+    } else if (e.message) {
       setError(e.message);
+    } else {
+      setError(e);
     }
   }
 };

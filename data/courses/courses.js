@@ -91,7 +91,7 @@ export const getDepartmentById = async (departmentId) => {
 };
 
 export const registerDepartment = async (departmentName) => {
-  const newDepartment = verify.string(departmentName, "departmentName");
+  departmentName = verify.string(departmentName, "departmentName");
 
   const departmentCollection = await departments();
   const department = await departmentCollection.findOne({
@@ -100,9 +100,11 @@ export const registerDepartment = async (departmentName) => {
   if (department) {
     throwerror("Department already exists!");
   } else {
+    const newDepartment = {
+      departmentName: departmentName,
+    };
     const insertInfo = await departmentCollection.insertOne(newDepartment);
-    const newId = insertInfo.insertedId.toString();
-    return newId;
+    return insertInfo;
   }
 };
 
@@ -112,6 +114,9 @@ export const updateDepartment = async (departmentId, departmentName) => {
   let department = await departmentCollection.findOne({
     _id: departmentId,
   });
+  if (!department) {
+    throw { status: 404, message: "Department not found" };
+  }
   department.departmentName = departmentName;
   const updateInfo = await departmentCollection.updateOne(
     { _id: department._id },
@@ -120,7 +125,7 @@ export const updateDepartment = async (departmentId, departmentName) => {
   );
   if (!updateInfo) throwerror("Department was not updated successfully!");
 
-  return await getDepartmentById(departmentId);
+  return updateInfo;
 };
 
 export const deleteDepartment = async (departmentId) => {
@@ -171,37 +176,22 @@ export const getAllCourses = async (
       },
       {
         $match: {
-          sections: {
-            $elemMatch: {
-              sectionYear: year,
-              sectionSemester: semester,
-            },
-          },
+          courseSemester: semester,
+          courseYear: year,
         },
       },
       {
         $project: {
           _id: 1,
-          // Include all other fields from the "courses" collection
           courseName: 1,
           courseNumber: 1,
           courseDepartmentId: 1,
           courseCredits: 1,
-          sections: {
-            $filter: {
-              input: "$sections",
-              as: "section",
-              cond: {
-                $and: [
-                  { $eq: ["$$section.sectionYear", year] },
-                  { $eq: ["$$section.sectionSemester", semester] },
-                ],
-              },
-            },
-          },
+          courseSemester: 1,
+          courseYear: 1,
+          sections: 1,
           departmentName: "$department.departmentName",
           courseDescription: 1,
-          // Include all fields from the "sections" collection
           instructors: "$instructor",
         },
       },
@@ -346,10 +336,10 @@ export const getCourseById = async (courseId) => {
         sectionInstructor;
     }
   } catch (e) {
+    if (!existingCourse.length) {
+      throwErrorWithStatus(404, `Course with ${courseId} not found`);
+    }
     throw "Internal Server Error";
-  }
-  if (!existingCourse) {
-    throwErrorWithStatus(400, `Course with ${courseId} not found`);
   }
 
   return existingCourse;
@@ -436,13 +426,13 @@ export const getSectionsByCourseId = async (courseId) => {
 };
 
 export const getSectionById = async (sectionId) => {
-  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  sectionId = verify.validateMongoId(sectionId.toString(), "sectionId");
   const courseCollection = await courses();
   const course = await courseCollection.findOne({
     "sections.sectionId": sectionId,
   });
   if (!course) {
-    throwErrorWithStatus(400, `Section was not found!`);
+    throwErrorWithStatus(404, `Section was not found!`);
   }
   const section = course.sections.find(
     (section) => section.sectionId.toString() === sectionId.toString()
@@ -494,7 +484,7 @@ export const getStudentsInSection = async (sectionId) => {
     "sections.sectionId": sectionId,
   });
   if (!course) {
-    throwErrorWithStatus(400, `Section was not found!`);
+    throwErrorWithStatus(404, `Section was not found!`);
   }
   const section = course.sections.find(
     (section) => section.sectionId.toString() === sectionId.toString()
@@ -548,6 +538,7 @@ export const registerSection = async (
   );
 
   const courseCollection = await courses();
+  const userCollection = await users();
   const existingSection = await courseCollection.findOne({
     _id: courseId,
     "sections.sectionName": newSection.sectionName,
@@ -557,7 +548,14 @@ export const registerSection = async (
     throwErrorWithStatus(400, "Section with the same name already exists");
 
   newSection.sectionId = new ObjectId();
-  newSection.enrolledStudents = [];
+  newSection.students = [];
+
+  const userupdate = await userCollection.updateOne(
+    {
+      _id: newSection.sectionInstructor,
+    },
+    { $push: { registeredCourses: newSection.sectionId.toString() } }
+  );
 
   const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
@@ -674,11 +672,11 @@ export const enrollSection = async (sectionId, userId) => {
   );
 
   // Capacity Check
-  if (section?.enrolledStudents?.length >= section.sectionCapacity) {
+  if (section?.students?.length >= section.sectionCapacity) {
     throwErrorWithStatus(400, `Section is at maximum capacity. Cannot enroll.`);
   }
   // Enrollment Check
-  if (section.enrolledStudents.includes(userId)) {
+  if (section.students.includes(userId)) {
     throwErrorWithStatus(400, `User is already enrolled in this section.`);
   }
   const userCollection = await users();
@@ -737,7 +735,7 @@ export const enrollSection = async (sectionId, userId) => {
     }
   }
 
-  section.enrolledStudents.push(userId);
+  section.students.push(userId);
 
   await userCollection.updateOne(
     { _id: userId },
@@ -781,7 +779,7 @@ export const discardSection = async (sectionId, userId) => {
   );
 
   if (
-    !section.enrolledStudents.some(
+    !section.students.some(
       (enrolledUserId) => enrolledUserId.toString() === userId.toString()
     )
   ) {
@@ -797,7 +795,7 @@ export const discardSection = async (sectionId, userId) => {
     }
   );
 
-  section.enrolledStudents = section.enrolledStudents.filter(
+  section.students = section.students.filter(
     (enrolledUserId) => enrolledUserId.toString() !== userId.toString()
   );
 
@@ -857,7 +855,7 @@ export const checkEnrollment = async (sectionId, studentId) => {
     const courseCollection = await courses();
     const enrollmentData = await courseCollection.findOne({
       "sections.sectionId": sectionId,
-      "sections.enrolledStudents": studentId,
+      "sections.students": studentId,
     });
 
     return !!enrollmentData;

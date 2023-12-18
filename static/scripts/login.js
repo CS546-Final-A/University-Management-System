@@ -53,7 +53,6 @@ function enterLogin(event) {
 
 function setError(error) {
   var toastRed1 = $("html").css("--toastRed1");
-  var toastRed2 = $("html").css("--toastRed2");
   $(".toast-header").css("background-color", toastRed1);
   $(".toast-header").css("color", "#000000");
   $(".toast-header .me-auto").html("&nbsp;&nbsp;Login Failed");

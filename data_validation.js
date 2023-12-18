@@ -145,9 +145,7 @@ const verify = {
 
     if (isNaN(parseInt(hr))) throwerror(`Invalid hour in ${timeName}`);
 
-    if (
-      (parseInt(hr) < 0 || parseInt(hr) > 23)
-    )
+    if (parseInt(hr) < 0 || parseInt(hr) > 23)
       throwerror(`Invalid hour in ${timeName}`);
 
     if (isNaN(min) || min < 0 || min > 59)
@@ -230,6 +228,34 @@ const verify = {
       throwerror(`${stringName} should only have alphabets`);
     }
     return string;
+  },
+  isAlphaStringwithSpaces: (string, stringName) => {
+    string = verify.string(string, stringName);
+    if (!/^[A-Za-z ]+$/.test(string)) {
+      throwerror(`${stringName} should only have alphabets or spaces`);
+    }
+    return string;
+  },
+  letterGrade: (grade) => {
+    grade = verify.string(grade, "Letter grade");
+
+    const potentialgrades = [
+      "A",
+      "A-",
+      "B+",
+      "B",
+      "B-",
+      "C+",
+      "C",
+      "C-",
+      "D",
+      "F",
+    ];
+
+    if (!potentialgrades.includes(grade)) {
+      throwerror("Invalid grade");
+    }
+    return grade;
   },
 };
 

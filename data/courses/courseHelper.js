@@ -8,7 +8,7 @@ export const validateCourse = (
   courseCredits,
   courseDescription,
   courseSemester,
-  courseYear,
+  courseYear
 ) => {
   if (
     !courseNumber ||
@@ -21,7 +21,7 @@ export const validateCourse = (
   }
 
   courseNumber = verify.numberInteger(courseNumber, "courseNumber");
-  courseName = verify.isAlphaString(courseName, "courseName");
+  courseName = verify.isAlphaStringwithSpaces(courseName, "courseName");
   courseDepartmentId = verify.validateMongoId(
     courseDepartmentId,
     "courseDepartmentId"
@@ -68,7 +68,10 @@ export const validateSection = (
   }
 
   sectionName = verify.isAlphaString(sectionName, "sectionName");
-  sectionInstructor = verify.validateMongoId(sectionInstructor, "sectionInstructor");
+  sectionInstructor = verify.validateMongoId(
+    sectionInstructor,
+    "sectionInstructor"
+  );
   sectionType = verify.sectionType(sectionType);
   sectionStartTime = verify.time(sectionStartTime, "sectionStartTime");
   sectionEndTime = verify.time(sectionEndTime, "sectionEndTime");

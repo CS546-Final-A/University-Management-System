@@ -1,38 +1,51 @@
-<div class="container mt-5">
-    <h2>List of Assignments</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Assignment Name</th>
-                <th scope="col">Due Date</th>
-                <th scope="col">Weight</th>
-                <th scope="col">Submission Limit</th>
-                <th scope="col">Max Score</th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each assignments}}
-            <tr>
-                <td>{{this.assignmentName}}</td>
-                <td>{{this.assignmentDueDate}}</td>
-                <td>{{this.assignmentWeight}}</td>
-                <td>{{this.submissionLimit}}</td>
-                <td>{{this.assignmentMaxScore}}</td>
-                <td>
-                    <a href="view/{{this._id}}/" class="btn btn-primary">View</a>
-                    {{#if (eq ../session_type "Professor")}}
-                    <a href="edit/{{this._id}}/" class="btn btn-warning">Edit</a>
-                    <a href="delete/{{this._id}}/" class="btn btn-danger">Delete</a>
-                    {{/if}}
-                </td>
-            </tr>
-            {{/each}}
+<div class="container-fluid">
+    <h2>
+        <div class="d-flex">
+            <div class="my-auto"><img class="iconSwitch" src="/icons/list.svg" alt="moduleIcon"> List of Assignments
+            </div>
+            <div class="my-auto text-muted fs-5" id="reportCount"></div>
+            <div class="form-floating ms-auto fs-6">
+                <input class="form-control tabledisplay" type="text" placeholder="" id="searchInput" />
+                <label for="#searchInput"><img class="iconSwitch" src="/icons/search.svg" alt="moduleIcon">
+                    Search</label>
+            </div>
+        </div>
+    </h2>
+    <div class="table-responsive glassEffect my-4">
+        <table class="table table-striped h-100 mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">Assignment Name</th>
+                    <th scope="col">Due Date</th>
+                    <th scope="col">Weight</th>
+                    <th scope="col">Submission Limit</th>
+                    <th scope="col">Max Score</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each assignments}}
+                <tr class="searchData">
+                    <td>{{this.assignmentName}}</td>
+                    <td>{{this.assignmentDueDate}}</td>
+                    <td>{{this.assignmentWeight}}</td>
+                    <td>{{this.submissionLimit}}</td>
+                    <td>{{this.assignmentMaxScore}}</td>
+                    <td>
+                        <a href="view/{{this._id}}/" class="btn btn-info">View</a>
+                        {{#if (eq ../session_type "Professor")}}
+                        <a href="edit/{{this._id}}/" class="btn btn-warning">Edit</a>
+                        <a href="delete/{{this._id}}/" class="btn btn-danger">Delete</a>
+                        {{/if}}
+                    </td>
+                </tr>
+                {{/each}}
 
-        </tbody>
+            </tbody>
 
-    </table>
+        </table>
+    </div>
     {{#if (eq session_type "Professor")}}
-    <a href="create" class="btn btn-primary">Create Assignment</a>
+    <a href="create" class="btn btn-info my-4">Create Assignment</a>
     {{/if}}
 </div>

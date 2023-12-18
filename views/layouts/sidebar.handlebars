@@ -2,15 +2,24 @@
 <html lang="en">
 
 <head>
+    <script>
+        // Access the darkmode variable from res.locals
+        var _isDarkMode = {{ darkmode }};
+    </script>
     <meta charset="utf-8" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <link rel="stylesheet" href="/styles/bootstrap.min.css" />
     <link rel="stylesheet" href="/styles/bootstrap-select.min.css" />
     <link rel="stylesheet" href="/styles/styles.css" />
     <link rel="stylesheet" href="/styles/sidebar.css" />
     <script src="/scripts/jquery.min.js"></script>
+
+    <script src="/scripts/styles.js"></script>
+    <!-- JS Imports -->
+    <script src="/scripts/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/bootstrap-select.min.js"></script>
+
     <title>University Management System</title>
 </head>
 
@@ -38,13 +47,13 @@
                     {{#if session_name}}
                     <li class="nav-item">
                         <a class="nav-link" href="/courses/">
-                            <span class="fs-5 position-relative" id="coursesText">Courses</span>
+                            <span class="fs-5 position-relative" id="coursesText">Course</span>
                         </a>
                     </li>
                     <li class="nav-item ms-auto dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            data-bs-auto-close="outside" aria-expanded="false"><img src="/icons/user-circle.svg"
-                                alt="user-circle-icon" /></a>
+                            data-bs-auto-close="outside" aria-expanded="false"><img class="iconSwitch"
+                                src="/icons/user-circle.svg" alt="user-circle-icon" /></a>
                         <ul class="dropdown-menu p-0" id="navProfileDropdown">
                             <li>
                                 <div class="container p-0">
@@ -105,7 +114,7 @@
             data-bs-autohide="false">
             <div class="toast-header">
                 <img src="/icons/error.svg" alt="errorIcon">
-                <strong class="me-auto" id="toastHeadMsg">Bootstrap</strong>
+                <strong class="me-auto ms-2" id="toastHeadMsg">Bootstrap</strong>
                 <small>Just Now</small>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
@@ -115,12 +124,6 @@
         </div>
     </div>
 
-
-    <!-- JS Imports -->
-    <script src="/scripts/jquery.min.js"></script>
-    <script src="/scripts/bootstrap.bundle.min.js"></script>
-    <script src="/scripts/bootstrap-select.min.js"></script>
-    <script src="/scripts/styles.js"></script>
     <script>
         $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {
@@ -129,6 +132,8 @@
             });
         });
     </script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/verification.js"></script>
+    <script language="JavaScript" type="text/javascript" src="/scripts/request.js"></script>
     {{#if script}}
     {{> (lookup . 'script') }}
     {{/if}}

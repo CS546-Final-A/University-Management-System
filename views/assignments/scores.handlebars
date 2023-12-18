@@ -1,31 +1,48 @@
-<h1>Scores for {{assignment.assignmentName}}</h1>
+<div class="container-fluid">
+    <h2>
+        <div class="d-flex my-2">
+            <div class="my-auto">Scores for {{assignment.assignmentName}}</div>
+            <div class="my-auto text-muted fs-5" id="reportCount"></div>
+            <div class="form-floating ms-auto fs-6">
+                <input class="form-control blockdisplay" type="text" placeholder="" id="searchInput" />
+                <label for="#searchInput"><img class="iconSwitch" src="/icons/search.svg" alt="search icon">
+                    Search</label>
+            </div>
+        </div>
+    </h2>
 
-{{#each students}}
-<h3>Student: {{name}}</h3>
-<ul>
-    <form action="/sections/{{../sectionID}}/assignments/view/{{../assignment._id}}/scores" method="post">
 
-        <input type="hidden" name="studentId" value="{{this._id}}">
+
+    {{#each students}}
+    <div class="searchData my-5">
+        <h3>Student: {{name}}</h3>
+
         <p>Current Recorded Score: {{this.score}}</p>
-        <label for="score">Score:</label>
-        <input type="text" name="score" value="">
-        <button type="submit">Submit Score</button>
-    </form>
-    {{#each submissions}}
-    <li>
-        <p>File Name: {{this.file}}</p>
+
+        <div class="mt-4">
+            {{#each submissions}}
+            <div class="my-2">
+                <p>File Name: {{this.file}}</p>
+                <p>Submission Date : {{this.submissionDate}}</p>
+                <a class="btn btn-warning"
+                    href="/download/assignments/{{../../assignment._id}}/submissions/{{_id}}">Download Submission</a>
+            </div>
+            {{/each}}
+        </div>
+
+        {{#if (eq ../session_type "Professor")}}
+        <form action="/sections/{{../sectionID}}/assignments/view/{{../assignment._id}}/scores" method="post">
+            <input type="hidden" name="studentId" value="{{this._id}}">
+            <div class="form-floating my-3 col-md-4">
+                <input class="form-control" type="text" name="score" value="" placeholder="">
+                <label for="score">Score:</label>
+            </div>
 
 
-        <p>Submission Date : {{this.submissionDate}}</p>
+            <button class="btn btn-info" type="submit">Submit Score</button>
+        </form>
+        {{/if}}
+    </div>
 
-
-        <button>
-            <a href="/download/assignments/{{../../assignment._id}}/submissions/{{_id}}">Download Submission</a>
-        </button>
-        <!-- Add a form for the professor to input the score -->
-
-    </li>
     {{/each}}
-    </form>
-</ul>
-{{/each}}
+</div>

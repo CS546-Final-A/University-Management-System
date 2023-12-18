@@ -15,9 +15,12 @@
   --glassColor2: #29292936;
   --activeGlassColor: var(--glassColor1);
   --toastRed1: #e84848;
-  --shadowCol1: #5959594f;
-  --shadowCol2: #2c2c2c4f;
-  --activeShadowcolor: var(--shadowCol1);
+  --shadowColor1: #5959594f;
+  --shadowColor2: #2c2c2c4f;
+  --activeShadowColor: var(--shadowColor1);
+  --stripeTableColor1: #0000000f;
+  --stripeTableColor2: #ffffff1a;
+  --activeStripeTableColor: var(--stripeTableColor1);
 }
 
 body {
@@ -37,7 +40,7 @@ body {
 .start-header {
   opacity: 1;
   padding: 10px 0px;
-  box-shadow: 5px 5px 30px 10px rgb(138 155 165 / 35%);
+  box-shadow: 0px 10px 30px 0px var(--activeShadowColor);
   -webkit-transition: all 0.2s linear;
   transition: all 0.2s linear;
 }
@@ -200,6 +203,7 @@ h1 span {
 }
 .nav-item .dropdown-menu {
   opacity: 0;
+  min-width: 20rem !important;
   visibility: hidden;
   display: block;
   position: absolute;
@@ -219,10 +223,6 @@ h1 span {
 
 .dropdown-toggle::after {
   display: none;
-}
-
-body.dark .start-header {
-  box-shadow: 0 10px 30px 0 rgba(0, 0, 0);
 }
 
 .logo {
@@ -269,8 +269,12 @@ button {
 input {
   border: 0 !important;
   border-radius: 0px !important;
-  border-bottom: 1px solid var(--activeTextColor) !important;
+  border-bottom: 1.5px solid var(--activeTextColor) !important;
   box-shadow: none !important;
+}
+
+input:focus {
+  border-bottom-color: var(--greenAccent) !important;
 }
 
 input:-webkit-autofill,
@@ -349,7 +353,7 @@ input.autofill:active::after {
 
 .glassEffect {
   background-color: var(--activeGlassColor) !important;
-  box-shadow: 0 2px 10px var(--activeShadowcolor) !important;
+  box-shadow: 0 2px 10px var(--activeShadowColor) !important;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   border: 1px solid #ffffff73;
@@ -373,12 +377,12 @@ a:focus {
   text-decoration: none;
 }
 
-.searchData {
+.row.searchData {
   border-bottom: 1px solid var(--activeTextColor);
   transition: all 0.2s linear;
 }
 
-.searchData:hover {
+.row.searchData:hover {
   background-color: #95959555;
 }
 
@@ -406,7 +410,93 @@ a:focus {
   opacity: 1 !important;
 }
 
+.btn {
+  transition: all 0.2s linear;
+}
+.btn:hover {
+  filter: brightness(1.15);
+}
+
 .modal-backdrop.show {
   background-color: var(--activeBgColor) !important;
-  opacity: 0.6 !important;
+  opacity: 0.85 !important;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-control-plaintext,
+.form-floating > .form-select {
+  height: calc(3.5rem + 0px) !important;
+}
+
+.modal-open {
+  overflow: scroll !important;
+  padding-right: 0px !important;
+}
+
+.form-floating > .form-control-plaintext ~ label,
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+  transform: scale(0.85) translateY(-1.4rem) translateX(0.15rem) !important;
+}
+/* .form-control:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 45%;
+  height: 2px;
+  width: 10px;
+  visibility: hidden;
+  background-color: #8e44ad;
+  transition: 0.2s ease all;
+}
+
+.form-control:focus:after {
+  visibility: visible;
+  width: 100%;
+  left: 0;
+} */
+
+.iconSwitch {
+  color: #000000 !important;
+}
+.invertColor {
+  filter: invert(1);
+}
+
+.bootstrap-select .dropdown-menu,
+.bootstrap-select > .dropdown-toggle {
+  background-color: var(--activeBgColor) !important;
+  color: var(--activeTextColor) !important;
+  border-color: var(--activeTextColor) !important;
+}
+
+.bootstrap-select .dropdown-menu li a {
+  color: var(--activeTextColor) !important;
+  transition: all 0.15s linear;
+}
+
+.bootstrap-select .dropdown-menu li a:hover {
+  background-color: var(--greenAccent) !important;
+  color: #ffffff !important;
+}
+
+.bootstrap-select .dropdown-menu li a.active {
+  background-color: var(--activeTextColor) !important;
+  color: var(--activeBgColor) !important;
+}
+
+.bootstrap-select .dropdown-toggle:focus,
+.bootstrap-select > select.mobile-device:focus + .dropdown-toggle {
+  outline: 0px !important;
+  border-color: var(--greenAccent) !important;
+}
+
+.table {
+  color: var(--activeTextColor) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-accent-bg: var(--activeStripeTableColor) !important;
+  color: var(--activeTextColor) !important;
 }

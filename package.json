@@ -26,6 +26,7 @@
     "express-handlebars": "^7.1.2",
     "express-rate-limit": "^7.1.5",
     "express-session": "^1.17.3",
+    "html-pdf": "^3.0.1",
     "lusca": "^1.7.0",
     "moment": "^2.29.4",
     "mongodb": "^6.2.0",

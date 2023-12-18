@@ -76,4 +76,14 @@ const verify = {
     }
     return type;
   },
+  string: (str) => {
+    if (typeof str !== "string") {
+      throw "Invalid string";
+    }
+    str = str.trim();
+    if (!str.length) {
+      throw "Empty string";
+    }
+    return str;
+  },
 };

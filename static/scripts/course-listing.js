@@ -13,19 +13,22 @@ $("#filter-button").click(async function (e) {
   // Construct the query parameters
   let queryParams = new URLSearchParams();
   if (searchTerm) {
-    queryParams.set("searchTerm", searchTerm);
+    queryParams.set("searchTerm", encodeURIComponent(searchTerm));
   }
   if (departmentFilter) {
-    queryParams.set("departmentFilter", departmentFilter);
+    queryParams.set("departmentFilter", encodeURIComponent(departmentFilter));
   }
   if (instructorFilter) {
-    queryParams.set("instructorFilter", instructorFilter);
+    queryParams.set("instructorFilter", encodeURIComponent(instructorFilter));
   }
   if (meetingDaysFilter) {
-    queryParams.set("meetingDaysFilter", meetingDaysFilter);
+    queryParams.set("meetingDaysFilter", encodeURIComponent(meetingDaysFilter));
   }
   if (deliveryModeFilter) {
-    queryParams.set("deliveryModeFilter", deliveryModeFilter);
+    queryParams.set(
+      "deliveryModeFilter",
+      encodeURIComponent(deliveryModeFilter)
+    );
   }
   if (queryParams.toString()) {
     queryParams = "?" + queryParams.toString();
@@ -44,5 +47,5 @@ $(".courseRedirect").click(async function (e) {
   const courseID = $(this).attr("data-id");
   // console.log(courseID);
   // console.log(window.location.href);
-  window.location.href = "/courses/" + courseID;
+  window.location.href = "/courses/" + encodeURIComponent(courseID);
 });
