@@ -44,12 +44,21 @@
                         </a>
                     </li>
 
-                    {{#if session_name}}
+                    {{#ifUserType 'Admin,Student' session_type}}
                     <li class="nav-item">
                         <a class="nav-link" href="/courses/">
                             <span class="fs-5 position-relative" id="coursesText">Course</span>
                         </a>
                     </li>
+                    {{/ifUserType}}
+                    {{#ifUserType 'Admin' session_type}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/configuration/">
+                            <span class="fs-5 position-relative" id="configurationText">Configuration</span>
+                        </a>
+                    </li>
+                    {{/ifUserType}}
+                    {{#if session_type}}
                     <li class="nav-item ms-auto dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             data-bs-auto-close="outside" aria-expanded="false"><img class="iconSwitch"
@@ -99,8 +108,8 @@
                     <a class="hover" href="/sections/{{sectionID}}/grades/"><span></span><text>Grades</text></a>
                 </li>
                 <li class="py-1">
-                    <a class="hover" href="/courses/{{courseId}}/materials/"><span></span><text>Course Learning
-                            Materials</text></a>
+                    <a class="hover" href="/courses/{{courseId}}/materials/"><span></span><text>Course
+                            Learning</text></a>
                 </li>
             </ul>
         </nav>

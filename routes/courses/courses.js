@@ -59,6 +59,73 @@ router.get("/:year/:semester/registration", async (req, res) => {
   }
 });
 
+router.get("/update/:courseId", async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    let courses = await courseDataFunctions.getCourseById(courseId);
+    let uniqueDepartmentNames =
+      await courseDataFunctions.getUniqueDepartmentNamesandId();
+    courses.forEach((course) => {
+      course.departmentId = course.courseDepartmentId._id.toString();
+      course.courseId = course._id.toString();
+    });
+    let renderObjs = {
+      session_name: req.session.name,
+      session_type: req.session.type,
+      session_email: req.session.email,
+      uniqueDepartmentNames: uniqueDepartmentNames,
+      editMode: true,
+      course: courses[0],
+      script: "courses/registration",
+    };
+    return res.render("courses/registration", renderObjs);
+  } catch (e) {
+    routeError(res, e);
+  }
+});
+
+router.put("/update", async (req, res) => {
+  try {
+    const {
+      courseId,
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription,
+    } = req.body;
+    const course = validateCourse(
+      courseNumber,
+      courseName,
+      courseDepartmentId,
+      courseCredits,
+      courseDescription,
+    );
+    let result = await courseDataFunctions.updateCourse(
+      courseId,
+      course.courseNumber,
+      course.courseName,
+      course.courseDepartmentId,
+      course.courseCredits,
+      course.courseDescription,
+    );
+    if (result.acknowledged) {
+      // window.location.href = "/courses/" + result.insertedId;
+      return res.json(result);
+    } else {
+      throw "Unexpected result";
+    }
+  } catch (e) {
+    if (e.status !== 500 && e.status) {
+      res.status(e.status);
+      return res.json({ error: e.message });
+    } else {
+      res.status(500);
+      res.json({ error: "Internal Server Error" });
+    }
+  }
+});
+
 router.post("/registration", async (req, res) => {
   try {
     const {
@@ -394,6 +461,24 @@ router.route("/:courseId/materials").get(async (req, res) => {
       });
     });
 
+    let organizedHeadings = {};
+
+    data[0].courseLearning.headings.forEach((heading, index) => {
+      let headingFiles = data[0].courseLearning.files.filter(
+        (file) => file.heading === heading
+      );
+
+      if (headingFiles.length > 0) {
+        organizedHeadings[index] = {
+          name: heading,
+          files: headingFiles.map((file) => ({
+            name: file.fileName,
+            path: file.filePath,
+          })),
+        };
+      }
+    });
+
     let renderObjs = {
       userId: req.session.userid,
       name: req.session.name,
@@ -405,6 +490,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
       sections: data[0].sections,
       headings: data[0].courseLearning.headings,
       files: data[0].courseLearning.files,
+      allFiles: organizedHeadings,
       // layout: "sidebar",
       // sectionID,
     };
