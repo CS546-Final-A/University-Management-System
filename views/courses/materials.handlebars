@@ -80,20 +80,33 @@
         </div>
         {{/if}}
 
-        <h2>Files</h2>
+        <h2>
+            <div class="d-flex my-2">
+                <div class="my-auto"><img class="iconSwitch" src="/icons/file.svg" alt="file icon"> Files</div>
+                <div class="my-auto text-muted fs-5" id="reportCount"></div>
+                <div class="form-floating ms-auto fs-6">
+                    <input class="form-control" type="text" placeholder="" id="searchInput" />
+                    <label for="#searchInput"><img class="iconSwitch" src="/icons/search.svg" alt="search icon">
+                        Search</label>
+                </div>
+            </div>
+        </h2>
 
-        {{#each heading}}
-        <div class="card my-4 glassEffect">
+        {{#each allFiles}}
+        <div class="card my-4 glassEffect searchData">
             <div class="card-header glassEffect d-flex">
                 {{this.name}}
             </div>
             <div class="card-body">
                 {{#each this.files}}
-                <div class="my-auto fs-6 ms-3" id="fileName">{{this.fileName}}</div>
-                <div class="my-auto fs-6 ms-3" id="filePath" hidden>{{this.filePath}}</div>
-                <div class="ms-auto">
-                    <button class="btnSubmit p-2 downloadBtn">Download</button>
+                <div class="d-flex my-2 hover">
+                    <div class="my-auto fs-6 ms-3" id="fileName">{{this.name}}</div>
+                    <div class="my-auto fs-6 ms-3" id="filePath" hidden>{{this.path}}</div>
+                    <div class="ms-auto">
+                        <button class="btn btn-info downloadBtn">Download</button>
+                    </div>
                 </div>
+
                 {{/each}}
             </div>
 
