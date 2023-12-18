@@ -66,14 +66,20 @@
                                     </div>
                                     {{#if (eq session_type 'Student')}}
                                     <div class="my-auto d-flex justify-content-center btnNavbar">
-                                        <a class="w-100 ps-0" href=" /transcript"><button
-                                                class="mb-0 py-2 w-100 btnNavbar">Generate Transcripts</button></a>
+                                        <button class="mb-0 py-2 w-100 btnNavbar"
+                                            onclick="window.location.href='/transcript'">
+                                            Generate Transcripts
+                                        </button>
                                     </div>
+
                                     {{/if}}
                                     <div class="my-auto d-flex justify-content-center btnNavbar">
-                                        <a class="w-100 ps-0" href=" /logout"><button
-                                                class="mb-0 py-2 w-100 btnNavbar">Logout</button></a>
+                                        <button class="mb-0 py-2 w-100 btnNavbar"
+                                            onclick="window.location.href='/logout'">
+                                            Logout
+                                        </button>
                                     </div>
+
 
                                 </div>
                             </li>
