@@ -91,25 +91,24 @@
         </div>
 
         {{#each allFiles}}
-        <div class="card my-4 glassEffect searchData">
-            <div class="card-header glassEffect d-flex">
-                {{this.name}}
-            </div>
-            <div class="card-body">
-                {{#each this.files}}
-                <div class="d-flex my-2 hover">
-                    <div class="my-auto fs-6 ms-3" id="fileName">{{this.name}}</div>
-                    <div class="my-auto fs-6 ms-3" id="filePath" hidden>{{this.path}}</div>
-                    <div class="ms-auto">
-                        <button class="btn btn-info downloadBtn">Download</button>
-                    </div>
-                </div>
-
-                {{/each}}
-            </div>
-
+    <div class="card my-4 glassEffect searchData">
+        <div class="card-header glassEffect d-flex">
+            {{this.name}}
         </div>
-        {{/each}}
+        <div class="card-body">
+            {{#each this.files}}
+            <div class="d-flex my-2 hover">
+                <div class="my-auto fs-6 ms-3 fileName">{{this.name}}</div>
+                <div class="my-auto fs-6 ms-3 filePath" hidden>{{this.path}}</div>
+                <div class="ms-auto">
+                    <button class="btn btn-info downloadBtn">Download</button>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+{{/each}}
+
     </div>
 </div>
 
@@ -199,17 +198,21 @@
                 });
 
             }
-            const downloadButtons = document.querySelectorAll('.downloadBtn');
+           const downloadButtons = document.querySelectorAll('.downloadBtn');
 
-            downloadButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const parentDiv = button.closest('.card-header');
-                    const filePath = parentDiv.querySelector('#filePath').innerText;
-                    const fileName = parentDiv.querySelector('#fileName').innerText;
-                    const url = window.location.href + `downloadFile?filePath=${filePath}&fileName=${fileName}`;
-                    window.location.href = url;
-                });
-            });
+downloadButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const parentDiv = button.closest('.searchData');
+        const filePath = parentDiv.querySelector('.filePath').innerText;
+        const fileName = parentDiv.querySelector('.fileName').innerText;
+        const url = window.location.href + `downloadFile?filePath=${filePath}&fileName=${fileName}`;
+        // Simulate downloading the file by creating a temporary link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.setAttribute('download', fileName);
+        downloadLink.click();
+    });
+});
         }
     )
 
