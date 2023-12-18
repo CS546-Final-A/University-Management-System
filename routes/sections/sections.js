@@ -112,13 +112,10 @@ router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
     try {
-      let sectionId = verify.validateMongoId(req.params.sectionId);
       const section = await courseDataFunctions.getSectionById(
         res.locals.sectionID
       );
-      const course = await courseDataFunctions.getCourseById(
-        section.courseId.toString()
-      );
+
       let renderObjs = {};
       const userType = req.session.type;
 
@@ -128,6 +125,7 @@ router
         // sideBarTitle: `${course.courseName}`,
         courseId: section.courseId.toString(),
         modules: section.sectionModules,
+        script: "workspace/module",
         userType,
       };
       res.render("workspace/module", renderObjs);
@@ -184,9 +182,6 @@ router
 
       const sectionn = await courseDataFunctions.getSectionById(
         res.locals.sectionID
-      );
-      const course = await courseDataFunctions.getCourseById(
-        sectionn.courseId.toString()
       );
 
       let userId = req.session.userid;

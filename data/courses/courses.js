@@ -314,6 +314,10 @@ export const getCourseById = async (courseId) => {
           courseCredits: 1,
           courseDescription: 1,
           sections: 1,
+          courseLearning: 1,
+          courseYear: 1,
+          courseSemester: 1,
+
           courseDepartmentId: {
             _id: "$department._id",
             name: "$department.departmentName",
@@ -860,5 +864,57 @@ export const checkEnrollment = async (sectionId, studentId) => {
     return !!enrollmentData;
   } catch (error) {
     return false;
+  }
+};
+
+export const addHeading = async (courseId, heading) => {
+  try {
+    courseId = verify.validateMongoId(courseId.toString(), "courseId");
+    const courseCollection = await courses();
+    const result = await courseCollection.updateOne(
+      { _id: courseId },
+      { $push: { "courseLearning.headings": heading } }
+    );
+
+    if (result.modifiedCount === 1) {
+      return { success: true, message: "Heading added successfully" };
+    } else {
+      return { success: false, message: "Failed to add heading" };
+    }
+  } catch (error) {
+    console.error("Error adding heading:", error);
+    return {
+      success: false,
+      message: "An error occurred while adding heading",
+    };
+  }
+};
+
+export const addFileDetails = async (heading, fileName, filePath, courseId) => {
+  try {
+    courseId = verify.validateMongoId(courseId.toString(), "courseId");
+    const courseCollection = await courses();
+    const fileId = new ObjectId();
+    const result = await courseCollection.updateOne(
+      { _id: new ObjectId(courseId) },
+      {
+        $push: {
+          "courseLearning.files": {
+            _id: fileId,
+            heading: heading,
+            fileName: fileName,
+            filePath: filePath,
+          },
+        },
+      }
+    );
+
+    if (result.modifiedCount === 1) {
+      console.log("File details added successfully");
+    } else {
+      console.log("Failed to add file details");
+    }
+  } catch (error) {
+    console.error("Error adding file details:", error);
   }
 };
