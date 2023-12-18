@@ -1,55 +1,113 @@
-<h2>Course Learning Materials</h2>
-<div>
-    Course Name: {{courseName}} <br>
-    Course Description: {{courseDescription}}
+<div class="container-fluid">
+    <h2>
+        <div class="d-flex">Course Learning Materials</div>
+    </h2>
+    <div class="col-12">
+        <div>
+            Course Name: {{courseName}}
+        </div>
+        <div>
+            Course Description: {{courseDescription}}
+        </div>
 
-    {{#if (eq type "Professor")}}
-    <div id="uploadHeadingDiv">
-        <label for="headingInput">Upload Heading</label>
-        <input type="text" id="headingInput" />
-        <button id="headingUploadButton">Upload Heading</button>
-    </div>
-    <form id="fileUploadForm">
-        <select id="headingDropdown">
-            {{#each headings}}
-            <option value="{{this}}">{{this}}</option>
-            {{/each}}
-        </select>
-        <label for="fileInput">Select File</label>
-        <input type="file" id="fileInput" accept=".pdf" />
-        <button type="submit">Submit</button>
-    </form>
-    <h2>Files</h2>
-    {{#each files}}
-    <div class="card my-4 glassEffect">
-        <div class="card-header glassEffect d-flex">
-            <div class="my-auto" id="heading">{{this.heading}}</div>
-            <div class="my-auto fs-6 ms-3" id="fileName">{{this.fileName}}</div>
-            <div class="my-auto fs-6 ms-3" id="filePath" hidden>{{this.filePath}}</div>
-            <div class="ms-auto">
-                <button class="btnSubmit p-2 downloadBtn">Download</button>
+
+        {{#if (eq type "Professor")}}
+        <div class="my-4"><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal">New
+                Module</button>
+
+            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal2">New File</button>
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content glassEffect">
+                    <div class="modal-header glassEffect">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">New Heading</h1>
+                        <button type="button" class="btn-close btn-info" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="moduleForm">
+                            <div id="uploadHeadingDiv" class="form-floating mb-3">
+                                <input class="form-control" type="text" id="headingInput" placeholder="" />
+                                <label for="headingInput">Heading</label>
+                            </div>
+
+                            <input type="hidden" id="csrf" value="{{_csrf}}">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="headingUploadButton" class="btn btn-info">Upload Heading</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    {{/each}}
 
-</div>
-{{/if}}
-{{#if (eq type "Student")}}
-<h2>Files</h2>
-{{#each files}}
-<div class="card my-4 glassEffect">
-    <div class="card-header glassEffect d-flex">
-        <div class="my-auto" id="heading">{{this.heading}}</div>
-        <div class="my-auto fs-6 ms-3" id="fileName">{{this.fileName}}</div>
-        <div class="my-auto fs-6 ms-3" id="filePath" hidden>{{this.filePath}}</div>
-        <div class="ms-auto">
-            <button class="btnSubmit p-2 downloadBtn">Download</button>
+        <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel2"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content glassEffect">
+                    <div class="modal-header glassEffect">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel2">New File</h1>
+                        <button type="button" class="btn-close btn-info" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="fileUploadForm">
+                            <div class="mb-3">
+
+                                <select id="headingDropdown" class="selectpicker form-control" data-live-search="true">
+                                    {{#each headings}}
+                                    <option value="{{this}}">{{this}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="fileInput">Select File</label>
+                                <input type="file" id="fileInput" accept=".pdf" />
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-info">Upload File</button>
+                    </div>
+                </div>
+            </div>
         </div>
+        {{/if}}
+
+        <h2>Files</h2>
+
+        {{#each heading}}
+        <div class="card my-4 glassEffect">
+            <div class="card-header glassEffect d-flex">
+                {{this.name}}
+            </div>
+            <div class="card-body">
+                {{#each this.files}}
+                <div class="my-auto fs-6 ms-3" id="fileName">{{this.fileName}}</div>
+                <div class="my-auto fs-6 ms-3" id="filePath" hidden>{{this.filePath}}</div>
+                <div class="ms-auto">
+                    <button class="btnSubmit p-2 downloadBtn">Download</button>
+                </div>
+                {{/each}}
+            </div>
+
+        </div>
+        {{/each}}
     </div>
 </div>
-{{/each}}
-{{/if}}
+
+
+
+
+
+
 <script>
 
     $(document).ready(
