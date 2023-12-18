@@ -16,6 +16,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import { dirname } from "path";
 import { inflateRawSync } from "zlib";
+import fs from "fs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -99,7 +100,7 @@ router.put("/update", async (req, res) => {
       courseName,
       courseDepartmentId,
       courseCredits,
-      courseDescription,
+      courseDescription
     );
     let result = await courseDataFunctions.updateCourse(
       courseId,
@@ -107,7 +108,7 @@ router.put("/update", async (req, res) => {
       course.courseName,
       course.courseDepartmentId,
       course.courseCredits,
-      course.courseDescription,
+      course.courseDescription
     );
     if (result.acknowledged) {
       // window.location.href = "/courses/" + result.insertedId;
@@ -592,8 +593,8 @@ router.get("/:courseId/materials/downloadFile", async (req, res) => {
   try {
     let courseId = req.params.courseId;
     courseId = verify.validateMongoId(courseId);
-    const filePath = req.query.filePath;
-    const fileName = req.query.fileName;
+    let filePath = req.query.filePath;
+    let fileName = req.query.fileName;
 
     let course = await courseDataFunctions.getCourseById(courseId);
     course = course[0];
@@ -621,12 +622,25 @@ router.get("/:courseId/materials/downloadFile", async (req, res) => {
     if (!belongs) {
       throw { status: 403, message: "You do not belong to this course" };
     }
-    res.download(filePath, fileName, (err) => {
-      if (err) {
-        console.log(err);
-        res.status(404).json({ error: "File not found" });
-      }
-    });
+    filePath = filePath.split(path.sep).join(path.posix.sep);
+    if (!filePath.startsWith("files/materials/" + courseId.toString())) {
+      throw {
+        status: 403,
+        message: "You do not have acces to this file path " + filePath,
+      };
+    }
+    if (fs.existsSync(filePath)) {
+      var data = fs.readFileSync(filePath);
+      res.contentType("application/pdf");
+      res.send(data, fileName, (err) => {
+        if (err) {
+          console.log(err);
+          res.status(404).json({ error: "File not found" });
+        }
+      });
+    } else {
+      throw { status: "404", message: "File Not Found" };
+    }
   } catch (e) {
     routeError(res, e);
   }

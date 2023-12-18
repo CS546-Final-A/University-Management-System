@@ -1,5 +1,6 @@
 <div class="container-fluid">
 
+
     <div class="d-flex">Course Learning Materials</div>
     <div class="col-12">
         <div>
@@ -91,131 +92,155 @@
         </div>
 
         {{#each allFiles}}
-    <div class="card my-4 glassEffect searchData">
-        <div class="card-header glassEffect d-flex">
-            {{this.name}}
+        <div class="card my-4 glassEffect searchData">
+            <div class="card-header glassEffect d-flex">
+                {{this.name}}
+            </div>
+            <div class="card-body">
+                {{#each this.files}}
+                <div class="d-flex my-2 hover fileContainer">
+                    <div class="my-auto fs-6 ms-3 fileName">{{this.name}}</div>
+                    <div class="my-auto fs-6 ms-3 filePath" hidden>{{this.path}}</div>
+
+                    <button class=" ms-auto btn btn-info downloadBtn">View</button>
+
+                </div>
+
+                {{/each}}
+            </div>
+
         </div>
-        <div class="card-body">
-            {{#each this.files}}
-            <div class="d-flex my-2 hover">
-                <div class="my-auto fs-6 ms-3 fileName">{{this.name}}</div>
-                <div class="my-auto fs-6 ms-3 filePath" hidden>{{this.path}}</div>
-                <div class="ms-auto">
-                    <button class="btn btn-info downloadBtn">Download</button>
+        {{/each}}
+
+        <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="pdfModalLabel"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
                 </div>
             </div>
-            {{/each}}
         </div>
     </div>
-{{/each}}
-
-    </div>
 </div>
-
-
-
-
-
-
 <script>
+    $(document).ready(function () {
 
-    $(document).ready(
-        function () {
-            let headingUploadBtn = document.getElementById("headingUploadButton");
-            let fileUploadForm = document.getElementById("fileUploadForm");
 
-            if (headingUploadBtn) {
+        let headingUploadBtn = document.getElementById("headingUploadButton");
+        let fileUploadForm = document.getElementById("fileUploadForm");
 
-                document.getElementById("headingUploadButton").addEventListener("click", async () => {
-                    const uploadedHeading = document.getElementById("headingInput").value.trim();
+        if (headingUploadBtn) {
 
-                    if (!uploadedHeading) {
-                        alert("Please enter a valid heading");
-                        return;
-                    }
+            document.getElementById("headingUploadButton").addEventListener("click", async () => {
+                const uploadedHeading = document.getElementById("headingInput").value.trim();
 
-                    const newHeading = new FormData();
-                    newHeading.append("heading", uploadedHeading);
+                if (!uploadedHeading) {
+                    alert("Please enter a valid heading");
+                    return;
+                }
 
-                    try {
-                        const response = await fetch(window.location.href + 'heading', {
-                            method: "POST",
-                            body: newHeading,
-                        });
+                const newHeading = new FormData();
+                newHeading.append("heading", uploadedHeading);
 
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            console.error("Error:", response.status);
-                        }
-                    } catch (error) {
-                        console.error("Error:", error);
-                    }
-                });
-
-            }
-            if (fileUploadForm) {
-                document.getElementById("fileUploadForm").addEventListener("submit", async (e) => {
-                    e.preventDefault();
-
-                    const selectedHeading = document.getElementById("headingDropdown").value.trim();
-                    const uploadedFiles = document.getElementById("fileInput").files;
-
-                    if (uploadedFiles.length === 0) {
-                        return alert("Please select a file");
-                    }
-
-                    if (uploadedFiles.length > 1) {
-                        return alert("Please select only one file");
-                    }
-
-                    if (!selectedHeading || !uploadedFiles) {
-                        alert("Please select a heading and upload a file");
-                        return;
-                    }
-
-                    const formData = new FormData();
-                    Object.keys(uploadedFiles).forEach((key) => {
-                        formData.append(uploadedFiles.item(key).name, uploadedFiles.item(key));
+                try {
+                    const response = await fetch(window.location.href + 'heading', {
+                        method: "POST",
+                        body: newHeading,
                     });
-                    formData.append("heading", selectedHeading);
 
-                    try {
-                        const response = await fetch(window.location.href + 'file', {
-                            method: "POST",
-                            body: formData,
-                        });
-
-                        if (response.ok) {
-                            console.log("File uploaded successfully");
-                            window.location.reload();
-                        } else {
-                            console.log("File upload failed");
-                        }
-                    } catch (error) {
-                        console.error("Error:", error);
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        console.error("Error:", response.status);
                     }
-                });
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            });
 
-            }
-           const downloadButtons = document.querySelectorAll('.downloadBtn');
-
-downloadButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const parentDiv = button.closest('.searchData');
-        const filePath = parentDiv.querySelector('.filePath').innerText;
-        const fileName = parentDiv.querySelector('.fileName').innerText;
-        const url = window.location.href + `downloadFile?filePath=${filePath}&fileName=${fileName}`;
-        // Simulate downloading the file by creating a temporary link
-        const downloadLink = document.createElement('a');
-        downloadLink.href = url;
-        downloadLink.setAttribute('download', fileName);
-        downloadLink.click();
-    });
-});
         }
-    )
+        if (fileUploadForm) {
+            document.getElementById("fileUploadForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
 
+                const selectedHeading = document.getElementById("headingDropdown").value.trim();
+                const uploadedFiles = document.getElementById("fileInput").files;
+
+                if (uploadedFiles.length === 0) {
+                    return alert("Please select a file");
+                }
+
+                if (uploadedFiles.length > 1) {
+                    return alert("Please select only one file");
+                }
+
+                if (!selectedHeading || !uploadedFiles) {
+                    alert("Please select a heading and upload a file");
+                    return;
+                }
+
+                const formData = new FormData();
+                Object.keys(uploadedFiles).forEach((key) => {
+                    formData.append(uploadedFiles.item(key).name, uploadedFiles.item(key));
+                });
+                formData.append("heading", selectedHeading);
+
+                try {
+                    const response = await fetch(window.location.href + 'file', {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if (response.ok) {
+                        console.log("File uploaded successfully");
+                        window.location.reload();
+                    } else {
+                        console.log("File upload failed");
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            });
+
+        }
+        const downloadButtons = document.querySelectorAll('.downloadBtn');
+
+        fileContainer = document.querySelectorAll('.fileContainer');
+
+        fileContainer.forEach(container => {
+            let fileNameElement = container.querySelector('.fileName');
+            let filePathElement = container.querySelector('.filePath');
+
+            let downloadBtn = container.querySelector('.downloadBtn');
+
+            downloadBtn.addEventListener('click', () => {
+                let filePath = filePathElement.innerText;
+                let fileName = fileNameElement.innerText;
+
+                $("#pdfModal").modal("show");
+
+                const url = window.location.href + `downloadFile?filePath=${filePath}&fileName=${fileName}`;
+
+                const pdfModalLabel = document.getElementById("pdfModalLabel");
+                pdfModalLabel.innerText = fileName;
+
+                const pdfModalBody = document.querySelector("#pdfModal .modal-body");
+                pdfModalBody.innerHTML = `<iframe class="pdfViwer" src="${url}" ></iframe>`;
+            });
+
+        });
+
+
+        $("#pdfModal .close").click(function () {
+            $("#pdfModal").modal("hide");
+        });
+
+    });
 
 
 
