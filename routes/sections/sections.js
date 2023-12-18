@@ -40,6 +40,12 @@ router.use("/:sectionID*", async (req, res, next) => {
     res.locals.sectionID = req.params.sectionID;
     res.locals.layout = "sidebar";
     const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
+    const section = await courseDataFunctions.getSectionById(
+      res.locals.sectionID
+    );
+
+    res.locals.courseId = section.courseId.toString();
+
     if (await belongsincourse(req.session.userid.toString(), sectionID)) {
       next();
     } else {
@@ -112,23 +118,25 @@ router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
     try {
-      let sectionId = verify.validateMongoId(req.params.sectionId);
+      const section = await courseDataFunctions.getSectionById(
+        res.locals.sectionID
+      );
 
       let renderObjs = {};
-      const section = await courseDataFunctions.getSectionById(sectionId);
       const userType = req.session.type;
 
       renderObjs = {
         ...renderObjs,
         layout: "sidebar",
         // sideBarTitle: `${course.courseName}`,
-        script: "workspace/module",
+        courseId: section.courseId.toString(),
         modules: section.sectionModules,
+        script: "workspace/module",
         userType,
       };
       res.render("workspace/module", renderObjs);
     } catch (e) {
-      routeError(res, e);
+      res.status(500).json({ error: "Internal server error" });
     }
   })
   .post(async (req, res) => {
@@ -177,6 +185,11 @@ router
     try {
       let renderObjs = {};
       let { sectionId, moduleId } = req.params;
+
+      const sectionn = await courseDataFunctions.getSectionById(
+        res.locals.sectionID
+      );
+
       let userId = req.session.userid;
       userId = verify.validateMongoId(userId);
       moduleId = verify.validateMongoId(moduleId);

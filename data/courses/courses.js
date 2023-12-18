@@ -204,7 +204,6 @@ export const getAllCourses = async (
   }
 
   if (searchTerm) {
-    console.log(searchTerm);
     courseList = courseList.filter((course) => {
       let x = course.courseNumber + " - " + course.courseName.toLowerCase();
       console.log(x);
@@ -274,6 +273,8 @@ export const registerCourse = async (
   const existingCourse = await courseCollection.findOne({
     courseNumber: courseNumber,
     courseName: courseName,
+    courseSemester: courseSemester,
+    courseYear: courseYear,
   });
   if (existingCourse) {
     throwErrorWithStatus(400, "Course already exists");
@@ -285,12 +286,15 @@ export const registerCourse = async (
     throwErrorWithStatus(400, "Department not found");
   }
   newCourse.sections = [];
+  newCourse.courseLearning = {
+    headings: [],
+    files: [],
+  }
   const insertInfo = await courseCollection.insertOne(newCourse);
   return insertInfo;
 };
 export const getCourseById = async (courseId) => {
   courseId = verify.validateMongoId(courseId, "courseId");
-  // console.log(courseId);
   const courseCollection = await courses();
   const existingCourse = await courseCollection
     .aggregate([
@@ -314,6 +318,10 @@ export const getCourseById = async (courseId) => {
           courseCredits: 1,
           courseDescription: 1,
           sections: 1,
+          courseLearning: 1,
+          courseYear: 1,
+          courseSemester: 1,
+
           courseDepartmentId: {
             _id: "$department._id",
             name: "$department.departmentName",
@@ -549,6 +557,7 @@ export const registerSection = async (
   newSection.sectionId = new ObjectId();
   newSection.students = [];
 
+
   const userupdate = await userCollection.updateOne(
     {
       _id: newSection.sectionInstructor,
@@ -601,6 +610,23 @@ export const updateSection = async (
 
   if (!course) {
     throwErrorWithStatus(400, `Section was not found!`);
+  }
+
+  const section = course.sections.find(
+    (section) => section.sectionId.toString() === sectionId.toString()
+  );
+
+  let removeSection, addSection;
+  if (section.sectionInstructor.toString() !== sectionInstructor) {
+    const userCollection = await users();
+    removeSection = await userCollection.updateOne(
+      { _id: section.sectionInstructor },
+      { $pull: { registeredCourses: sectionId } }
+    );
+    addSection = await userCollection.updateOne(
+      { _id: updatedSection.sectionInstructor },
+      { $push: { registeredCourses: sectionId } }
+    );
   }
 
   updatedSection.sectionId = sectionId;
@@ -860,5 +886,57 @@ export const checkEnrollment = async (sectionId, studentId) => {
     return !!enrollmentData;
   } catch (error) {
     return false;
+  }
+};
+
+export const addHeading = async (courseId, heading) => {
+  try {
+    courseId = verify.validateMongoId(courseId.toString(), "courseId");
+    const courseCollection = await courses();
+    const result = await courseCollection.updateOne(
+      { _id: courseId },
+      { $push: { "courseLearning.headings": heading } }
+    );
+
+    if (result.modifiedCount === 1) {
+      return { success: true, message: "Heading added successfully" };
+    } else {
+      return { success: false, message: "Failed to add heading" };
+    }
+  } catch (error) {
+    console.error("Error adding heading:", error);
+    return {
+      success: false,
+      message: "An error occurred while adding heading",
+    };
+  }
+};
+
+export const addFileDetails = async (heading, fileName, filePath, courseId) => {
+  try {
+    courseId = verify.validateMongoId(courseId.toString(), "courseId");
+    const courseCollection = await courses();
+    const fileId = new ObjectId();
+    const result = await courseCollection.updateOne(
+      { _id: new ObjectId(courseId) },
+      {
+        $push: {
+          "courseLearning.files": {
+            _id: fileId,
+            heading: heading,
+            fileName: fileName,
+            filePath: filePath,
+          },
+        },
+      }
+    );
+
+    if (result.modifiedCount === 1) {
+      console.log("File details added successfully");
+    } else {
+      console.log("Failed to add file details");
+    }
+  } catch (error) {
+    console.error("Error adding file details:", error);
   }
 };
