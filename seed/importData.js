@@ -1,33 +1,65 @@
 // importData.js
+import "dotenv/config";
 
-import { MongoClient } from "mongodb";
-import courseData from "./courseData.json";
-import userData from "./userData.json";
-import departmentData from "./departmentData.json";
-import sessionData from "./sessionData.json";
-import assignmentData from "./assignmentData.json";
-import path from "path";
+import * as mongoCollections from "../config/mongoCollections.js";
+import { ObjectId } from "mongodb";
 
-const fs = require("fs");
+import fs from "fs";
+function replaceOid(jsonObject) {
+  const parsedObject = jsonObject;
+
+  function processItem(item) {
+    if (item && typeof item === "object") {
+      for (const key in item) {
+        for (const key2 in item[key]) {
+          if (key2 === "$oid") {
+            item[key] = new ObjectId(item[key][key2]);
+          }
+          if (key2 === "$date") {
+            item[key] = new Date(item[key][key2]);
+          }
+          if (key2 === "$numberInt") {
+            item[key] = parseInt(item[key][key2]);
+          }
+          if (key2 === "$numberDecimal") {
+            item[key] = parseFloat(item[key][key2]);
+          }
+          if (key2 === "$numberLong") {
+            item[key] = parseInt(item[key][key2]);
+          }
+          if (key2 === "$numberDouble") {
+            item[key] = parseFloat(item[key][key2]);
+          } else {
+            processItem(item[key]);
+          }
+        }
+      }
+    } else if (Array.isArray(item)) {
+      item.forEach((arrayItem) => {
+        processItem(arrayItem);
+      });
+    }
+  }
+
+  processItem(parsedObject);
+
+  return parsedObject;
+}
+
 const importData = async () => {
-  const uri = "mongodb://localhost:27017/your-database-name";
-  const client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
   try {
-    await client.connect();
     const collections = [
       "courses",
       "users",
       "departments",
-      "sessions",
+      "finalgrades",
       "assignments",
     ];
+
     const loadJSON = (filePath) => {
       try {
-        const jsonData = fs.readFileSync(filePath, "utf8");
+        let jsonData = fs.readFileSync(filePath, "utf8");
+
         return JSON.parse(jsonData);
       } catch (error) {
         console.error(`Error loading JSON file: ${error}`);
@@ -35,20 +67,24 @@ const importData = async () => {
       }
     };
 
-    collections.forEach(async (collectionName) => {
-      const database = client.db();
-      const collection = database.collection(collectionName);
-      const jsonData = loadJSON("./seeds/" + collectionName + "Data.json");
-      await collection.deleteMany({});
-      const x = await collection.insertMany(jsonData);
-      console.log(x);
-      console.log(
-        "Data imported successfully from " + collectionName + "Data.json"
-      );
-    });
+    for (let collection of collections) {
+      const data = loadJSON(`seed/seeds/${collection}Data.json`);
+
+      replaceOid(data);
+      console.log(data);
+      if (data) {
+        const dbCollection = await mongoCollections[collection]();
+        dbCollection.drop();
+        await dbCollection.deleteMany({});
+        await dbCollection.insertMany(data);
+        console.log(`Inserted ${data.length} documents into ${collection}`);
+      }
+    }
+  } catch (e) {
+    console.error(e);
   } finally {
-    await client.close();
+    process.exit();
   }
 };
-
-importData();
+console.log("hi");
+await importData();

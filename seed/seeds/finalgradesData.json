@@ -1,0 +1,12 @@
+[{
+  "_id": {
+    "$oid": "657fafea5ca7fcd983909073"
+  },
+  "userID": {
+    "$oid": "657f90c649985ad997d14d0e"
+  },
+  "sectionID": {
+    "$oid": "657faa045ca7fcd983909062"
+  },
+  "grade": "C+"
+}]

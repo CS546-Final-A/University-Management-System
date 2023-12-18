@@ -1,0 +1,150 @@
+[{
+  "_id": {
+    "$oid": "657fab0c5ca7fcd983909068"
+  },
+  "userId": {
+    "$oid": "657f86ee49985ad997d14d0a"
+  },
+  "assignmentName": "Node modules",
+  "assignmentDescription": "Submit your node modules here",
+  "assignmentWeight": 10,
+  "assignmentDueDate": {
+    "$date": "2023-12-18T05:00:00.000Z"
+  },
+  "assignmentSectionId": {
+    "$oid": "657faa045ca7fcd983909062"
+  },
+  "submissionLimit": 1,
+  "assignmentMaxScore": 100,
+  "submissions": [
+    {
+      "_id": {
+        "$oid": "657faf775ca7fcd983909072"
+      },
+      "studentId": {
+        "$oid": "657f90c649985ad997d14d0e"
+      },
+      "file": "Archive.zip",
+      "submissionDate": {
+        "$numberLong": "1702866807845"
+      }
+    }
+  ],
+  "scores": [
+    {
+      "studentId": {
+        "$oid": "657f90c649985ad997d14d0e"
+      },
+      "score": 100
+    },
+    {
+      "studentId": {
+        "$oid": "657f90d349985ad997d14d0f"
+      },
+      "score": 50
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "657fab295ca7fcd983909069"
+  },
+  "userId": {
+    "$oid": "657f86ee49985ad997d14d0a"
+  },
+  "assignmentName": "Final Project",
+  "assignmentDescription": "Submit your final project here",
+  "assignmentWeight": 90,
+  "assignmentDueDate": {
+    "$date": "2023-12-31T05:00:00.000Z"
+  },
+  "assignmentSectionId": {
+    "$oid": "657faa045ca7fcd983909062"
+  },
+  "submissionLimit": 5,
+  "assignmentMaxScore": 100,
+  "submissions": [],
+  "scores": [
+    {
+      "studentId": {
+        "$oid": "657f90d349985ad997d14d0f"
+      },
+      "score": 100
+    },
+    {
+      "studentId": {
+        "$oid": "657f90c649985ad997d14d0e"
+      },
+      "score": 75
+    },
+    {
+      "studentId": {
+        "$oid": "657f90f249985ad997d14d10"
+      },
+      "score": 0
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "657fac9d5ca7fcd98390906d"
+  },
+  "userId": {
+    "$oid": "657f86ee49985ad997d14d0a"
+  },
+  "assignmentName": "Do nothing",
+  "assignmentDescription": "Just wait",
+  "assignmentWeight": 100,
+  "assignmentDueDate": {
+    "$date": "2024-01-06T05:00:00.000Z"
+  },
+  "assignmentSectionId": {
+    "$oid": "657faa245ca7fcd983909063"
+  },
+  "submissionLimit": 1,
+  "assignmentMaxScore": 100,
+  "submissions": [],
+  "scores": []
+},
+{
+  "_id": {
+    "$oid": "657facc15ca7fcd98390906e"
+  },
+  "userId": {
+    "$oid": "657f86ee49985ad997d14d0a"
+  },
+  "assignmentName": "Write Code",
+  "assignmentDescription": "Your code",
+  "assignmentWeight": 100,
+  "assignmentDueDate": {
+    "$date": "2024-09-25T04:00:00.000Z"
+  },
+  "assignmentSectionId": {
+    "$oid": "657faa815ca7fcd983909065"
+  },
+  "submissionLimit": 1,
+  "assignmentMaxScore": 100,
+  "submissions": [],
+  "scores": []
+},
+{
+  "_id": {
+    "$oid": "657fae615ca7fcd983909071"
+  },
+  "userId": {
+    "$oid": "657f909849985ad997d14d0b"
+  },
+  "assignmentName": "Write a thesis",
+  "assignmentDescription": "Pass or fail Dr.",
+  "assignmentWeight": 100,
+  "assignmentDueDate": {
+    "$date": "2029-01-21T05:00:00.000Z"
+  },
+  "assignmentSectionId": {
+    "$oid": "657faaca5ca7fcd983909067"
+  },
+  "submissionLimit": 1,
+  "assignmentMaxScore": 1,
+  "submissions": [],
+  "scores": []
+}]
