@@ -394,6 +394,24 @@ router.route("/:courseId/materials").get(async (req, res) => {
       });
     });
 
+    let organizedHeadings = {};
+
+    data[0].courseLearning.headings.forEach((heading, index) => {
+      let headingFiles = data[0].courseLearning.files.filter(
+        (file) => file.heading === heading
+      );
+
+      if (headingFiles.length > 0) {
+        organizedHeadings[index] = {
+          name: heading,
+          files: headingFiles.map((file) => ({
+            name: file.fileName,
+            path: file.filePath,
+          })),
+        };
+      }
+    });
+
     let renderObjs = {
       userId: req.session.userid,
       name: req.session.name,
@@ -405,6 +423,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
       sections: data[0].sections,
       headings: data[0].courseLearning.headings,
       files: data[0].courseLearning.files,
+      allFiles: organizedHeadings,
       // layout: "sidebar",
       // sectionID,
     };

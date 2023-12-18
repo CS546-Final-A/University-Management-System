@@ -353,7 +353,6 @@ router
           professor.latitude,
           professor.longitude
         );
-        if (d > 0.1) alert("you'll be marked absent ");
       }
       await addStudentToAttendance(
         name,
