@@ -61,6 +61,7 @@ router.get(
         };
         throw e;
       }
+
     } catch (e) {
       routeError(res, e);
     }
