@@ -5,6 +5,8 @@ Our final project for CS 546
 To run:
 
 ```
+npm run seed
+
 npm start
 ```
 
