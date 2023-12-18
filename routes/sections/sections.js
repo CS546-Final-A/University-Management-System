@@ -111,6 +111,7 @@ router.route("/:sectionId").get(async (req, res) => {
 router
   .route("/:sectionId/modules")
   .get(async (req, res) => {
+
     let sectionId = verify.validateMongoId(req.params.sectionId);
     const section = await courseDataFunctions.getSectionById(
       res.locals.sectionID
@@ -130,13 +131,9 @@ router
       userType,
     };
     res.render("workspace/module", renderObjs);
+
   })
   .post(async (req, res) => {
-    req.body = santizeInputs(req.body);
-    let { sectionId } = req.params;
-    sectionId = verify.validateMongoId(req.params.sectionId);
-    const { moduleName, moduleDescription, moduleDate } = req.body;
-
     try {
       req.body = santizeInputs(req.body);
       let { sectionId } = req.params;
@@ -182,12 +179,14 @@ router
     try {
       let renderObjs = {};
       let { sectionId, moduleId } = req.params;
+
       const sectionn = await courseDataFunctions.getSectionById(
         res.locals.sectionID
       );
       const course = await courseDataFunctions.getCourseById(
         sectionn.courseId.toString()
       );
+
       let userId = req.session.userid;
       userId = verify.validateMongoId(userId);
       moduleId = verify.validateMongoId(moduleId);
@@ -314,8 +313,7 @@ router
             ...renderObjs,
             layout: "sidebar",
             // sideBarTitle: `${course.courseName}`,
-
-            courseId: sectionn.courseId.toString(),
+            sectionID: sectionId,
             userType,
             name,
             n,

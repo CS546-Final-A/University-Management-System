@@ -1,23 +1,17 @@
 import { Router, query } from "express";
 import verify, { santizeInputs } from "../../data_validation.js";
+import * as courseDataFunctions from "../../data/courses/courses.js";
 import util from "util";
 import {
   validateCourse,
   validateSection,
 } from "../../data/courses/courseHelper.js";
-import multer from "multer";
-import filesPayloadExists from "../../routes/middleware/filesPayloadExists.js";
-import fileExtLimiter from "../../routes/middleware/fileExtLimiter.js";
-import fileSizesLimiter from "../../routes/middleware/fileSizeLimiter.js";
-import * as courseDataFunctions from "../../data/courses/courses.js";
-import { fileURLToPath } from "url";
-import path from "path";
-import { dirname } from "path";
 import routeError from "../routeerror.js";
 import fileUpload from "express-fileupload";
 import { inflateRawSync } from "zlib";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
 
 const router = Router();
 const upload = multer();
@@ -345,6 +339,7 @@ router.get("/getSectionById/:sectionId", async (req, res) => {
   }
 });
 
+
 router.use("/:courseId*", async (req, res, next) => {
   try {
     const { courseId } = req.params;
@@ -545,4 +540,5 @@ router.get("/:courseId/materials/downloadFile", async (req, res) => {
     routeError(res, e);
   }
 });
+
 export default router;
