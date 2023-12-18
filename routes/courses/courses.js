@@ -15,11 +15,12 @@ import path from "path";
 import { dirname } from "path";
 import routeError from "../routeerror.js";
 import fileUpload from "express-fileupload";
+import { inflateRawSync } from "zlib";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const router = Router();
-
+const upload = multer();
 router.get("/", async (req, res) => {
   try {
     let uniqueSectionYearandSemester =
@@ -344,6 +345,41 @@ router.get("/getSectionById/:sectionId", async (req, res) => {
   }
 });
 
+router.use("/:courseId*", async (req, res, next) => {
+  try {
+    const { courseId } = req.params;
+    let course = await courseDataFunctions.getCourseById(courseId);
+    course = course[0];
+    const userId = req.session.userid;
+    if (!course) {
+      throw { status: 404, message: "Course not found" };
+    }
+
+    let belongs = false;
+    // console.log(course);
+    if (course.sections.length > 0) {
+      course.sections.forEach((section) => {
+        if (
+          section.students?.some(
+            (studentId) => studentId.toString() === userId.toString()
+          )
+        ) {
+          belongs = true;
+        }
+        if (section.sectionInstructor._id.toString() === userId.toString()) {
+          belongs = true;
+        }
+      });
+    }
+    if (!belongs) {
+      throw { status: 403, message: "You do not belong to this course" };
+    }
+    next();
+  } catch (e) {
+    routeError(res, e);
+  }
+});
+
 router.route("/:courseId/materials").get(async (req, res) => {
   const { courseId } = req.params;
   try {
@@ -352,11 +388,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
     data.forEach((course) => {
       course.courseId = course._id.toString();
       course.sections.forEach((section) => {
-        if (
-          section.enrolledStudents?.some((studentId) =>
-            studentId.equals(userId)
-          )
-        ) {
+        if (section.students?.some((studentId) => studentId.equals(userId))) {
           section.isEnrolled = true;
         }
       });
@@ -420,8 +452,8 @@ router
     fileSizesLimiter,
     async (req, res) => {
       try {
-        console.log(req.files);
-        console.log(req.body.heading);
+        // console.log(req.files);
+        // console.log(req.body.heading);
 
         const heading = req.body.heading;
         req.body = santizeInputs(req.body);
@@ -443,7 +475,7 @@ router
             files[key].name
           );
           fileName = files[key].name;
-          console.log(filepath);
+          // console.log(filepath);
           files[key].mv(filepath, (err) => {
             if (err)
               return res.status(500).json({ status: "error", message: err });
@@ -471,12 +503,38 @@ router
     }
   );
 router.get("/:courseId/materials/downloadFile", async (req, res) => {
-  console.log(req);
   try {
     let courseId = req.params.courseId;
     courseId = verify.validateMongoId(courseId);
     const filePath = req.query.filePath;
     const fileName = req.query.fileName;
+
+    let course = await courseDataFunctions.getCourseById(courseId);
+    course = course[0];
+    const userId = req.session.userid;
+    if (!course) {
+      throw { status: 404, message: "Course not found" };
+    }
+
+    let belongs = false;
+    // console.log(course);
+    if (course.sections.length > 0) {
+      course.sections.forEach((section) => {
+        if (
+          section.students?.some(
+            (studentId) => studentId.toString() === userId.toString()
+          )
+        ) {
+          belongs = true;
+        }
+        if (section.sectionInstructor._id.toString() === userId.toString()) {
+          belongs = true;
+        }
+      });
+    }
+    if (!belongs) {
+      throw { status: 403, message: "You do not belong to this course" };
+    }
     res.download(filePath, fileName, (err) => {
       if (err) {
         console.log(err);
@@ -484,7 +542,7 @@ router.get("/:courseId/materials/downloadFile", async (req, res) => {
       }
     });
   } catch (e) {
-    res.status(500).json({ error: "Internal server error" });
+    routeError(res, e);
   }
 });
 export default router;
