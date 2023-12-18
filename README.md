@@ -19,8 +19,4 @@ SMTPUsername="Username"
 SMTPPassword="Password"
 MailServerDomain="The domain from which your emails will be sent"
 SiteDomain="The url from which the site can be accessed"
-UnixCompat=True on Unix based systems
 ```
-
-Note on UnixCompat:
-The module we are using for pdf generation has compatibility issues with Unix based systems. Setting UnixCompat to true will allow the module to operate on these systems.
