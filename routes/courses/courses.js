@@ -48,6 +48,30 @@ router.get("/:year/:semester/registration", async (req, res) => {
   }
 });
 
+router.get("/update/:courseId", async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    let courses = await courseDataFunctions.getCourseById(courseId);
+    let uniqueDepartmentNames =
+    await courseDataFunctions.getUniqueDepartmentNamesandId();
+    courses.forEach(course => {
+      course.departmentId = course.courseDepartmentId._id.toString();
+    });
+    let renderObjs = {
+      session_name: req.session.name,
+      session_type: req.session.type,
+      session_email: req.session.email,
+      uniqueDepartmentNames: uniqueDepartmentNames,
+      editMode: true,
+      course: courses[0],
+      script: "courses/registration",
+    };
+    return res.redirect("courses/registration", renderObjs);
+  } catch (e) {
+    routeError(res, e);
+  }
+});
+
 router.post("/registration", async (req, res) => {
   try {
     const {

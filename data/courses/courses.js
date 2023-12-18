@@ -313,6 +313,8 @@ export const getCourseById = async (courseId) => {
           courseName: 1,
           courseCredits: 1,
           courseDescription: 1,
+          courseYear: 1,
+          courseSemester: 1,
           sections: 1,
           courseDepartmentId: {
             _id: "$department._id",

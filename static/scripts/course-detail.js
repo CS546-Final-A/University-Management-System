@@ -4,6 +4,7 @@ function openAddSectionModal() {
   document.getElementById("addSectionModalLabel").textContent = "Add Section";
   $("#addSectionModal").modal("toggle");
 }
+
 // Handle form submission
 const sectionSubmit = async (event) => {
   event.preventDefault();
@@ -68,6 +69,16 @@ const sectionSubmit = async (event) => {
       setError(e.message, "error");
     }
   }
+};
+
+const editCourse = async (courseId) => {
+  const csrf = document.getElementById("csrf").value;
+  console.log(courseId);
+  const result = await request(
+    "GET",
+    `/courses/update/${courseId}`,
+    csrf,
+  );
 };
 
 const editSection = async (sectionId) => {

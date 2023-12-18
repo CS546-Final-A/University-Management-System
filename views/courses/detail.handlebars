@@ -9,11 +9,15 @@
             <div class="mx-4 my-auto text-muted fs-5">
                 {{this.courseDepartmentId.name}}
             </div>
+            {{#if (eq ../session_type 'Admin')}}
+            <button class="btn btn-warning edit-btn" onclick="editCourse('{{this.courseId}}')">Edit Course</button>
+            {{/if}}
         </div>
     </h2>
     <div class="my-3"><strong>Credits:</strong> {{this.courseCredits}}</div>
 
     <div class="my-3">{{this.courseDescription}}</div>
+
 
     {{#if (eq ../session_type 'Admin')}}
     <div class="my-4">
