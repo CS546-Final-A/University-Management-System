@@ -1,49 +1,102 @@
 <link rel="stylesheet" href="/styles/courses.css">
-<div class="menuContainer">
-    {{#if (eq type 'Admin')}}
-    <div id="courseRegistration" class="menuCard">
-        Course Registration
-    </div>
-    {{/if}}
-    <div id="courseListing" class="menuCard">
-        Course Enrollment
+
+
+
+<h2>
+    <div class="d-flex my-2"><img class="iconSwitch" src="/icons/enroll.svg" alt="Enroll Icon"> Course</div>
+</h2>
+<div class="row my-4">
+    {{#if (eq session_type 'Admin')}}
+    <div class="col-md-2">
+        <button id="courseRegistration" class="my-auto btn btn-info p-4">
+            Registration
+        </button>
     </div>
 
-    <div class="modal fade" id="yearAndSemesterSelect" tabindex="-1" role="dialog"
-        aria-labelledby="yearAndSemesterSelect" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="yearAndSemesterSelectLabel">Select Year and Semester</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form>
+    {{/if}}
+    <div class="col-md-2">
+        <button id="courseListing" class="my-auto btn btn-info p-4">
+            Enrollment
+        </button>
+    </div>
+
+</div>
+<div class="modal fade" id="yearAndSemesterSelect" tabindex="-1" role="dialog" aria-labelledby="yearAndSemesterSelect"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content glassEffect">
+            <div class="modal-header glassEffect">
+                <h5 class="modal-title" id="yearAndSemesterSelectLabel">Select Year and Semester</h5>
+                <button type="button" class="btn-close btn-info" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row"></div>
+                <form>
+                    <div class="my-4">
                         <label for="year">Select Year:</label>
-                        <select id="year" name="selectedYear">
+                        <select id="year" name="selectedYear" class="selectpicker form-control" data-live-search="true">
                             {{#each uniqueYear}}
                             <option value="{{this}}">{{this}}</option>
                             {{/each}}
                         </select>
-
+                    </div>
+                    <div class="my-4">
                         <label for="semester">Select Semester:</label>
-                        <select id="semester" name="selectedSemester">
+                        <select id="semester" name="selectedSemester" class="selectpicker form-control"
+                            data-live-search="true">
                             {{#each uniqueSemester}}
                             <option value="{{this}}">{{this}}</option>
                             {{/each}}
                         </select>
 
-
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="close btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button id="selectSemester" type="submit">Continue</button>
-                </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="close btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="selectSemester" type="submit" class="btn btn-info">Continue</button>
             </div>
         </div>
     </div>
-
 </div>
+
+<div class="modal fade" id="yearAndSemesterSelectRegistration" tabindex="-1" role="dialog"
+    aria-labelledby="yearAndSemesterSelectLabelRegistration" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content glassEffect">
+            <div class="modal-header glassEffect">
+                <h5 class="modal-title" id="yearAndSemesterSelectLabelRegistration">Select Year and Semester
+                </h5>
+                <button type="button" class="btn-close btn-info" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="semYearForm">
+                    <div class="form-floating my-4">
+                        <input class="form-control" type="number" id="yearRegistration" name="selectedYear" min="2022"
+                            max="2100" placeholder="">
+                        <label for="yearRegistration">Select Year:</label>
+                    </div>
+
+
+                    <div class="my-4">
+                        <label for="semesterRegistration">Select Semester:</label>
+                        <select id="semesterRegistration" name="selectedSemester" class="selectpicker form-control"
+                            data-live-search="true">
+                            <option value="Spring">Spring</option>
+                            <option value="Summer">Summer</option>
+                            <option value="Fall">Fall</option>
+                            <option value="Winter">Winter</option>
+                        </select>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="close btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="selectSemesterRegistration" type="submit" class="btn btn-info">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/scripts/course-landing.js"></script>

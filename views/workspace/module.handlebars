@@ -1,26 +1,72 @@
-<h1>Modules</h1>
-
-<div class="modules">
-        {{#each modules}}
-        <div class="module">
-
-
-            <div class="details">
-           
-                <p>ID: {{this.moduleId}}</p>
-                <p>Name: {{this.moduleName}}</p>
-                <p>Desc: {{this.moduleDescription}}</p>
-                <p>Date: {{this.moduleDate}}</p>
+<div class="container-fluid">
+    <h2>
+        <div class="d-flex">
+            <div class="my-auto"><img class="iconSwitch" src="/icons/module.svg" alt="module Icon"> Modules</div>
+            <div class="my-auto text-muted fs-5" id="reportCount"></div>
+            <div class="form-floating ms-auto fs-6">
+                <input class="form-control" type="text" placeholder="" id="searchInput" />
+                <label for="#searchInput"><img class="iconSwitch" src="/icons/search.svg" alt="search icon">
+                    Search</label>
             </div>
+        </div>
+    </h2>
+
+    <div class="d-flex">
+        {{#if (eq userType "Professor")}}
+        <div class="my-auto"><button class="btn btn-info" id="addModuleButton" data-bs-toggle="modal"
+                data-bs-target="#exampleModal">New Module</button></div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content glassEffect">
+                    <div class="modal-header glassEffect">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">New Module</h1>
+                        <button type="button" class="btn-close btn-info" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="moduleForm" style="display: none;">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" type="text" id="moduleName" placeholder="" />
+                                <label for="#moduleName">Name</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" type="text" id="moduleDesc" placeholder="">
+                                <label for="moduleDesc">Description</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" type="date" id="moduleDate">
+                                <label for="#moduleDate">Date</label>
+                            </div>
+                            <input type="hidden" id="csrf" value="{{_csrf}}">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="moduleFormBtn" type="submit" class="btn btn-info">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+    </div>
 
 
-
-         
-            
-                <a href="/workspace/{{../sectionID}}/modules/{{this.moduleId}}/attendance">Attendance</a>
-            
+    {{#each modules}}
+    <div class="card my-4 glassEffect searchData">
+        <div class="card-header glassEffect d-flex">
+            <div class="my-auto">{{this.moduleName}}</div>
+            <div class="my-auto fs-6 ms-3">({{this.moduleDate}})</div>
+            <div class="ms-auto"><button class="btnSubmit p-2">
+                    <a href="/sections/{{../sectionID}}/modules/{{this.moduleId}}/attendance">Attendance</a></button>
+            </div>
         </div>
 
+        <div class="card-body">
+            <div class="card-title">{{this.moduleDescription}}</div>
+        </div>
 
-        {{/each}}
     </div>
+    {{/each}}
+</div>

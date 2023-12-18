@@ -1,0 +1,38 @@
+<div class="container-fluid">
+    <h2>Create Assignment</h2>
+    <form id="createAssignmentForm" method="post">
+        <div class="form-floating my-4">
+            <input type="text" class="form-control" id="assignmentName" name="assignmentName" placeholder="" required>
+            <label for="assignmentName">Assignment Name</label>
+        </div>
+        <div class="my-4">
+            <label for="assignmentDescription">Assignment Description</label>
+            <textarea class="form-control" id="assignmentDescription" name="assignmentDescription" rows="4"
+                required></textarea>
+        </div>
+        <div class="form-floating my-4">
+            <input type="number" class="form-control" id="assignmentWeight" name="assignmentWeight" placeholder=""
+                required>
+            <label for="assignmentWeight">Assignment Weight</label>
+        </div>
+        <div class="form-floating my-4">
+            <input type="date" class="form-control" id="assignmentDueDate" name="assignmentDueDate" placeholder=""
+                required>
+            <label for="assignmentDueDate">Due Date</label>
+        </div>
+        <div class="form-floating my-4">
+
+            <input type="number" class="form-control" id="submissionLimit" name="submissionLimit" placeholder=""
+                required>
+            <label for="submissionLimit">Submission Limit</label>
+        </div>
+        <div class="form-floating my-4">
+            <input type="number" class="form-control" id="assignmentMaxScore" name="assignmentMaxScore" placeholder=""
+                required>
+            <label for="assignmentMaxScore">Max Score</label>
+        </div>
+        <br>
+        <input type="hidden" id="_csrf" name="_csrf" value="{{_csrf}}">
+        <button type="submit" class="btn btn-info">Create Assignment</button>
+    </form>
+</div>

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import session from "express-session";
+import MongoStore from "connect-mongo";
 import lusca from "lusca";
 import exphbs from "express-handlebars";
 import { fileURLToPath } from "url";
@@ -32,6 +33,10 @@ app.use(
     secret: process.env.CookieSecret,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.mongoServerUrl,
+      dbName: "UMS",
+    }),
   })
 );
 
@@ -43,34 +48,49 @@ app.use("/", (req, res, next) => {
   next();
 });
 
-app.use(
-  lusca({
-    csrf: true,
-    /*csp: {
-       ...
-    },*/
-    xframe: "SAMEORIGIN",
-    p3p: "ABCDEF",
-    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
-    xssProtection: true,
-    nosniff: true,
-    referrerPolicy: "same-origin",
-  })
-);
+// app.use(
+//   lusca({
+//     csrf: true,
+//     /*csp: {
+//        ...
+//     },*/
+//     xframe: "SAMEORIGIN",
+//     p3p: "ABCDEF",
+//     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+//     xssProtection: true,
+//     nosniff: true,
+//     referrerPolicy: "same-origin",
+//   })
+// );
 
 // Define the eq helper
 const eqHelper = function (a, b) {
-  if (a === b) {
-    return true;
-  } else {
-    return false;
-  }
+  return a === b;
 };
+
+const gtHelper = function (a, b) {
+  return a > b;
+};
+
+const gtD = function (a, b) {
+  const x = new Date(a);
+  const y = new Date(b);
+  return x > y;
+};
+const ifUserType = function(roleString, session_type, options) {
+  const roleArray = roleString.split(',');
+
+  if (Array.isArray(roleArray) && roleArray.includes(session_type)) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+}
 
 const handlebars = exphbs.create({
   defaultLayout: "main",
   partialsDir: ["views/partials/"],
-  helpers: { eq: eqHelper },
+  helpers: { eq: eqHelper, gt: gtHelper, gtD: gtD, ifUserType: ifUserType },
 });
 
 app.engine("handlebars", handlebars.engine);

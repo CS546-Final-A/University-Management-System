@@ -6,7 +6,9 @@ export const validateCourse = (
   courseName,
   courseDepartmentId,
   courseCredits,
-  courseDescription
+  courseDescription,
+  courseSemester,
+  courseYear
 ) => {
   if (
     !courseNumber ||
@@ -19,13 +21,15 @@ export const validateCourse = (
   }
 
   courseNumber = verify.numberInteger(courseNumber, "courseNumber");
-  courseName = verify.isAlphaString(courseName, "courseName");
+  courseName = verify.isAlphaStringwithSpaces(courseName, "courseName");
   courseDepartmentId = verify.validateMongoId(
     courseDepartmentId,
     "courseDepartmentId"
   );
   courseCredits = verify.numberInteger(courseCredits, "courseCredits");
   courseDescription = verify.string(courseDescription, "courseDescription");
+  courseSemester = verify.semester(courseSemester, "courseSemester");
+  courseYear = verify.year(courseYear, "courseYear");
 
   return {
     courseNumber,
@@ -33,6 +37,8 @@ export const validateCourse = (
     courseDepartmentId,
     courseCredits,
     courseDescription,
+    courseSemester,
+    courseYear,
   };
 };
 
@@ -44,8 +50,6 @@ export const validateSection = (
   sectionEndTime,
   sectionDay,
   sectionCapacity,
-  sectionYear,
-  sectionSemester,
   sectionLocation,
   sectionDescription
 ) => {
@@ -57,8 +61,6 @@ export const validateSection = (
     !sectionEndTime |
     !sectionDay |
     !sectionCapacity |
-    !sectionYear |
-    !sectionSemester |
     !sectionLocation |
     !sectionDescription
   ) {
@@ -66,14 +68,15 @@ export const validateSection = (
   }
 
   sectionName = verify.isAlphaString(sectionName, "sectionName");
-  sectionInstructor = verify.validateMongoId(sectionInstructor, "sectionInstructor");
+  sectionInstructor = verify.validateMongoId(
+    sectionInstructor,
+    "sectionInstructor"
+  );
   sectionType = verify.sectionType(sectionType);
   sectionStartTime = verify.time(sectionStartTime, "sectionStartTime");
   sectionEndTime = verify.time(sectionEndTime, "sectionEndTime");
   sectionDay = verify.day(sectionDay, "sectionDay");
   sectionCapacity = verify.numberInteger(sectionCapacity, "sectionCapacity");
-  sectionYear = verify.year(sectionYear);
-  sectionSemester = verify.semester(sectionSemester, "sectionSemester");
   sectionLocation = verify.string(sectionLocation, "sectionLocation");
   sectionDescription = verify.string(sectionDescription, "sectionDescription");
 
@@ -85,8 +88,6 @@ export const validateSection = (
     sectionEndTime,
     sectionDay,
     sectionCapacity,
-    sectionYear,
-    sectionSemester,
     sectionLocation,
     sectionDescription,
   };

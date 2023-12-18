@@ -1,21 +1,6 @@
 h1 {
   margin-bottom: 2rem;
 }
-a {
-  color: #8167a9;
-  cursor: pointer;
-}
-.course-listing {
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  align-items: top;
-  justify-content: start;
-  width: 100%;
-  padding: 1rem;
-  padding-top: 2rem;
-  background-color: #dfdfdf;
-}
 
 .course-listing h2 {
   border: none;
@@ -47,11 +32,6 @@ a {
   cursor: pointer;
   color: unset;
 }
-/* Style for the filter container */
-.filter {
-  width: 300px; /* Adjust the width as needed */
-  margin: 20px;
-}
 
 /* Style for labels */
 .filter label {
@@ -68,22 +48,9 @@ a {
   box-sizing: border-box;
 }
 
-/* Style for the Apply button */
-.filter button {
-  background-color: #8167a9;
-  color: white;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.filter button:hover {
-  background-color: #8167a9;
-}
-
 /* Course Landing/Dashboard */
 
-.menuContainer{
+.menuContainer {
   display: flex;
   gap: 1rem;
 }
@@ -103,34 +70,19 @@ a {
 }
 
 /* Course Registration Form */
-.courseRegistrationContainer{
-  display:flex;
+.courseRegistrationContainer {
+  display: flex;
   justify-content: center;
 }
 
-.courseRegistrationForm{
+.courseRegistrationForm {
   display: flex;
   flex-direction: column;
 }
 
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   margin: 20px;
-}
-
-h2 {
-  color: #333;
-}
-
-form {
-  max-width: 400px;
-  margin: 20px 0;
-}
-
-label {
-  display: block;
-  margin: 10px 0 5px;
-  color: #333;
 }
 
 input[type="text"],
@@ -143,17 +95,6 @@ textarea {
   max-height: 200px;
 }
 
-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
+.courseRedirect {
   cursor: pointer;
 }
-
-button:hover {
-  background-color: #45a049;
-}
-
-

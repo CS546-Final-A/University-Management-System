@@ -1,140 +1,150 @@
-<h1>Attendance</h1>
-
-   {{#if (eq userType "Student")}}
-        <h1>Welcome, Student  {{name}}   !</h1>
-        
-        <button id = "markPresentButton">mark me present</button>
-
-
-    {{else if (eq userType "Professor")}}
-        <h1>Welcome, Professor  {{name}} !</h1>
-
-        <button>generate shared key</button>
-
-        <button  id="downloadAttendanceButton" >download attendance</button>
-        <h1>{{attendanceData}}</h1>
-   
-    {{/if}}
-
-<script src="../../data/users/getUserInfoByID.js"></script>
-    <script>
-document.getElementById("markPresentButton").addEventListener("click", markPresent);
-
-
-async function markPresent() {
-  try {
-    const pathSegments = window.location.pathname.split('/');
-    const sectionId = pathSegments[2];  
-    const moduleId = pathSegments[4];   
-    const position = await getCurrentPosition();
-    const { latitude, longitude } = position.coords;
-    const response = await fetch(`/workspace/${sectionId}/modules/${moduleId}/attendance`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        latitude,
-        longitude,
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data.message);
-    } else {
-      console.error(`Failed to mark attendance. Status: ${response.status}`);
-    }
-  } catch (error) {
-    console.error("Error marking attendance:", error);
-  }
-}
+<div class="container-fluid">
+  <h2>
+    <div class="d-flex my-2">
+      <div class="my-auto"><img class="iconSwitch" src="/icons/attendance.svg" alt="attendance Icon">Attendance</div>
+    </div>
+  </h2>
 
 
 
-function getCurrentPosition() {
-  return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(resolve, reject);
-  });
-}
-    document.getElementById("downloadAttendanceButton").addEventListener("click", downloadAttendance);
+  {{#if (eq userType "Student")}}
+
+  {{#if (eq n 1)}}
+  <button class="btn btn-info" id="markedProfPresentButton" disabled>Wait for prof</button>
+  {{/if}}
+
+  {{#if (eq n 2)}}
+  <p>Attendance started at {{H}}:{{M}}{{k}}. Will go on for 10 mins from the start time.</p>
+  <button class="btn btn-warning" id="markPresentButton">Mark me present</button>
+  {{/if}}
+
+  {{#if (eq n 3)}}
+  <button class="btn btn-danger" disabled>You missed this week's attendance</button>
+  {{/if}}
+
+  {{#if (eq n 4)}}
+  <button class="btn btn-success" disabled>Marked!</button>
+  {{/if}}
 
 
 
-async function downloadAttendance() {
-    try {
-          
-        const pathSegments = window.location.pathname.split('/');
-        const sectionId = pathSegments[2];  
-        const moduleId = pathSegments[4];   
-        const response = await fetch(`/workspace/${sectionId}/modules/${moduleId}/attendance`);
+  {{/if}}
 
-        if (response.ok) {
-            const data = await response.json();
-            console.log("Attendance data:", data.attendance);
-           
-        } else {
-            console.error(`Failed to download attendance. Status: ${response.status}`);
+  {{#if (eq userType "Professor")}}
+  {{#if (eq needButton true)}}
+  <button class="btn btn-warning" id="markProfPresentButton">Start Attendance</button>
+  {{else}}
+  <button class="btn btn-success" id="markedProfPresentButton" disabled>Attendance Marked</button>
+  {{/if}}
+
+  <div class="card glassEffect mt-4">
+    <div class="card-header glassEffect d-flex fs-3">
+      <div class="my-auto">Report</div>
+      <div class="my-auto text-muted fs-5" id="reportCount"></div>
+      <div class="form-floating ms-auto fs-6">
+        <input class="form-control" type="text" placeholder="sad" id="searchInput" />
+        <label for="#searchInput"><img class="iconSwitch" src="/icons/search.svg" alt="moduleIcon">
+          Search</label>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="col-12">
+
+        <div class="row fs-4 my-2 fw-bold searchHead">
+          <div class="col-md-4">Name</div>
+          <div class="col-md-4">User ID</div>
+          <div class="col-md-4">Distance</div>
+        </div>
+
+        {{#each studentsWithinRange}}
+        <div class="row searchData">
+          <div class="col-md-4">{{this.name}}</div>
+          <div class="col-md-4">{{this.userId}}</div>
+          <div class="col-md-4">{{this.distanceFromProfessor}}</div>
+        </div>
+
+        {{/each}}
+      </div>
+    </div>
+
+  </div>
+  {{/if}}
+</div>
+
+<script>
+  $(document).ready(function () {
+    function updateSearchResults() {
+      var value = $("#searchInput").val().toLowerCase();
+      var count = 0;
+
+      $(".searchData").each(function (index, element) {
+        var rowText = $(element).text().toLowerCase();
+        var isVisible = rowText.indexOf(value) > -1;
+
+        $(element).css("display", isVisible ? "flex" : "none");
+
+        if (isVisible) {
+          count++;
         }
-    } catch (error) {
-        console.error("Error downloading attendance:", error);
+      });
+
+      // Update the reportCount element with the total count
+      $("#reportCount").text(" (" + count + ")");
     }
-} 
 
-const calculateDistance = (lat1, lon1, lat2, lon2) => {
-  // Implementation of the Haversine formula
-  // (you may want to use a library for more accurate calculations)
-  const R = 6371; // Radius of the Earth in kilometers
-  const dLat = toRadians(lat2 - lat1);
-  const dLon = toRadians(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) *
-      Math.cos(toRadians(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c * 1000; // Convert to meters
-  return distance;
-};
+    // Event listener for the keyup event on the search input
+    $("#searchInput").on("keyup", updateSearchResults);
 
-const toRadians = (degrees) => {
-  return degrees * (Math.PI / 180);
-};
-
-if ({{#eq userType "Professor"}}true{{/eq}}) {
-  window.addEventListener('load', function() {
-    
-    func(); 
-
+    // Initial update when the page loads
+    updateSearchResults();
   });
-async function func(){
-    const attendees = [];
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const markPresentButton = document.getElementById("markPresentButton");
+    const markProfPresentButton = document.getElementById("markProfPresentButton");
 
-        const position = await getCurrentPosition();
-        console.log(position);
-        const { latitude, longitude } = position.coords;
-        for (const i of  {{{attendanceData}}}) {
-          let d = calculateDistance(
-            i.latitude,
-            i.longitude,
-            latitude,
-            longitude
-          );
-          console.log("d=");
-          console.log(d);
-          if (d <= 0.01) {
-            const attendee = await getUserByID(iterator.userId, {
-              _id: 0,
-              firstname: 1,
-              lastname: 1,
-            });
+    if (markProfPresentButton) {
+      markProfPresentButton.addEventListener("click", markPresent);
+    }
+    if (markPresentButton) {
+      markPresentButton.addEventListener("click", markPresent);
+    }
+  });
 
-            attendees.push(attendee.firstname + " " + attendee.lastname);
-          }
-}
+  async function markPresent() {
+    try {
+      const pathSegments = window.location.pathname.split('/');
+      const sectionId = pathSegments[2];
+      const moduleId = pathSegments[4];
+      const position = await getCurrentPosition();
+      const { latitude, longitude } = position.coords;
+      const response = await fetch(`/workspace/${sectionId}/modules/${moduleId}/attendance`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          latitude,
+          longitude,
+        }),
+      });
 
-console.log(attendees)
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.message);
+        window.location.reload();
+      } else {
+        console.error(`Failed to mark attendance. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error marking attendance:", error);
+    }
+  }
 
-}
-    </script>
+  function getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+  }
+</script>

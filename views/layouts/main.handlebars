@@ -2,6 +2,10 @@
 <html lang="en">
 
 <head>
+    <script>
+        // Access the darkmode variable from res.locals
+        var _isDarkMode = {{ darkmode }};
+    </script>
     <meta charset="utf-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +13,12 @@
     <link rel="stylesheet" href="/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/styles/bootstrap-select.min.css">
     <link rel="stylesheet" href="/styles/styles.css">
+    <script src="/scripts/jquery.min.js"></script>
+
+    <script src="/scripts/styles.js"></script>
+    <!-- JS Imports -->
+    <script src="/scripts/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/bootstrap-select.min.js"></script>
 
     <title>University Management System</title>
 </head>
@@ -20,33 +30,48 @@
                 <ul id="navigationList" class="nav d-flex mx-5">
                     <li class="nav-item">
                         <a class="nav-link" href="/dashboard">
-                            <span class="fs-5 position-relative" id="homeText">Home</span>
+                            <span class="fs-5 position-relative" id="homeText">Dashboard</span>
                         </a>
                     </li>
-                    {{#if name}}
+                    {{#ifUserType 'Admin,Student' session_type}}
                     <li class="nav-item">
                         <a class="nav-link" href="/courses/">
-                            <span class="fs-5 position-relative" id="coursesText">Courses</span>
+                            <span class="fs-5 position-relative" id="coursesText">Course</span>
                         </a>
                     </li>
+                    {{/ifUserType}}
+                    {{#ifUserType 'Admin' session_type}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/configuration/">
+                            <span class="fs-5 position-relative" id="configurationText">Configuration</span>
+                        </a>
+                    </li>
+                    {{/ifUserType}}
+                    {{#if session_type}}
                     <li class="nav-item ms-auto dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            data-bs-auto-close="outside" aria-expanded="false"><img src="/icons/user-circle.svg"
-                                alt="user-circle-icon" /></a>
+                            data-bs-auto-close="outside" aria-expanded="false"><img class="iconSwitch"
+                                src="/icons/user-circle.svg" alt="user-circle-icon" /></a>
                         <ul class="dropdown-menu p-0" id="navProfileDropdown">
                             <li>
                                 <div class="container p-0">
                                     <div class="m-2 px-2">
-                                        {{name}} <span class="text-muted fs-6"> {{type}} </span>
+                                        {{session_name}} <span class="text-muted fs-6"> {{session_type}} </span>
                                     </div>
                                     <div class="m-2 px-2">
-                                        {{email}}
+                                        {{session_email}}
                                     </div>
                                     <div id="switch" class="m-4">
                                         <div id="circle"></div>
                                     </div>
+                                    {{#if (eq session_type 'Student')}}
                                     <div class="my-auto d-flex justify-content-center btnNavbar">
-                                        <a class="w-100" href="/logout"><button
+                                        <a class="w-100 ps-0" href=" /transcript"><button
+                                                class="mb-0 py-2 w-100 btnNavbar">Generate Transcripts</button></a>
+                                    </div>
+                                    {{/if}}
+                                    <div class="my-auto d-flex justify-content-center btnNavbar">
+                                        <a class="w-100 ps-0" href=" /logout"><button
                                                 class="mb-0 py-2 w-100 btnNavbar">Logout</button></a>
                                     </div>
 
@@ -68,8 +93,8 @@
                 data-bs-autohide="false">
                 <div class="toast-header">
                     <img src="/icons/error.svg" alt="errorIcon">
-                    <strong class="me-auto" id="toastHeadMsg">Bootstrap</strong>
-                    <small>Just Now</small>
+                    <strong class="me-auto ms-2" id="toastHeadMsg">Bootstrap</strong>
+                    <small class="toast-timestamp">Just Now</small>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -82,10 +107,6 @@
 
 
     <!-- JS Imports -->
-    <script language="JavaScript" type="text/javascript" src="/scripts/jquery.min.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/scripts/bootstrap.bundle.min.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/scripts/bootstrap-select.min.js"></script>
-    <script language="JavaScript" type="text/javascript" src="/scripts/styles.js"></script>
     <script language="JavaScript" type="text/javascript" src="/scripts/verification.js"></script>
     <script language="JavaScript" type="text/javascript" src="/scripts/request.js"></script>
     {{#if script}}

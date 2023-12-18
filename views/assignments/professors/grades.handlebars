@@ -1,0 +1,53 @@
+<div class="container-fluid">
+    <h2>
+        <div class="d-flex mb-2">
+            <div class="my-auto"><img class="iconSwitch" src="/icons/grade.svg" alt="moduleIcon"> Grades
+            </div>
+            <div class="my-auto text-muted fs-5" id="reportCount"></div>
+            <div class="form-floating ms-auto fs-6">
+                <input class="form-control tabledisplay" type="text" placeholder="" id="searchInput" />
+                <label for="#searchInput"><img class="iconSwitch" src="/icons/search.svg" alt="grade icon">
+                    Search</label>
+            </div>
+        </div>
+    </h2>
+    <div class="table-responsive glassEffect my-4">
+        <table class="table table-striped h-100 mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">Student Name</th>
+                    <th scope="col">Grade</th>
+                    <th scope="col">Letter Grade</th>
+                    <th scope="col">Finalize</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each students}}
+                <tr class="searchData">
+                    <td><a href="{{this._id}}">{{this.firstname}} {{this.lastname}}</a></td>
+                    <td>{{this.grade}}</td>
+                    <td>{{this.lettergrade}}</td>
+                    <td>
+                        <form class="submitform">
+                            <input type="hidden" name="studentid" value="{{this._id}}">
+                            <input type="hidden" name="grade" value="{{this.lettergrade}}">
+                            <input type="hidden" name="csrf" value="{{_csrf}}">
+                            {{#if this.finalgrade}}
+                            <button disabled type="submit" class="btn btn-secondary">Finalize Grade</button>
+
+                            {{else}}
+                            <button type="submit" class="btn btn-info">Finalize Grade</button>
+
+                            {{/if}}
+
+                        </form>
+                    </td>
+                </tr>
+                {{/each}}
+
+            </tbody>
+
+        </table>
+    </div>
+
+</div>

@@ -7,9 +7,6 @@ const router = Router();
 
 router.get("/", (req, res) => {
   let renderObjs = {
-    name: req.session.name,
-    type: req.session.type,
-    email: req.session.email,
     script: "login",
   };
   res.render("public/login", renderObjs);
@@ -27,6 +24,7 @@ router.post("/", async (req, res) => {
       req.session.type = result.type;
       req.session.name = result.name;
       req.session.email = result.email;
+      req.session.darkmode = result.preferences.darkmode || 0;
     }
 
     res.json({ loggedin: result.successful });

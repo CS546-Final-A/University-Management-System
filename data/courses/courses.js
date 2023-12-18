@@ -17,6 +17,18 @@ export const getAllInstructors = async () => {
   return instructorList;
 };
 
+export const getInstructorById = async (instructorId) => {
+  instructorId = verify.validateMongoId(instructorId, "instructorId");
+  const userCollection = await users();
+  const instructor = await userCollection.findOne({
+    _id: instructorId,
+    type: "Professor",
+  });
+  if (!instructor) {
+    throwerror("Instructor does not exists");
+  } else return instructor;
+};
+
 export const getUniqueInstructorNamesandId = async () => {
   const userCollection = await users();
   const instructors = await userCollection
@@ -79,7 +91,7 @@ export const getDepartmentById = async (departmentId) => {
 };
 
 export const registerDepartment = async (departmentName) => {
-  const newDepartment = verify.string(departmentName, "departmentName");
+  departmentName = verify.string(departmentName, "departmentName");
 
   const departmentCollection = await departments();
   const department = await departmentCollection.findOne({
@@ -88,9 +100,11 @@ export const registerDepartment = async (departmentName) => {
   if (department) {
     throwerror("Department already exists!");
   } else {
+    const newDepartment = {
+      departmentName: departmentName,
+    };
     const insertInfo = await departmentCollection.insertOne(newDepartment);
-    const newId = insertInfo.insertedId.toString();
-    return newId;
+    return insertInfo;
   }
 };
 
@@ -100,6 +114,9 @@ export const updateDepartment = async (departmentId, departmentName) => {
   let department = await departmentCollection.findOne({
     _id: departmentId,
   });
+  if (!department) {
+    throw { status: 404, message: "Department not found" };
+  }
   department.departmentName = departmentName;
   const updateInfo = await departmentCollection.updateOne(
     { _id: department._id },
@@ -108,7 +125,7 @@ export const updateDepartment = async (departmentId, departmentName) => {
   );
   if (!updateInfo) throwerror("Department was not updated successfully!");
 
-  return await getDepartmentById(departmentId);
+  return updateInfo;
 };
 
 export const deleteDepartment = async (departmentId) => {
@@ -159,37 +176,22 @@ export const getAllCourses = async (
       },
       {
         $match: {
-          sections: {
-            $elemMatch: {
-              sectionYear: year,
-              sectionSemester: semester,
-            },
-          },
+          courseSemester: semester,
+          courseYear: year,
         },
       },
       {
         $project: {
           _id: 1,
-          // Include all other fields from the "courses" collection
           courseName: 1,
           courseNumber: 1,
           courseDepartmentId: 1,
           courseCredits: 1,
-          sections: {
-            $filter: {
-              input: "$sections",
-              as: "section",
-              cond: {
-                $and: [
-                  { $eq: ["$$section.sectionYear", year] },
-                  { $eq: ["$$section.sectionSemester", semester] },
-                ],
-              },
-            },
-          },
+          courseSemester: 1,
+          courseYear: 1,
+          sections: 1,
           departmentName: "$department.departmentName",
           courseDescription: 1,
-          // Include all fields from the "sections" collection
           instructors: "$instructor",
         },
       },
@@ -253,14 +255,18 @@ export const registerCourse = async (
   courseName,
   courseDepartmentId,
   courseCredits,
-  courseDescription
+  courseDescription,
+  courseSemester,
+  courseYear
 ) => {
   let newCourse = validateCourse(
     courseNumber,
     courseName,
     courseDepartmentId,
     courseCredits,
-    courseDescription
+    courseDescription,
+    courseSemester,
+    courseYear
   );
 
   const courseCollection = await courses();
@@ -278,19 +284,63 @@ export const registerCourse = async (
   if (!department) {
     throwErrorWithStatus(400, "Department not found");
   }
+  newCourse.sections = [];
   const insertInfo = await courseCollection.insertOne(newCourse);
   return insertInfo;
 };
 export const getCourseById = async (courseId) => {
   courseId = verify.validateMongoId(courseId, "courseId");
+  // console.log(courseId);
   const courseCollection = await courses();
-  const existingCourse = await courseCollection.findOne({
-    _id: courseId,
-  });
+  const existingCourse = await courseCollection
+    .aggregate([
+      { $match: { _id: courseId } },
+      {
+        $lookup: {
+          from: "departments",
+          localField: "courseDepartmentId",
+          foreignField: "_id",
+          as: "department",
+        },
+      },
+      {
+        $unwind: "$department",
+      },
 
-  if (!existingCourse) {
-    throwErrorWithStatus(400, `Course with ${courseId} not found`);
+      {
+        $project: {
+          courseNumber: 1,
+          courseName: 1,
+          courseCredits: 1,
+          courseDescription: 1,
+          sections: 1,
+          courseDepartmentId: {
+            _id: "$department._id",
+            name: "$department.departmentName",
+          },
+        },
+      },
+    ])
+    .toArray();
+  try {
+    for (let sectionIndex in existingCourse[0].sections) {
+      let instructorId =
+        existingCourse[0].sections[sectionIndex].sectionInstructor;
+      let instructor = await getInstructorById(instructorId.toString());
+      let sectionInstructor = {
+        _id: instructor._id,
+        name: instructor.firstname + " " + instructor.lastname,
+      };
+      existingCourse[0].sections[sectionIndex].sectionInstructor =
+        sectionInstructor;
+    }
+  } catch (e) {
+    if (!existingCourse.length) {
+      throwErrorWithStatus(404, `Course with ${courseId} not found`);
+    }
+    throw "Internal Server Error";
   }
+
   return existingCourse;
 };
 
@@ -375,13 +425,13 @@ export const getSectionsByCourseId = async (courseId) => {
 };
 
 export const getSectionById = async (sectionId) => {
-  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  sectionId = verify.validateMongoId(sectionId.toString(), "sectionId");
   const courseCollection = await courses();
   const course = await courseCollection.findOne({
     "sections.sectionId": sectionId,
   });
   if (!course) {
-    throwErrorWithStatus(400, `Section was not found!`);
+    throwErrorWithStatus(404, `Section was not found!`);
   }
   const section = course.sections.find(
     (section) => section.sectionId.toString() === sectionId.toString()
@@ -426,6 +476,40 @@ export const getSectionsByIds = async (sectionIds) => {
   return sections;
 };
 
+export const getStudentsInSection = async (sectionId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  const courseCollection = await courses();
+  const course = await courseCollection.findOne({
+    "sections.sectionId": sectionId,
+  });
+  if (!course) {
+    throwErrorWithStatus(404, `Section was not found!`);
+  }
+  const section = course.sections.find(
+    (section) => section.sectionId.toString() === sectionId.toString()
+  );
+
+  const userIds = section.students;
+  const userCollection = await users();
+  const userList = await userCollection
+    .find({ _id: { $in: userIds } })
+    .toArray();
+
+  const mappedStudents = section.students.map((student) => {
+    const user = userList.find(
+      (user) => user._id.toString() === student.toString()
+    );
+    return {
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      studentId: student,
+    };
+  });
+
+  return mappedStudents;
+};
+
 export const registerSection = async (
   courseId,
   sectionName,
@@ -435,8 +519,6 @@ export const registerSection = async (
   sectionEndTime,
   sectionDay,
   sectionCapacity,
-  sectionYear,
-  sectionSemester,
   sectionLocation,
   sectionDescription
 ) => {
@@ -450,15 +532,31 @@ export const registerSection = async (
     sectionEndTime,
     sectionDay,
     sectionCapacity,
-    sectionYear,
-    sectionSemester,
     sectionLocation,
     sectionDescription
   );
 
   const courseCollection = await courses();
+  const userCollection = await users();
+  const existingSection = await courseCollection.findOne({
+    _id: courseId,
+    "sections.sectionName": newSection.sectionName,
+  });
+
+  if (existingSection)
+    throwErrorWithStatus(400, "Section with the same name already exists");
+
   newSection.sectionId = new ObjectId();
-  const updateInfo = await courseCollection.update(
+  newSection.students = [];
+
+  const userupdate = await userCollection.updateOne(
+    {
+      _id: newSection.sectionInstructor,
+    },
+    { $push: { registeredCourses: newSection.sectionId.toString() } }
+  );
+
+  const updateInfo = await courseCollection.updateOne(
     { _id: courseId },
     { $push: { sections: newSection } }
   );
@@ -474,26 +572,24 @@ export const registerSection = async (
 export const updateSection = async (
   sectionId,
   sectionName,
+  sectionInstructor,
   sectionType,
   sectionStartTime,
   sectionEndTime,
   sectionDay,
   sectionCapacity,
-  sectionYear,
-  sectionSemester,
   sectionLocation,
   sectionDescription
 ) => {
   sectionId = verify.validateMongoId(sectionId, "sectionId");
   let updatedSection = validateSection(
     sectionName,
+    sectionInstructor,
     sectionType,
     sectionStartTime,
     sectionEndTime,
     sectionDay,
     sectionCapacity,
-    sectionYear,
-    sectionSemester,
     sectionLocation,
     sectionDescription
   );
@@ -512,7 +608,15 @@ export const updateSection = async (
     { "sections.sectionId": sectionId },
     {
       $set: {
-        "sections.$": updatedSection,
+        "sections.$.sectionName": updatedSection.sectionName,
+        "sections.$.sectionInstructor": updatedSection.sectionInstructor,
+        "sections.$.sectionType": updatedSection.sectionType,
+        "sections.$.sectionStartTime": updatedSection.sectionStartTime,
+        "sections.$.sectionEndTime": updatedSection.sectionEndTime,
+        "sections.$.sectionDay": updatedSection.sectionDay,
+        "sections.$.sectionCapacity": updatedSection.sectionCapacity,
+        "sections.$.sectionLocation": updatedSection.sectionLocation,
+        "sections.$.sectionDescription": updatedSection.sectionDescription,
       },
     },
     { returnDocument: "after" }
@@ -526,18 +630,18 @@ export const updateSection = async (
   return updateInfo;
 };
 
-export const deletesection = async (sectionId) => {
+export const deleteSection = async (sectionId) => {
   sectionId = verify.validateMongoId(sectionId, "sectionId");
 
   const courseCollection = await courses();
-  const section = await courseCollection.findOne({
+  const course = await courseCollection.findOne({
     "sections.sectionId": sectionId,
   });
 
-  if (!section) {
+  if (!course) {
     throwErrorWithStatus(400, `Section was not found!`);
   }
-  const deletionInfo = db.courseCollection.updateOne(
+  const deletionInfo = await courseCollection.updateOne(
     { "sections.sectionId": sectionId },
     { $pull: { sections: { sectionId: sectionId } } }
   );
@@ -545,32 +649,216 @@ export const deletesection = async (sectionId) => {
   if (!deletionInfo) {
     throwerror("Section was not deleted successfully!");
   }
+  deletionInfo.courseId = course._id;
+  return deletionInfo;
+};
+
+export const enrollSection = async (sectionId, userId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  userId = verify.validateMongoId(userId, "userId");
+
+  const courseCollection = await courses();
+  const course = await courseCollection.findOne({
+    "sections.sectionId": sectionId,
+  });
+
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+
+  const section = course.sections.find(
+    (section) => section.sectionId.toString() === sectionId.toString()
+  );
+
+  // Capacity Check
+  if (section?.students?.length >= section.sectionCapacity) {
+    throwErrorWithStatus(400, `Section is at maximum capacity. Cannot enroll.`);
+  }
+  // Enrollment Check
+  if (section.students.includes(userId)) {
+    throwErrorWithStatus(400, `User is already enrolled in this section.`);
+  }
+  const userCollection = await users();
+  const user = await userCollection.findOne({
+    _id: userId,
+    type: "Student",
+  });
+  if (!user) {
+    throwErrorWithStatus(400, `User is not a student. Cannot enroll.`);
+  }
+
+  // Section Enrollment Check
+  const enrolledInSection = course.sections.find((s) =>
+    user.registeredCourses.includes(s.sectionId.toString())
+  );
+
+  if (enrolledInSection) {
+    throwErrorWithStatus(
+      400,
+      `User is already enrolled in a section within this course. Cannot enroll.`
+    );
+  }
+
+  // Time check
+  const conflictingSections = await userCollection
+    .find({
+      _id: userId,
+      registeredCourses: { $in: course.sections.map((s) => s.sectionId) },
+    })
+    .toArray();
+
+  for (const enrolledSection of conflictingSections) {
+    for (const enrolledSectionId of enrolledSection.registeredCourses) {
+      const enrolledCourse = await courseCollection.findOne({
+        "sections.sectionId": enrolledSectionId,
+      });
+
+      const enrolledSectionInCourse = enrolledCourse?.sections?.find(
+        (s) => s.sectionId.toString() === enrolledSectionId.toString()
+      );
+      if (
+        enrolledSectionInCourse &&
+        enrolledSectionInCourse.sectionDay === section.sectionDay &&
+        isTimeSlotOverlap(
+          section.sectionStartTime,
+          section.sectionEndTime,
+          enrolledSectionInCourse.sectionStartTime,
+          enrolledSectionInCourse.sectionEndTime
+        )
+      ) {
+        throwErrorWithStatus(
+          400,
+          `User is already enrolled in a conflicting time slot. Cannot enroll.`
+        );
+      }
+    }
+  }
+
+  section.students.push(userId);
+
+  await userCollection.updateOne(
+    { _id: userId },
+    {
+      $push: {
+        registeredCourses: sectionId.toString(),
+      },
+    }
+  );
+  const updateResult = await courseCollection.updateOne(
+    { "sections.sectionId": sectionId },
+    {
+      $set: {
+        "sections.$": section,
+      },
+    }
+  );
+
+  if (updateResult.modifiedCount !== 1) {
+    throwErrorWithStatus(400, `Failed to enroll user.`);
+  }
+};
+
+export const discardSection = async (sectionId, userId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  userId = verify.validateMongoId(userId, "userId");
+
+  const courseCollection = await courses();
+  const userCollection = await users();
+
+  const course = await courseCollection.findOne({
+    "sections.sectionId": sectionId,
+  });
+
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
+  }
+
+  const section = course.sections.find(
+    (section) => section.sectionId.toString() === sectionId.toString()
+  );
+
+  if (
+    !section.students.some(
+      (enrolledUserId) => enrolledUserId.toString() === userId.toString()
+    )
+  ) {
+    throwErrorWithStatus(400, `User is not enrolled in this section.`);
+  }
+
+  await userCollection.updateOne(
+    { _id: userId },
+    {
+      $pull: {
+        registeredCourses: sectionId.toString(),
+      },
+    }
+  );
+
+  section.students = section.students.filter(
+    (enrolledUserId) => enrolledUserId.toString() !== userId.toString()
+  );
+
+  const updateResult = await courseCollection.updateOne(
+    { "sections.sectionId": sectionId },
+    {
+      $set: {
+        "sections.$": section,
+      },
+    }
+  );
+
+  if (updateResult.modifiedCount !== 1) {
+    throwErrorWithStatus(400, `Failed to discard user from the section.`);
+  }
+};
+
+const isTimeSlotOverlap = (start1, end1, start2, end2) => {
+  return !(end1 < start2 || start1 > end2);
 };
 
 export const getUniqueSectionYearandSemester = async () => {
   const courseCollection = await courses();
-  const courseList = await courseCollection
-    .find({
-      $and: [
-        { "sections.sectionYear": { $exists: true } },
-        { "sections.sectionSemester": { $exists: true } },
-      ],
-    })
-    .project({
-      sections: { sectionYear: 1, sectionSemester: 1 },
-    })
-    .toArray();
+  const distinctYear = await courseCollection.distinct("courseYear");
+  const distinctSemester = await courseCollection.distinct("courseSemester");
+  return [distinctYear, distinctSemester];
+};
 
-  const uniqueYear = new Set([]);
-  const uniqueSemester = new Set([]);
+export const checkStudentInSection = async (sectionId, studentId) => {
+  sectionId = verify.validateMongoId(sectionId, "sectionId");
+  studentId = verify.validateMongoId(studentId, "studentId");
 
-  for (const sections of courseList) {
-    for (const section of sections.sections) {
-      // console.log(section);
-      uniqueYear.add(section.sectionYear);
-      uniqueSemester.add(section.sectionSemester);
-    }
+  const courseCollection = await courses();
+  const course = await courseCollection.findOne(
+    {
+      "sections.sectionId": sectionId,
+    },
+    {
+      $match: {
+        sections: { $elemMatch: { sectionId: sectionId, students: studentId } },
+      },
+    },
+    { $project: { sections: 1 } }
+  );
+  if (!course) {
+    throwErrorWithStatus(400, `Section was not found!`);
   }
 
-  return [uniqueYear, uniqueSemester];
+  return course;
+};
+
+export const checkEnrollment = async (sectionId, studentId) => {
+  try {
+    sectionId = verify.validateMongoId(sectionId.toString(), "sectionId");
+    studentId = verify.validateMongoId(studentId, "studentId");
+
+    const courseCollection = await courses();
+    const enrollmentData = await courseCollection.findOne({
+      "sections.sectionId": sectionId,
+      "sections.students": studentId,
+    });
+
+    return !!enrollmentData;
+  } catch (error) {
+    return false;
+  }
 };

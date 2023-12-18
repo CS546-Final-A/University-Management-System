@@ -1,36 +1,54 @@
 import { Router } from "express";
 import * as courseData from "../data/courses/courses.js";
 import getUserByID from "../data/users/getUserInfoByID.js";
+import * as prefRoute from "../data/users/setPreference.js";
+import routeError from "./routeerror.js";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
-  const { name, type, email, userid } = req.session;
-  const renderObjs = { name, type, email };
+router
+  .get("/", async (req, res) => {
+    try {
+      if (req.session.type === "Admin") {
+        return res.render("admin/dashboard");
+      }
 
-  if (type === "Admin") {
-    return res.render("admin/dashboard", renderObjs);
-  }
+      const userInfo = await getUserByID(req.session.userid);
+      const registeredCourses = userInfo.registeredCourses || [];
 
-  const userInfo = await getUserByID(userid);
-  const registeredCourses = userInfo.registeredCourses || [];
+      const requestedSections = await courseData.getSectionsByIds(
+        registeredCourses.map((course) => course)
+      );
 
-  const requestedSections = await courseData.getSectionsByIds(
-    registeredCourses.map((course) => course)
-  );
+      let renderObjs = {};
+      const workspace = requestedSections.map((section) => {
+        return {
+          courseName: section.courseName,
+          courseNumber: section.courseNumber,
+          sectionType: section.sectionType,
+          sectionName: section.sectionName,
+          sectionId: section.sectionId.toString(),
+        };
+      });
 
-  const workspace = requestedSections.map((section) => {
-    return {
-      courseName: section.courseName,
-      courseNumber: section.courseNumber,
-      sectionType: section.sectionType,
-      sectionName: section.sectionName,
-      sectionId: section.sectionId.toString(),
-    };
+      renderObjs.workspace = workspace;
+      return res.render("public/dashboard", renderObjs);
+    } catch (e) {
+      routeError(res, e);
+    }
+  })
+  .post("/", async (req, res) => {
+    try {
+      const result = await prefRoute.setTheme(
+        req.session.userid,
+        req.body.darkmode
+      );
+      req.session.darkmode = req.body.darkmode;
+
+      res.status(200).json({ message: "Theme updated successfully", result });
+    } catch (e) {
+      return res.status(e.status).json(e.message);
+    }
   });
-
-  renderObjs.workspace = workspace;
-  return res.render("public/dashboard", renderObjs);
-});
 
 export default router;

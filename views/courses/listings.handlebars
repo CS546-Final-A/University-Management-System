@@ -1,72 +1,83 @@
 <link rel="stylesheet" href="/styles/courses.css">
-<h1>Course Listing</h1>
-<div class="course-listing">
+<h2><img class="iconSwitch" src="/icons/list.svg" alt="moduleIcon"> Course Listing</h2>
+
+<div class="d-flex mt-4">
+    <div class="filter col-md-2 me-5">
+        <div class="form-floating">
+            <input class="form-control" type="text" id="filter-input" placeholder="Enter course name">
+            <label for="filter-input">Filter:</label>
+        </div>
 
 
-    <div class="filter">
-        <label for="filter-input">Filter:</label>
-        <input type="text" id="filter-input" placeholder="Enter course name">
-        <br>
-        <label for="department-filter">Department:</label>
-        <select id="department-filter">
-            <option value="">All</option>
-            {{#each courses.uniqueDepartmentNames}}
-            <option value="{{this.id}}">{{this.name}}</option>
-            {{/each}}
-        </select>
-        <br>
+        <div class="mb-3">
+            <label for="department-filter">Department:</label>
+            <select id="department-filter" class="selectpicker form-control" data-live-search="true">
+                <option value="">All</option>
+                {{#each courses.uniqueDepartmentNames}}
+                <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
 
+        <div class="mb-3">
+            <label for="instructor-filter">Instructor:</label>
+            <select id="instructor-filter" class="selectpicker form-control" data-live-search="true">
+                <option value="">All</option>
+                {{#each courses.uniqueInstructors}}
+                <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
 
-        <label for="instructor-filter">Instructor:</label>
-        <select id="instructor-filter">
-            <option value="">All</option>
-            {{#each courses.uniqueInstructors}}
-            <option value="{{this.id}}">{{this.name}}</option>
-            {{/each}}
-        </select>
-        <br>
-        <label for="delivery-mode-filter">Delivery Mode:</label>
-        <select id="delivery-mode-filter">
-            <option value="">All</option>
-            {{#each courses.uniqueSectionTypes}}
-            <option value="{{this}}">{{this}}</option>
-            {{/each}}
-        </select>
-        <br>
-        <label for="meeting-days-filter">Meeting Days:</label>
-        <select id="meeting-days-filter">
-            <option value="">All</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-        </select>
-        <button id="filter-button">Apply</button>
+        <div class="mb-3"><label for="delivery-mode-filter">Delivery Mode:</label>
+            <select id="delivery-mode-filter" class="selectpicker form-control" data-live-search="true">
+                <option value="">All</option>
+                {{#each courses.uniqueSectionTypes}}
+                <option value="{{this}}">{{this}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="meeting-days-filter">Meeting Days:</label>
+            <select id="meeting-days-filter" class="selectpicker form-control" data-live-search="true">
+                <option value="">All</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+            </select>
+        </div>
+
+        <button class="btnSubmit w-100 py-1" id="filter-button">Apply</button>
     </div>
     <div class="courses">
-        
+        {{#if courses.found }}
         {{#each courses}}
-        <div class="course">
-            <div class="details">
-                <h2 class="courseRedirect" data-id="{{this._id}}">{{this.courseNumber}} -
-                        {{this.courseName}}</a></h2>
+        <div class="card glassEffect">
+            <div class="card-header glassEffect courseRedirect" data-id="{{this._id}}">{{this.courseNumber}} -
+                {{this.courseName}}</div>
+            <div class="card-body">
                 <p>{{this.courseDescription}}</p>
                 <p>Department: {{this.departmentName}}</p>
-                
                 <p>Credits: {{this.courseCredits}}</p>
-                {{!-- <p>Delivery Mode: {{this.delivery_mode}}</p>
-                <p>Status: {{this.Status}}</p> --}}
-            </div>
-            <div class="actions">
-                <a class="courseRedirect" data-id="{{this._id}}">View</a>
+                <div class="actions"><a class="courseRedirect btn btn-info py-1 px-4 my-2"
+                        data-id="{{this._id}}">View</a>
+
+                </div>
             </div>
         </div>
         {{/each}}
+        {{else}}
+        <div class="card glassEffect">
+            <div class="card-header glassEffect">No courses found</div>
+            <div class="card-body">
+                <p>There are no courses that match your search criteria. Try something else</p>
+            </div>
 
-        
+
+        </div>
+        {{/if}}
     </div>
-    <script>
-        console.log("{{courses.year}}")
-    </script>
 </div>

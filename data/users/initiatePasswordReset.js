@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { passwordresets, users } from "../../config/mongoCollections.js";
 import verify from "../../data_validation.js";
 
-import sendPasswordResetEmail from "../emails/sendPasswordResetEmail.js";
+import { sendPasswordResetEmail } from "../emails/sendPasswordResetEmail.js";
 
 async function initiatePasswordReset(email) {
   email = verify.email(email);
@@ -12,7 +12,7 @@ async function initiatePasswordReset(email) {
   const resetscol = await passwordresets();
 
   const user = await usercol.findOne(
-    { email: email },
+    { email: email, status: "Active" },
     { projection: { _id: 1 } }
   );
 

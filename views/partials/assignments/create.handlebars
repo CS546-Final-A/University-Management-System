@@ -1,0 +1,86 @@
+<script>
+
+
+
+
+    $(document).ready(function () {
+
+
+
+        $("#createAssignmentForm").submit(function (e) {
+            e.preventDefault();
+
+            const assignmentName = $("#assignmentName").val();
+            const assignmentDescription = $("#assignmentDescription").val();
+            const assignmentWeight = $("#assignmentWeight").val();
+            const assignmentDueDate = $("#assignmentDueDate").val();
+            const assignmentSectionId = $("#assignmentSectionId").val();
+            const submissionLimit = $("#submissionLimit").val();
+            const assignmentMaxScore = $("#assignmentMaxScore").val();
+            try {
+                validateAssignment(
+
+                    assignmentName,
+                    assignmentDescription,
+                    assignmentWeight,
+                    assignmentDueDate,
+                    assignmentSectionId,
+                    submissionLimit,
+                    assignmentMaxScore
+                );
+                e.currentTarget.submit();
+            } catch (err) {
+                alert(err)
+            }
+
+        });
+
+        const validateAssignment = (
+
+            assignmentName,
+            assignmentDescription,
+            assignmentWeight,
+            assignmentDueDate,
+            assignmentSectionId,
+            submissionLimit,
+            assignmentMaxScore
+        ) => {
+
+            if (!assignmentName) {
+                throw ("Invalid assignment name")
+            }
+            if (!assignmentDescription) {
+                throw ("Invalid assignment description")
+            }
+            if (typeof assignmentName !== "string" || typeof assignmentDescription !== "string") {
+                throw ("Invalid assignment name or description")
+            }
+
+            if (!assignmentWeight) {
+                throw ("Invalid assignment weight")
+            }
+            assignmentWeight = parseFloat(assignmentWeight);
+
+            if (assignmentWeight < 0 || assignmentWeight > 100) {
+                throw ("Invalid assignment weight")
+            }
+            assignmentMaxScore = parseInt(assignmentMaxScore);
+            if (
+                !assignmentMaxScore ||
+                typeof assignmentMaxScore !== "number" ||
+                assignmentMaxScore < 0) {
+                throw ("Invalid assignment max score")
+            }
+            if (assignmentDueDate < Date.now()) {
+                throw ("Invalid assignment due date");
+            }
+            submissionLimit = parseInt(submissionLimit);
+
+            if (!submissionLimit || typeof submissionLimit !== "number" ||
+                submissionLimit < 0) {
+                throw ("Invalid submission limit")
+            } return true;
+        };
+    });
+
+</script>
