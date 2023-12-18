@@ -28,8 +28,14 @@ export const validateCourse = (
   );
   courseCredits = verify.numberInteger(courseCredits, "courseCredits");
   courseDescription = verify.string(courseDescription, "courseDescription");
-  courseSemester = verify.semester(courseSemester, "courseSemester");
-  courseYear = verify.year(courseYear, "courseYear");
+  
+  if (courseSemester) {
+    courseSemester = verify.semester(courseSemester, "courseSemester");
+  }
+  
+  if (courseYear) {
+    courseYear = verify.year(courseYear, "courseYear");
+  }
 
   return {
     courseNumber,

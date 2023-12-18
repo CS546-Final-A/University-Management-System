@@ -1,8 +1,44 @@
 <link rel="stylesheet" href="/styles/courses.css">
 <link rel="stylesheet" href="/styles/error.css">
-<h2>Course Registration {{{semester}}}-{{{year}}}</h2>
+<h2>Course {{#if editMode}}Update{{else}}Registration{{/if}} {{{course.courseSemester}}}-{{{course.courseYear}}}</h2>
+{{#if editMode}}
+<div class="courseRegistrationContainer container mt-5">
+    <form id="courseRegistrationForm" class="courseRegistrationForm">
+        <input type="text" id="courseId" name="courseId" value="{{course.courseId}}" required hidden>
 
-<div class="courseRegistrationContainer">
+        <label for="courseNumber">Course Number:</label>
+        <input type="text" id="courseNumber" name="courseNumber" value="{{course.courseNumber}}" required>
+
+        <label for="courseSemester" hidden>Course Semester:</label>
+        <input type="text" id="courseSemester" name="courseSemester" value="{{course.courseSemester}}" required hidden>
+        <label for="courseYear" hidden>Course Year:</label>
+        <input type="text" id="courseYear" name="courseYear" value="{{course.courseYear}}"  required hidden>
+
+        <label for="courseName">Course Name:</label>
+        <input type="text" id="courseName" name="courseName" value="{{course.courseName}}" required>
+
+        <label for="courseDepartmentId">Department:</label>
+        <select id="courseDepartmentId">
+            {{#each uniqueDepartmentNames}}
+            <option value="{{this.id}}" {{#if (eq ../course.departmentId this.id)}}selected{{/if}}>{{this.name}}</option>
+            {{/each}}
+        </select>
+
+        <label for="courseCredits">Credits:</label>
+        <input type="number" id="courseCredits" name="courseCredits" value="{{course.courseCredits}}" required>
+
+        <label for="courseDescription">Description:</label>
+        <textarea id="courseDescription" name="courseDescription" required>{{course.courseDescription}}</textarea>
+        <input type="hidden" id="csrf" value="{{_csrf}}">
+        <div id="error"></div>
+        <div id="status"></div>
+        <div>
+            <button type="button" onclick="updateSubmit()">Update Course</button>
+        </div>
+    </form>
+</div>
+{{else}}
+<div class="courseRegistrationContainer container mt-5">
     <form id="courseRegistrationForm" class="courseRegistrationForm">
         <label for="courseNumber">Course Number:</label>
         <input type="text" id="courseNumber" name="courseNumber" required>
@@ -37,3 +73,5 @@
         </div>
     </form>
 </div>
+{{/if}}
+
