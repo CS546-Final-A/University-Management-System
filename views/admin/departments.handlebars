@@ -19,7 +19,7 @@
                 <td>{{departmentName}}</td>
                 <td>
                     <!-- Edit button to open the Bootstrap modal -->
-                    <button id="editModalButton" type="button" class="btn btn-primary"
+                    <button id="editModalButton{{_id}}" type="button" class="btn btn-primary"
                         onclick="openEditModal('{{_id}}', '{{departmentName}}')">Edit</button>
 
                     <!-- Delete button with a form to submit the delete request -->
@@ -87,7 +87,7 @@
                 <!-- Modal Body -->
                 <div class="modal-body">
                     <!-- Add department form -->
-                    <form id="addDepartmentForm" method="POST" action="/configuration/departments/register">
+                    <form id="editDepartmentForm" method="POST" action="/configuration/departments/register">
                         <div class="form-group">
                             <input type="text" class="form-control" id="editDepartmentId" name="departmentId" required
                                 hidden>
