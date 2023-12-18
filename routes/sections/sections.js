@@ -40,6 +40,12 @@ router.use("/:sectionID*", async (req, res, next) => {
     res.locals.sectionID = req.params.sectionID;
     res.locals.layout = "sidebar";
     const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
+    const section = await courseDataFunctions.getSectionById(
+      res.locals.sectionID
+    );
+
+    res.locals.courseId = section.courseId.toString();
+
     if (await belongsincourse(req.session.userid.toString(), sectionID)) {
       next();
     } else {
