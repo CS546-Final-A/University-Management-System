@@ -5,7 +5,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "seed": "node seed/importData.js"
   },
   "repository": {
     "type": "git",

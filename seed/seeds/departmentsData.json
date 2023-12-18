@@ -1,0 +1,18 @@
+[{
+  "_id": {
+    "$oid": "657f93aa8516a518ea54e32a"
+  },
+  "departmentName": "Computer Science"
+},
+{
+  "_id": {
+    "$oid": "657f93b08516a518ea54e32b"
+  },
+  "departmentName": "Business"
+},
+{
+  "_id": {
+    "$oid": "657f93b58516a518ea54e32c"
+  },
+  "departmentName": "Art"
+}]
