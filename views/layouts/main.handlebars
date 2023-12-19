@@ -74,7 +74,7 @@
             </div>
 
             {{/if}}
-           
+
             <div class="mt-auto">
                 <div class="fs-5 headSidebar glassEffect">{{session_type}}</div>
                 <ul class="list-unstyled components2 mt-auto">
@@ -136,9 +136,18 @@
     <script>
         $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {
+
+                sidebarToggle();
+            });
+
+            if (window.location.pathname === "/login/" || window.location.pathname === "/login") {
+                sidebarToggle();
+            }
+
+            function sidebarToggle() {
                 $('#sidebar').toggleClass('active');
                 $('#content').toggleClass('active');
-            });
+            }
         });
     </script>
     <script src="/scripts/verification.js"></script>
