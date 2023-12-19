@@ -1,6 +1,6 @@
 # University-Management-System
 
-##Overview
+## Overview
 
 Welcome to our final project for class CS 546! This project is designed to facilitate seamless communication and interaction among three primary roles: Admin, Professor, and Student. Below, you'll find an information on how to start and about the key features and functionalities.
 
