@@ -1,7 +1,10 @@
 # University-Management-System
 
-Our final project for CS 546
+Overview
 
+Welcome to our final project for class CS 546! This project is designed to facilitate seamless communication and interaction among three primary roles: Admin, Professor, and Student. Below, you'll find an information on how to start and about the key features and functionalities.
+
+## Getting Started
 To run:
 
 ```
@@ -24,3 +27,73 @@ SiteDomain="The url from which the site can be accessed"
 ```
 
 Extra Features : PDF transcript generator and emails
+
+## Features
+
+### Admin
+
+1. **Create User**
+    - Admins have the authority to create user accounts for Professors and Students.
+
+2. **Register, Edit Courses**
+    - Admins can manage the course catalog by registering new courses and editing existing ones.
+
+
+3. **Add, Delete Section to Courses**
+    - Admins can organize courses by adding or deleting sections.
+
+4. **Assign Professor to Section**
+    - Admins can assign Professors to specific sections of courses.
+
+5. **Edit Section**
+    - Admins can edit the details of existing sections, such as the schedule or location.
+
+6. **Manage Department Lookup**
+    - Admins can oversee and update department-related information.
+
+### Professor
+
+1. **View Courses on Dashboard**
+    - Professors can see the list of courses they are assigned to teach on their dashboard.
+
+2. **Create Modules in Assigned Section**
+    - Professors can create modules within the sections they are assigned to.
+
+3. **Create Assignments**
+    - Professors can create assignments for students within their assigned sections.
+
+4. **Grade Students**
+    - Professors can review and grade assignments submitted by students.
+
+5. **Add Learning Material**
+    - Professors can upload learning materials for students.
+
+### Student
+
+1. **View Enrolled Courses on Dashboard**
+    - Students can see a list of courses they are currently enrolled in on their dashboard.
+
+2. **Enroll for New Courses**
+    - Students can enroll in additional courses.
+
+3. **View Course Details**
+    - Students can access detailed information about each course they are enrolled in.
+
+4. **View and Submit Assignments**
+    - Students can view assignments created by professors and submit their completed work.
+
+5. **View Grades**
+    - Students can view their grades for completed assignments.
+
+6. **Read Course Learning Materials**
+    - Students can access and read learning materials uploaded by professors.
+
+7. **Generate Transcripts**
+    - Students can generate transcripts containing their academic records and grades.
+
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+--- 

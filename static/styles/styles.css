@@ -504,6 +504,7 @@ a:focus {
   color: var(--activeTextColor) !important;
 }
 
+
 .form-control:focus {
   box-shadow: 0 0 0 0.1rem var(--greenAccent);
 }
@@ -511,3 +512,11 @@ a:focus {
 /* .card.glassEffect.searchData {
   z-index: -1 !important;
 } */
+
+.pdfViwer{
+width: 100%;
+    height: 90vh;
+}
+#pdfModal .modal-dialog{
+    max-width: 90vw;
+}
