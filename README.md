@@ -25,8 +25,32 @@ SMTPPassword="Password"
 MailServerDomain="The domain from which your emails will be sent"
 SiteDomain="The url from which the site can be accessed"
 ```
+## Pre-Seeded User Accounts
 
-Extra Features : PDF transcript generator and emails
+After running the `npm run seed` command, you can use the following pre-seeded user accounts to log in to the application:
+
+### Admin Account
+- **Username:** admin@stevens.edu
+- **Password:** SuperSecret
+
+### Professor Account
+- **Username:** prof1@stevens.edu
+- **Password:** SuperSecret
+
+- **Username:** prof2@stevens.edu
+- **Password:** SuperSecret
+
+### Student Account
+- **Username:** student1@stevens.edu
+- **Password:** SuperSecret
+
+- **Username:** student2@stevens.edu
+- **Password:** SuperSecret
+
+- **Username:** student3@stevens.edu
+- **Password:** SuperSecret
+
+Please use these credentials to access the application with the respective roles and explore the features available for each user type.
 
 ## Features
 
