@@ -67,6 +67,9 @@ Extra Features : PDF transcript generator and emails
 
 5. **Add Learning Material**
     - Professors can upload learning materials for students.
+    - 
+6. **Manage Attendance**
+    - Professors can enable attendance and see who all are marked present based on their location.
 
 ### Student
 
@@ -90,6 +93,9 @@ Extra Features : PDF transcript generator and emails
 
 7. **Generate Transcripts**
     - Students can generate transcripts containing their academic records and grades.
+
+8. **Mark Attendance**
+    - Students can mark their attendance once the professor enables it.
 
 
 ## License
