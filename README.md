@@ -67,7 +67,7 @@ Extra Features : PDF transcript generator and emails
 
 5. **Add Learning Material**
     - Professors can upload learning materials for students.
-    - 
+
 6. **Manage Attendance**
     - Professors can enable attendance and see who all are marked present based on their location.
 
