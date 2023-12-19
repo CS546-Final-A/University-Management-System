@@ -1,6 +1,11 @@
 <div class="container-fluid">
 
-    <div class="d-flex">Course Learning Materials</div>
+
+    <div class="d-flex fs-2">
+        <div class="my-auto"><img class="iconSwitch" src="/icons/repository.svg" alt="repository icon"> Course
+            Repository
+        </div>
+    </div>
     <div class="col-12">
         <div>
             Course Name: {{courseName}}
@@ -12,7 +17,7 @@
 
         {{#if (eq type "Professor")}}
         <div class="my-4"><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal">New
-                Module</button>
+                Heading</button>
 
             <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal2">New File</button>
         </div>
@@ -81,7 +86,7 @@
 
 
         <div class="d-flex my-2">
-            <div class="my-auto"><img class="iconSwitch" src="/icons/file.svg" alt="file icon"> Files</div>
+            <div class="my-auto"><img class="iconSwitch" src="/icons/file.svg" alt="file icon"> Headings</div>
             <div class="my-auto text-muted fs-5" id="reportCount"></div>
             <div class="form-floating ms-auto fs-6">
                 <input class="form-control" type="text" placeholder="" id="searchInput" />
@@ -97,12 +102,23 @@
             </div>
             <div class="card-body">
                 {{#each this.files}}
-                <div class="d-flex my-2 hover">
-                    <div class="my-auto fs-6 ms-3" id="fileName">{{this.name}}</div>
-                    <div class="my-auto fs-6 ms-3" id="filePath" hidden>{{this.path}}</div>
-                    <div class="ms-auto">
-                        <button class="btn btn-info downloadBtn">Download</button>
+                <div class="d-flex my-2 fileContainer">
+                    <div class="my-auto fs-6 ms-3 fileName">{{this.name}}</div>
+                    <div class="my-auto fs-6 ms-3 filePath" hidden>{{this.path}}</div>
+
+                    {{!-- <div class="ms-auto">
+                        <select id="linkModule_{{this.fileId}}" name="linkModule_{{this.fileId}}"
+                            class="selectpicker form-control" data-live-search="true" multiple>
+                            {{#each ../../dropdown}}
+                            <option value="{{this.moduleId}}">{{this.sectionName}} - {{this.moduleName}}</option>
+                            {{/each}}
+                        </select>
+
                     </div>
+                    <button class="ms-auto btn btn-info updateModuleBtn">Update Module</button> --}}
+                    <button class="ms-auto btn btn-info downloadBtn">View</button>
+
+
                 </div>
 
                 {{/each}}
@@ -110,109 +126,154 @@
 
         </div>
         {{/each}}
+
+        <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="pdfModalLabel"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-
-
-
-
-
 <script>
+    function setError(error) {
+        var toastRed1 = $("html").css("--toastRed1");
+        $(".toast-header").css("background-color", toastRed1);
+        $(".toast-header").css("color", "#000000");
+        $(".toast-header .me-auto").html("&nbsp;&nbsp;Error");
 
-    $(document).ready(
-        function () {
-            let headingUploadBtn = document.getElementById("headingUploadButton");
-            let fileUploadForm = document.getElementById("fileUploadForm");
+        // $(".toast-body").css("background-color", toastRed2);
+        $(".toast-body").css("color", "#000000");
+        $(".toast-body").text(error);
+        $("#liveToast").toast("show");
+    }
+    $(document).ready(function () {
 
-            if (headingUploadBtn) {
+        let headingUploadBtn = document.getElementById("headingUploadButton");
+        let fileUploadForm = document.getElementById("fileUploadForm");
 
-                document.getElementById("headingUploadButton").addEventListener("click", async () => {
-                    const uploadedHeading = document.getElementById("headingInput").value.trim();
+        if (headingUploadBtn) {
 
-                    if (!uploadedHeading) {
-                        alert("Please enter a valid heading");
-                        return;
-                    }
+            document.getElementById("headingUploadButton").addEventListener("click", async () => {
+                const uploadedHeading = document.getElementById("headingInput").value.trim();
 
-                    const newHeading = new FormData();
-                    newHeading.append("heading", uploadedHeading);
+                if (!uploadedHeading) {
+                    alert("Please enter a valid heading");
+                    return;
+                }
 
-                    try {
-                        const response = await fetch(window.location.href + 'heading', {
-                            method: "POST",
-                            body: newHeading,
-                        });
+                const newHeading = new FormData();
+                newHeading.append("heading", uploadedHeading);
 
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            console.error("Error:", response.status);
-                        }
-                    } catch (error) {
-                        console.error("Error:", error);
-                    }
-                });
-
-            }
-            if (fileUploadForm) {
-                document.getElementById("fileUploadForm").addEventListener("submit", async (e) => {
-                    e.preventDefault();
-
-                    const selectedHeading = document.getElementById("headingDropdown").value.trim();
-                    const uploadedFiles = document.getElementById("fileInput").files;
-
-                    if (uploadedFiles.length === 0) {
-                        return alert("Please select a file");
-                    }
-
-                    if (uploadedFiles.length > 1) {
-                        return alert("Please select only one file");
-                    }
-
-                    if (!selectedHeading || !uploadedFiles) {
-                        alert("Please select a heading and upload a file");
-                        return;
-                    }
-
-                    const formData = new FormData();
-                    Object.keys(uploadedFiles).forEach((key) => {
-                        formData.append(uploadedFiles.item(key).name, uploadedFiles.item(key));
+                try {
+                    let response = await fetch(window.location.href + 'heading', {
+                        method: "POST",
+                        body: newHeading,
                     });
-                    formData.append("heading", selectedHeading);
 
-                    try {
-                        const response = await fetch(window.location.href + 'file', {
-                            method: "POST",
-                            body: formData,
-                        });
-
-                        if (response.ok) {
-                            console.log("File uploaded successfully");
-                            window.location.reload();
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        response = await response.text()
+                        response = JSON.parse(response)
+                        if (response.error) {
+                            throw response.error
                         } else {
-                            console.log("File upload failed");
+                            throw "Unexpected response from server"
                         }
-                    } catch (error) {
-                        console.error("Error:", error);
                     }
-                });
-
-            }
-            const downloadButtons = document.querySelectorAll('.downloadBtn');
-
-            downloadButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const parentDiv = button.closest('.card-header');
-                    const filePath = parentDiv.querySelector('#filePath').innerText;
-                    const fileName = parentDiv.querySelector('#fileName').innerText;
-                    const url = window.location.href + `downloadFile?filePath=${filePath}&fileName=${fileName}`;
-                    window.location.href = url;
-                });
+                } catch (error) {
+                    setError(error);
+                    console.error("Error:", error);
+                }
             });
-        }
-    )
 
+        }
+        if (fileUploadForm) {
+            document.getElementById("fileUploadForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const selectedHeading = document.getElementById("headingDropdown").value.trim();
+                const uploadedFiles = document.getElementById("fileInput").files;
+
+                if (uploadedFiles.length === 0) {
+                    return alert("Please select a file");
+                }
+
+                if (uploadedFiles.length > 1) {
+                    return alert("Please select only one file");
+                }
+
+                if (!selectedHeading || !uploadedFiles) {
+                    alert("Please select a heading and upload a file");
+                    return;
+                }
+
+                const formData = new FormData();
+                Object.keys(uploadedFiles).forEach((key) => {
+                    formData.append(uploadedFiles.item(key).name, uploadedFiles.item(key));
+                });
+                formData.append("heading", selectedHeading);
+
+                try {
+                    const response = await fetch(window.location.href + 'file', {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if (response.ok) {
+                        console.log("File uploaded successfully");
+                        window.location.reload();
+                    } else {
+                        throw "File upload failed";
+                    }
+                } catch (error) {
+                    setError(error);
+                    console.error("Error:", error);
+                }
+            });
+
+        }
+        const downloadButtons = document.querySelectorAll('.downloadBtn');
+
+        fileContainer = document.querySelectorAll('.fileContainer');
+
+        fileContainer.forEach(container => {
+            let fileNameElement = container.querySelector('.fileName');
+            let filePathElement = container.querySelector('.filePath');
+
+            let downloadBtn = container.querySelector('.downloadBtn');
+
+            downloadBtn.addEventListener('click', () => {
+                let filePath = filePathElement.innerText;
+                let fileName = fileNameElement.innerText;
+
+                $("#pdfModal").modal("show");
+
+                const url = window.location.href + `downloadFile?filePath=${filePath}&fileName=${fileName}`;
+
+                const pdfModalLabel = document.getElementById("pdfModalLabel");
+                pdfModalLabel.innerText = fileName;
+
+                const pdfModalBody = document.querySelector("#pdfModal .modal-body");
+                pdfModalBody.innerHTML = `<iframe class="pdfViwer" src="${url}" ></iframe>`;
+            });
+
+        });
+
+
+        $("#pdfModal .close").click(function () {
+            $("#pdfModal").modal("hide");
+        });
+
+    });
 
 
 

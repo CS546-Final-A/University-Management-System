@@ -1,14 +1,19 @@
-<link rel="stylesheet" href="/styles/courses.css">
+<div class="container-fluid">
 
-<div class="col-md-2">
-    <div id="departments" class="my-auto btn btn-info p-4">
-        Departments
+    <div class="d-flex fs-2">
+        <div class="my-auto"><img class="iconSwitch" src="/icons/enroll.svg" alt="Enroll Icon"> Configuration</div>
     </div>
-    {{#if error}}
+
+    <div class="col-md-2">
+        <div id="departments" class="my-auto btn btn-info p-4">
+            Department Master
+        </div>
+        {{#if error}}
         <br>
         <div id="error">{{error}}</div>
-    {{/if}}
-    {{!-- <div id="locations" class="menuCard">
-        Locations
-    </div> --}}
+        {{/if}}
+        {{!-- <div id="locations" class="menuCard">
+            Locations
+        </div> --}}
+    </div>
 </div>

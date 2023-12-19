@@ -1,15 +1,19 @@
 <div class="container-fluid">
 
-    <div class="d-flex">
+    <div class="d-flex fs-2">
         <div class="my-auto"><img class="iconSwitch" src="/icons/list.svg" alt="moduleIcon"> List of Assignments
         </div>
         <div class="my-auto text-muted fs-5" id="reportCount"></div>
         <div class="form-floating ms-auto fs-6">
-            <input class="form-control tabledisplay" type="text" placeholder="" id="searchInput" />
+            <input class="form-control tabledisplay" type="text" placeholder="" id="searchInput">
             <label for="searchInput"><img class="iconSwitch" src="/icons/search.svg" alt="moduleIcon">
                 Search</label>
         </div>
     </div>
+
+    {{#if (eq session_type "Professor")}}
+    <a href="create" class="btn btn-info">Create Assignment</a>
+    {{/if}}
 
     <div class="table-responsive glassEffect my-4">
         <table class="table table-striped h-100 mb-0">
@@ -45,7 +49,5 @@
 
         </table>
     </div>
-    {{#if (eq session_type "Professor")}}
-    <a href="create" class="btn btn-info my-4">Create Assignment</a>
-    {{/if}}
+
 </div>

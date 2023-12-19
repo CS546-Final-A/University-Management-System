@@ -38,7 +38,6 @@ const router = Router();
 router.use("/:sectionID*", async (req, res, next) => {
   try {
     res.locals.sectionID = req.params.sectionID;
-    res.locals.layout = "sidebar";
     const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
     const section = await courseDataFunctions.getSectionById(
       res.locals.sectionID
@@ -89,7 +88,7 @@ router.route("/:sectionId").get(async (req, res) => {
 
     renderObjs = {
       ...renderObjs,
-      layout: "sidebar",
+
       sideBarTitle: course[0].courseName,
       courseId: section.courseId.toString(),
       courseName: course[0].courseName,
@@ -127,7 +126,7 @@ router
 
       renderObjs = {
         ...renderObjs,
-        layout: "sidebar",
+
         // sideBarTitle: `${course.courseName}`,
         courseId: section.courseId.toString(),
         modules: section.sectionModules,
@@ -247,7 +246,6 @@ router
             const name = req.session.name;
             renderObjs = {
               ...renderObjs,
-              layout: "sidebar",
               // sideBarTitle: `${course.courseName}`,
               userType,
               name,
@@ -273,7 +271,7 @@ router
           n = 1;
           renderObjs = {
             ...renderObjs,
-            layout: "sidebar",
+
             // sideBarTitle: `${course.courseName}`,
             sectionID: sectionId,
             userType,
@@ -314,7 +312,7 @@ router
           if (needButton === true && userThereButton === true) n = 4;
           renderObjs = {
             ...renderObjs,
-            layout: "sidebar",
+
             // sideBarTitle: `${course.courseName}`,
             sectionID: sectionId,
             userType,

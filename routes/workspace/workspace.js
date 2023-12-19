@@ -32,7 +32,6 @@ function getCurrentPosition() {
 
 router.use("/:sectionID*", async (req, res, next) => {
   res.locals.sectionID = req.params.sectionID;
-  res.locals.layout = "sidebar";
   try {
     const sectionID = verify.validateMongoId(res.locals.sectionID, "SectionID");
     if (await belongsincourse(req.session.userid, sectionID)) {
@@ -73,7 +72,7 @@ router.route("/:sectionId").get(async (req, res) => {
 
   renderObjs = {
     ...renderObjs,
-    layout: "sidebar",
+
     sideBarTitle: course[0].courseName,
     courseId: section.courseId.toString(),
     courseName: course[0].courseName,
@@ -105,7 +104,7 @@ router
 
     renderObjs = {
       ...renderObjs,
-      layout: "sidebar",
+
       // sideBarTitle: `${course.courseName}`,
       modules: section.sectionModules,
       userType,
@@ -213,7 +212,7 @@ router
           const name = req.session.name;
           renderObjs = {
             ...renderObjs,
-            layout: "sidebar",
+
             // sideBarTitle: `${course.courseName}`,
             userType,
             name,
@@ -239,7 +238,7 @@ router
         n = 1;
         renderObjs = {
           ...renderObjs,
-          layout: "sidebar",
+
           // sideBarTitle: `${course.courseName}`,
           sectionID: sectionId,
           userType,
@@ -280,7 +279,7 @@ router
         if (needButton === true && userThereButton === true) n = 4;
         renderObjs = {
           ...renderObjs,
-          layout: "sidebar",
+
           // sideBarTitle: `${course.courseName}`,
           sectionID: sectionId,
           userType,

@@ -116,7 +116,7 @@ $(document).ready(function () {
   $(".hover").each(function (index) {
     let addAnimation = false;
     const $element = $(this);
-    const $elementSpan = $element.find("span");
+    const $elementSpan = $element.find(".animateHover");
 
     $element.on("mouseover", function (e) {
       $elementSpan.css({

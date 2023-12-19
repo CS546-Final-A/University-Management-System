@@ -11,7 +11,14 @@ h1 {
   display: flex;
   flex-direction: column;
 }
+.pdfViwer {
+  width: 100%;
+  height: 80vh;
+}
 
+#pdfModal .modal-dialog {
+  max-width: 90vw;
+}
 .course-listing .courses .course {
   display: flex;
   width: 100%;
