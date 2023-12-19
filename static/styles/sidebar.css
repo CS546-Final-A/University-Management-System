@@ -58,6 +58,7 @@
   padding-bottom: 5px;
   border-bottom: 1px solid var(--activeTextColor);
   border-top: 1px solid var(--activeTextColor);
+  text-align: center !important;
 }
 
 #sidebar ul li a {
@@ -66,6 +67,7 @@
   display: block;
   transition: all 0.1s linear;
   z-index: 10;
+  text-align: center !important;
 }
 
 #sidebar ul li.active > a {

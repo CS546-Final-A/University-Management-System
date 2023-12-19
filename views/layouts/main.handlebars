@@ -87,11 +87,19 @@
                         <a href="#"><span class="animateHover"></span><span>{{session_email}}</span></a>
                     </li>
                     <li class="py-1 mx-auto">
-                        <a href="#">
-                            <div id="switch" class="m-4">
-                                <div id="circle"></div>
+                        <div class="d-flex">
+                            <div class="my-auto ms-auto">
+                                <img class="iconSwitch invertColor" src="/icons/lightmode.svg" alt="lightmode">
                             </div>
-                        </a>
+                            <div class=""><a href="#" class="p-0">
+                                    <div id="switch" class="m-4 switched">
+                                        <div id="circle"></div>
+                                    </div>
+                                </a></div>
+                            <div class="my-auto me-auto">
+                                <img class="iconSwitch invertColor" src="/icons/darkmode.svg" alt="darkmode">
+                            </div>
+                        </div>
                     </li>
                     <li class="py-1">
                         <a class="hover" href="/logout"><span class="animateHover"></span><span>Logout</span></a>
