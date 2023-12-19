@@ -143,8 +143,18 @@
     </div>
 </div>
 <script>
-    $(document).ready(function () {
+    function setError(error) {
+        var toastRed1 = $("html").css("--toastRed1");
+        $(".toast-header").css("background-color", toastRed1);
+        $(".toast-header").css("color", "#000000");
+        $(".toast-header .me-auto").html("&nbsp;&nbsp;Error");
 
+        // $(".toast-body").css("background-color", toastRed2);
+        $(".toast-body").css("color", "#000000");
+        $(".toast-body").html(error);
+        $("#liveToast").toast("show");
+    }
+    $(document).ready(function () {
 
         let headingUploadBtn = document.getElementById("headingUploadButton");
         let fileUploadForm = document.getElementById("fileUploadForm");
@@ -163,7 +173,7 @@
                 newHeading.append("heading", uploadedHeading);
 
                 try {
-                    const response = await fetch(window.location.href + 'heading', {
+                    let response = await fetch(window.location.href + 'heading', {
                         method: "POST",
                         body: newHeading,
                     });
@@ -171,9 +181,16 @@
                     if (response.ok) {
                         window.location.reload();
                     } else {
-                        console.error("Error:", response.status);
+                        response = await response.text()
+                        response = JSON.parse(response)
+                        if (response.error) {
+                            throw response.error
+                        } else {
+                            throw "Unexpected response from server"
+                        }
                     }
                 } catch (error) {
+                    setError(error);
                     console.error("Error:", error);
                 }
             });
@@ -215,9 +232,10 @@
                         console.log("File uploaded successfully");
                         window.location.reload();
                     } else {
-                        console.log("File upload failed");
+                        throw "File upload failed";
                     }
                 } catch (error) {
+                    setError(error);
                     console.error("Error:", error);
                 }
             });
