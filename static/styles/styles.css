@@ -152,8 +152,14 @@ h1 {
   text-align: center;
 }
 
-h2 {
+h2,
+.fs-2 {
   border-bottom: 1px solid #8167a9;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  letter-spacing: 3px;
 }
 p {
   margin: 0;
@@ -324,11 +330,8 @@ input.autofill:active::after {
   background-color: var(--activeBgColor);
   color: var(--activeTextColor);
   border-radius: 5px;
-}
-
-.btnSubmit:hover {
-  background-color: var(--greenAccent);
-  color: white;
+  background-color: #16a084 !important;
+  color: white !important;
 }
 
 .btnNavbar {
@@ -414,7 +417,7 @@ a:focus {
   transition: all 0.2s linear;
 }
 .btn:hover {
-  filter: brightness(1.15);
+  filter: brightness(1.2);
 }
 
 .modal-backdrop.show {
@@ -500,6 +503,15 @@ a:focus {
   --bs-table-accent-bg: var(--activeStripeTableColor) !important;
   color: var(--activeTextColor) !important;
 }
+
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.1rem var(--greenAccent);
+}
+
+/* .card.glassEffect.searchData {
+  z-index: -1 !important;
+} */
 
 .pdfViwer{
 width: 100%;

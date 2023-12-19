@@ -475,10 +475,32 @@ router.route("/:courseId/materials").get(async (req, res) => {
           files: headingFiles.map((file) => ({
             name: file.fileName,
             path: file.filePath,
+            fileId: file._id.toString(),
           })),
         };
       }
     });
+
+    const sectionModulePairs = [];
+    if (data[0].sections.length > 0) {
+      data[0].sections.forEach((section) => {
+        const { sectionName, sectionModules } = section;
+        if (sectionModules && sectionModules.length > 0) {
+          sectionModules.forEach((module) => {
+            const { moduleId, moduleName } = module;
+
+            const pair = {
+              sectionName,
+              moduleName,
+              moduleId: moduleId.toString(),
+            };
+
+            sectionModulePairs.push(pair);
+          });
+        }
+      });
+      console.log(sectionModulePairs);
+    }
 
     let renderObjs = {
       userId: req.session.userid,
@@ -492,7 +514,8 @@ router.route("/:courseId/materials").get(async (req, res) => {
       headings: data[0].courseLearning.headings,
       files: data[0].courseLearning.files,
       allFiles: organizedHeadings,
-      // layout: "sidebar",
+      dropdown: sectionModulePairs,
+      //
       // sectionID,
     };
 
@@ -504,7 +527,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
     } else {
       console.log(e);
       res.status(500);
-      res.json({ error: "Login error" });
+      res.json({ error: "Internal server error" });
     }
   }
 });
@@ -518,14 +541,24 @@ router
       let userId = req.session.userid;
       userId = verify.validateMongoId(userId);
       courseId = verify.validateMongoId(courseId);
-      await courseDataFunctions.addHeading(
-        req.params.courseId,
-        req.body.heading
-      );
+      const header = verify.header(req.body.heading);
+
+      let course = await courseDataFunctions.getCourseById(courseId);
+      if (course[0].courseLearning.headings.includes(header)) {
+        throw { status: 400, message: "Heading already exists" };
+      }
+
+      await courseDataFunctions.addHeading(req.params.courseId, header);
       res.status(200).json({ message: "Heading added successfully" });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+    } catch (e) {
+      if (e.status !== 500 && e.status) {
+        res.status(e.status);
+        return res.json({ error: e.message });
+      } else {
+        console.log(e);
+        res.status(500);
+        res.json({ error: "Internal server error" });
+      }
     }
   });
 
@@ -542,14 +575,19 @@ router
         // console.log(req.files);
         // console.log(req.body.heading);
 
-        const heading = req.body.heading;
+        const heading = verify.header(req.body.heading);
+        let { courseId } = req.params;
+        courseId = verify.validateMongoId(courseId);
+
+        let course = await courseDataFunctions.getCourseById(courseId);
+        if (!course[0].courseLearning.headings.includes(heading)) {
+          throw { status: 404, message: "Heading not found" };
+        }
         req.body = santizeInputs(req.body);
 
         const files = req.files;
-        let { courseId } = req.params;
         let userId = req.session.userid;
         userId = verify.validateMongoId(userId);
-        courseId = verify.validateMongoId(courseId);
         let fileName = "";
         let filepath = "";
 

@@ -190,12 +190,12 @@ function setError(error, id) {
   var toastRed1 = $("html").css("--toastRed1");
   $(".toast-header").css("background-color", toastRed1);
   $(".toast-header").css("color", "#000000");
-  $(".toast-header .me-auto").html("&nbsp;&nbsp;Login Failed");
+  $(".toast-header .me-auto").text("&nbsp;&nbsp;Login Failed");
 
   // $(".toast-body").css("background-color", toastRed2);
   $(".toast-body").css("color", "#000000");
-  $("#toastHeadMsg").html(id);
-  $(".toast-body").html(error);
+  $("#toastHeadMsg").text(id);
+  $(".toast-body").text(error);
   toastStartTime = new Date();
   intervalId = setInterval(updateTimestamp, 1000);
   $("#liveToast").toast("show");

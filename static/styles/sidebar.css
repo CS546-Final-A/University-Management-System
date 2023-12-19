@@ -21,7 +21,6 @@
   display: flex;
   width: 100%;
   align-items: stretch;
-  margin-top: 90px;
 }
 
 #sidebar {
@@ -45,7 +44,7 @@
 
 #sidebar ul.components {
   padding: 20px 15px;
-  border-bottom: 1px solid #47748b;
+  /* border-bottom: 1px solid #47748b; */
 }
 
 #sidebar ul p {
@@ -53,11 +52,22 @@
   padding: 10px;
 }
 
+.headSidebar {
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--activeTextColor);
+  border-top: 1px solid var(--activeTextColor);
+  text-align: center !important;
+}
+
 #sidebar ul li a {
   padding: 7px 20px;
   font-size: 1.1em;
   display: block;
   transition: all 0.1s linear;
+  z-index: 10;
+  text-align: center !important;
 }
 
 #sidebar ul li.active > a {
@@ -245,18 +255,18 @@ a.article:hover {
   cursor: pointer;
 }
 
-.hover text {
+.hover span {
   position: relative;
   z-index: 2;
 
   transition: all var(--time);
 }
 
-.hover:hover text {
+.hover:hover {
   color: var(--activeBgColor);
 }
 
-.hover span {
+.hover span.animateHover {
   position: absolute;
   display: block;
   content: "";
@@ -271,7 +281,7 @@ a.article:hover {
   transition: width var(--time), padding-top var(--time);
 }
 
-.hover:hover span {
+.hover:hover span.animateHover {
   width: calc(var(--width) * 2.35);
   padding-top: calc(var(--width) * 2.35);
 }
