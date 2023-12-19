@@ -49,6 +49,6 @@ function setError(error) {
 
   // $(".toast-body").css("background-color", toastRed2);
   $(".toast-body").css("color", "#000000");
-  $(".toast-body").html(error);
+  $(".toast-body").text(error);
   $("#liveToast").toast("show");
 }
