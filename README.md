@@ -5,14 +5,8 @@
 Welcome to our final project for class CS 546! This project is designed to facilitate seamless communication and interaction among three primary roles: Admin, Professor, and Student. Below, you'll find an information on how to start and about the key features and functionalities.
 
 ## Getting Started
-To run:
 
-```
-npm run seed
-
-npm start
-```
-
+Create .env file
 .env
 
 ```
@@ -25,6 +19,17 @@ SMTPPassword="Password"
 MailServerDomain="The domain from which your emails will be sent"
 SiteDomain="The url from which the site can be accessed"
 ```
+
+To run:
+
+```
+npm i
+
+npm run seed
+
+npm start
+```
+
 ## Pre-Seeded User Accounts
 
 After running the `npm run seed` command, you can use the following pre-seeded user accounts to log in to the application:
