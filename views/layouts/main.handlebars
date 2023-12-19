@@ -24,9 +24,9 @@
 </head>
 
 <body>
-
     <div class="wrapper">
         <!-- Sidebar  -->
+        {{#if session_type}}
         <nav id="sidebar" class="glassEffect d-flex flex-column">
             <div>
                 <div class="fs-5 headSidebar mt-4 glassEffect">UMS</div>
@@ -74,7 +74,7 @@
             </div>
 
             {{/if}}
-            {{#if session_type}}
+           
             <div class="mt-auto">
                 <div class="fs-5 headSidebar glassEffect">{{session_type}}</div>
                 <ul class="list-unstyled components2 mt-auto">
@@ -99,8 +99,8 @@
                 </ul>
             </div>
 
-            {{/if}}
         </nav>
+        {{/if}}
 
         {{!-- <li class="nav-item hamIcon me-4">
             <div id="sidebarCollapse" class="border-0 p-0 m-0">
