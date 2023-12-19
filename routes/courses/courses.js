@@ -480,6 +480,27 @@ router.route("/:courseId/materials").get(async (req, res) => {
       }
     });
 
+    const sectionModulePairs = [];
+    if (data[0].sections.length > 0) {
+      data[0].sections.forEach((section) => {
+        const { sectionName, sectionModules } = section;
+        if (sectionModules && sectionModules.length > 0) {
+          sectionModules.forEach((module) => {
+            const { moduleId, moduleName } = module;
+
+            const pair = {
+              sectionName,
+              moduleName,
+              moduleId,
+            };
+
+            sectionModulePairs.push(pair);
+          });
+        }
+      });
+      console.log(sectionModulePairs);
+    }
+
     let renderObjs = {
       userId: req.session.userid,
       name: req.session.name,
@@ -492,6 +513,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
       headings: data[0].courseLearning.headings,
       files: data[0].courseLearning.files,
       allFiles: organizedHeadings,
+      dropdown: sectionModulePairs,
       //
       // sectionID,
     };
