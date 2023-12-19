@@ -625,11 +625,11 @@ export const updateSection = async (
     const userCollection = await users();
     removeSection = await userCollection.updateOne(
       { _id: section.sectionInstructor },
-      { $pull: { registeredCourses: sectionId } }
+      { $pull: { registeredCourses: sectionId.toString() } }
     );
     addSection = await userCollection.updateOne(
       { _id: updatedSection.sectionInstructor },
-      { $push: { registeredCourses: sectionId } }
+      { $push: { registeredCourses: sectionId.toString() } }
     );
   }
 
