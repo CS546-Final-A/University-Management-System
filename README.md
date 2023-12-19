@@ -121,6 +121,10 @@ Please use these credentials to access the application with the respective roles
 8. **Mark Attendance**
     - Students can mark their attendance once the professor enables it.
 
+## Extra Features
+1. **Generate Transcripts**
+2. **Integrated Frontend PDF Viewer**
+3. **User Email Notifications**
 
 ## License
 
