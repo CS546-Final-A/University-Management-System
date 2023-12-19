@@ -106,7 +106,18 @@
                     <div class="my-auto fs-6 ms-3 fileName">{{this.name}}</div>
                     <div class="my-auto fs-6 ms-3 filePath" hidden>{{this.path}}</div>
 
-                    <button class=" ms-auto btn btn-info downloadBtn">View</button>
+                    <div class="ms-auto">
+                        <select id="linkModule_{{this.fileId}}" name="linkModule_{{this.fileId}}"
+                            class="selectpicker form-control" data-live-search="true" multiple>
+                            {{#each ../../dropdown}}
+                            <option value="{{this.moduleId}}">{{this.sectionName}} - {{this.moduleName}}</option>
+                            {{/each}}
+                        </select>
+
+                    </div>
+                    <button class="ms-auto btn btn-info updateModuleBtn">Update Module</button>
+                    <button class="ms-auto btn btn-info downloadBtn">View</button>
+
 
                 </div>
 

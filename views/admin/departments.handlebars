@@ -1,39 +1,45 @@
 <link rel="stylesheet" href="/styles/error.css">
-<div class="container mt-5">
-    <h1>Department List</h1>
+<div class="container-fluid">
+
+    <div class="d-flex fs-2">
+        <div class="my-auto">Department List</div>
+    </div>
 
     <input type="hidden" id="csrf" value="{{_csrf}}">
     {{#if error}}
     <p>Error: {{error}}</p>
     {{/if}}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Department Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each departmentList}}
-            <tr>
-                <td>{{departmentName}}</td>
-                <td>
-                    <!-- Edit button to open the Bootstrap modal -->
-                    <button id="editModalButton{{_id}}" type="button" class="btn btn-primary"
-                        onclick="openEditModal('{{_id}}', '{{departmentName}}')">Edit</button>
+    <div class="table-responsive glassEffect">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Department Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each departmentList}}
+                <tr>
+                    <td>{{departmentName}}</td>
+                    <td>
+                        <!-- Edit button to open the Bootstrap modal -->
+                        <button id="editModalButton{{_id}}" type="button" class="btn btn-primary"
+                            onclick="openEditModal('{{_id}}', '{{departmentName}}')">Edit</button>
 
-                    <!-- Delete button with a form to submit the delete request -->
-                    <form method="POST" action="/configuration/departments/delete/{{_id}}" style="display:inline;">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {{/each}}
-        </tbody>
-    </table>
+                        <!-- Delete button with a form to submit the delete request -->
+                        <form method="POST" action="/configuration/departments/delete/{{_id}}" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
 
     <!-- Add button to open the Bootstrap modal -->
-    <button id="addModalButton" type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+    <button id="addModalButton" type="button" class="btn btn-info" data-toggle="modal" data-target="#addModal">
         Add Department
     </button>
 
@@ -57,7 +63,7 @@
                             <input type="text" class="form-control" id="addDepartmentName" name="departmentName"
                                 required>
                         </div>
-                        
+
                         <button type="submit" class="btn btn-primary" onclick="submitForm(event)">Add
                             Department</button>
                     </form>

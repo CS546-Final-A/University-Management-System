@@ -475,6 +475,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
           files: headingFiles.map((file) => ({
             name: file.fileName,
             path: file.filePath,
+            fileId: file._id.toString(),
           })),
         };
       }
@@ -491,7 +492,7 @@ router.route("/:courseId/materials").get(async (req, res) => {
             const pair = {
               sectionName,
               moduleName,
-              moduleId,
+              moduleId: moduleId.toString(),
             };
 
             sectionModulePairs.push(pair);
