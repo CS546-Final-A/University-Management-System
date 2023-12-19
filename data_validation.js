@@ -257,6 +257,13 @@ const verify = {
     }
     return grade;
   },
+  header: (header) => {
+    header = verify.string(header, "Header");
+    if (!/^[A-Za-z0-9 ]+$/.test(header)) {
+      throwerror("Header must be an alphanumeric string");
+    }
+    return header;
+  },
 };
 
 export default verify;
