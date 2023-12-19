@@ -500,3 +500,11 @@ a:focus {
   --bs-table-accent-bg: var(--activeStripeTableColor) !important;
   color: var(--activeTextColor) !important;
 }
+
+.pdfViwer{
+width: 100%;
+    height: 90vh;
+}
+#pdfModal .modal-dialog{
+    max-width: 90vw;
+}
