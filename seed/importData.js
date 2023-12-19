@@ -71,10 +71,9 @@ const importData = async () => {
       const data = loadJSON(`seed/seeds/${collection}Data.json`);
 
       replaceOid(data);
-      console.log(data);
       if (data) {
         const dbCollection = await mongoCollections[collection]();
-        dbCollection.drop();
+        // dbCollection.drop();
         await dbCollection.deleteMany({});
         await dbCollection.insertMany(data);
         console.log(`Inserted ${data.length} documents into ${collection}`);
@@ -86,5 +85,4 @@ const importData = async () => {
     process.exit();
   }
 };
-console.log("hi");
 await importData();
